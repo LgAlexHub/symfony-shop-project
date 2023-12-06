@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="UTF-8">
+        <title>{{ app_name }}{% block title %}{% endblock %}</title>
+        <link rel="icon" href="/icon.png" sizes="32x32" type="image/png">
+
+        {% block stylesheets %}
+            {{ encore_entry_link_tags('app') }}
+        {% endblock %}
+
+        {% block javascripts %}
+            {{ encore_entry_script_tags('app') }}
+        {% endblock %}
+    </head>
+    <body class="font-sans">
+        <nav class="flex items-center justify-between flex-wrap p-6 text-white bg-slate-700 mb-10">
+            <div class="w-full block flex-grow lg:flex lg:items-center lg:w-auto">
+                <div class="text-sm lg:flex-grow">
+                    <a href="{{path('admin.products.home')}}" class="block lg:w-fit md:w-full md:text-center mt-4 lg:inline-block lg:mt-0 hover:bg-white px-4 py-2 rounded text-white border rounded border-white hover:border-transparent hover:text-[#804C62] mr-4">
+                        Nos produits
+                    </a>
+                    <a class="border rounded-full px-2 py-2 hover:border-transparent hover:bg-lime-600 border-lime-200 bg-lime-400 text-white" href="{{path('admin.products.new')}}">
+                        <i class="fa-solid fa-plus"></i>
+                        <span>Ajouter un produit</span>
+                    </a>
+
+                    <p class="block lg:w-fit md:w-full md:text-center mt-4 lg:inline-block lg:mt-0 px-4 py-2 rounded text-white mr-4 [&>span]:underline [&>span]:font-bold">
+                        Date : <span>{{"now"|date("d/m/Y")}}</span>
+                    </p>
+                    {% if is_granted('IS_AUTHENTICATED_FULLY') %}
+                        <p class="block lg:w-fit md:w-full md:text-center mt-4 lg:inline-block lg:mt-0 px-4 py-2 rounded text-white mr-4 [&>span]:underline [&>span]:font-bold">
+                            Connecté.e en tant que : <span>{{ app.user.email }} - {{app.user.pseudonyme}}</span>
+                        </p>
+                    {% endif %}  
+                </div>
+                <div>
+                    <a href="" class="opacity-75 block md:text-center mt-4 lg:inline-block lg:mt-0 hover:text-teal-200 mr-4">
+                        Options
+                    </a>
+                    <a href="{{path('logout')}}" class="block md:text-center mt-4 lg:inline-block lg:mt-0 hover:text-teal-200 mr-4">
+                        Déconnexion
+                    </a>
+                </div>
+            </div>
+        </nav>
+        {% block body %}{% endblock %}
+    </body>
+</html>

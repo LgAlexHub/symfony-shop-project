@@ -1,0 +1,25 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Login{% endblock %}
+
+{% block body %}
+    <div class="container mx-auto mt-3 text-white">
+        <form action="{{path('login')}}" method="post">
+            <input type="hidden" name="_csrf_token" value="{{ csrf_token('authenticate') }}">
+            <div class="grid grid-cols-1 content-center justify-center [&>*]:m-auto [&>*]:py-1 [&>input]:my-1">
+                <label for="username">Email:</label>
+                <input type="text" class="border-2 rounded border-cyan-900 w-6/12 text-center text-black" id="username" name="_username" value="{{ last_username }}">
+                <label for="password">Password: </label>
+                <input type="password" class="border-2 rounded border-cyan-900 w-6/12 text-center text-black" id="password" name="_password">
+                {% if error %}
+                    <div class="bg-rose-600/50 px-2 py-1 border-2 rounded-md border-rose-600">
+                        <p>
+                            {{ error.messageKey|trans(error.messageData, 'security') }}
+                        </p>
+                    </div>
+                {% endif %}
+                <input class="border-2 rounded-sm border-cyan-800 bg-cyan-900 px-5 py-2 w-2/12 text-white hover:bg-white hover:text-cyan-900" type="submit" value="Login"/>
+            </div>
+        </form>
+    </div>
+{% endblock %}

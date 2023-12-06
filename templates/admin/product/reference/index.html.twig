@@ -1,0 +1,67 @@
+{% extends 'admin/base.html.twig' %}
+{% block body %}
+    <h1 class="text-center mt-3 text-2xl">Prix du produit : {{product.name}}</h1>
+    <div class="container mt-3">
+    <hr class="mx-20 my-4">
+        <h2 class="text-center mb-3 text-xl font-bold">Ajouter un prix :</h1>
+
+        {{ form_start(refForm, {attr: {'class' : 'space-y-9 w-full'}})}}
+            <div class="grid grid-cols-10 gap-2">
+                {{ form_errors(refForm) }}
+                <div class="col-span-3">
+                    {{ form_label(refForm.price, 'Prix :') }}
+                    {{ form_errors(refForm.price) }}
+                    {{ form_widget(refForm.price, {attr : {'class' : ' border rounded-sm border-slate-700 px-2 px-3', 'placeholder' : '12.30'}} )}}
+                </div>
+                <div class="col-span-3">
+                    {{ form_label(refForm.weight, 'Poids :') }}
+                    {{ form_errors(refForm.weight) }}
+                    {{ form_widget(refForm.weight, {attr : {'class' : ' border rounded-sm border-slate-700 px-2 px-3', 'placeholder': '120'}} )}}
+                </div>
+                <div class="col-span-3">
+                    {{ form_label(refForm.weightType, 'Unité :') }}
+                    {{ form_errors(refForm.weightType) }}
+                    {{ form_widget(refForm.weightType, {attr : {'class' : ' border rounded-sm border-slate-700 px-2 px-3', 'placeholder': 'g, mL, L...'}} )}}
+                </div>
+                <div class="col-start-4 col-span-8">
+                    {{ form_widget(refForm.submit, {label : 'Ajouter un prix', attr : {'class' : 'w-3/6 my-5 border border-lime-400 rounded-md bg-lime-400 px-2 py-1 text-white hover:bg-lime-800 hover:border-transparent'}})}}
+                </div>
+            </div>
+        {{ form_end(refForm)}}
+        <hr class="mx-20 my-4">
+
+        <div class="h-3/6 flex items-center justify-center">
+            <table class="table-fixed w-full border-separate border-spacing-2">
+                <thead>
+                    <tr>
+                        <td class="bg-slate-600 border border-slate-300 text-white px-2 py-1">
+                            Quantité
+                        </td>
+                        <td class="bg-slate-600 border border-slate-300 text-white px-2 py-1">
+                            Unité
+                        </td>
+                        <td class="bg-slate-600 border border-slate-300 text-white px-2 py-1">
+                            Prix
+                        </td>
+                        <td class="bg-slate-600 border border-slate-300 px-2 py-1">
+
+                        </td>
+                    </tr>
+                </thead>
+                <tbody class="text-center">
+                    {% for ref in product.productReferences %}
+                        <tr class="even:bg-white odd:bg-blue-50">
+                            <td class="border border-slate-300 px-2 w-1/6">{{ref.weight}}</td>
+                            <td class="border border-slate-300 px-2 w-1/6">{{ref.weightType}} </td>
+                            <td class="border border-slate-300 px-2 w-1/6">{{(ref.price/100)|number_format(2)}} €</td>
+                            <td class="w-1/6 space-x-2 py-3 bg-white space-x-8 text-center">
+                                <a href="{{path('admin.products.prices.edit', {'productId' : product.id, 'productRefId' : ref.id})}}" class="w-fit"><i class="fa-solid fa-pen-to-square border text-slate-800 border-slate-800 hover:text-white hover:border-transparent hover:bg-slate-800 rounded-md px-3 py-3"></i></a>                     </div>
+                                <a href="{{path('admin.products.prices.delete', {'productId' : product.id, 'productRefId' : ref.id})}}" class="w-fit"><i class="fa-solid fa-circle-xmark border text-red-500 border-red-500 hover:text-white hover:border-transparent hover:bg-red-500 rounded-md px-3 py-3"></i></a>                     </div>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+{% endblock %}

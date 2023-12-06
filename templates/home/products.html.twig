@@ -1,0 +1,23 @@
+{% extends 'base.html.twig' %}
+
+{% block title %} - Nos produits{% endblock %}
+
+{% block body %}
+    <div class="grid grid-cols-5 gap-4 px-2 py-3">
+        {% for product in products %}
+            <div class="max-w-sm rounded overflow-hidden shadow-lg">
+                {% if product.productReferences|length > 0 %}
+                    <img src="{{product.productReferences[0].picPath}}" class="w-full"  alt="Sunset in the mountains">
+                {% endif %}
+                <div class="px-6 py-4">
+                    <div class="font-bold text-md mb-2">{{product.name}}</div>
+                </div>
+                <div class="px-6 pt-4 pb-2">
+                    {% for ref in product.productReferences %}
+                        <span class="inline-block bg-gray-200 rounded-full px-3 py-1 text-sm font-semibold text-gray-700 mr-2 mb-2">{{ref.weight}} {{ref.weightType}}</span>
+                    {% endfor %}
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+{% endblock %}

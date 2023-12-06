@@ -1,0 +1,42 @@
+{% extends 'base.html.twig' %}
+
+{% block title %} - Accueil{% endblock %}
+
+{% block body %}
+    <div class="bg-hero bg-no-repeat flex items-center justify-center bg-right-bottom bg-cover py-10 ">
+        <h1 class="text-6xl text-center font-extralight text-white">Bienvenue sur {{app_name}}</h1>
+    </div>
+    <div class="container mx-auto mt-3">
+        <div class="columns-2 my-5 mb-3">
+            <img src="/jelly_5184x3456.jpeg" alt="Photo de confiture en préparation" class="rounded">
+            <div class="md:[&>p]:text-md [&>p]:text-orange-800 [&>h4]:text-orange-900 [&>h4]:font-medium [&>p]:mb-7 space-y-5">
+                <h4>
+                    Comment sont faites mes confitures ?
+                </h4>
+                <p>
+                    <i class="fa-solid fa-apple-whole fa-lg mr-3 text-red-600"></i>
+                    Ces confitures maisons sont faites avec des fruits de saison. Je porte une attention particulière à la sélection des fruits pour vous offrir une confiture de qualité.
+                </p>
+                <h4>
+                    Que fait-on des pots après avoir vider le pot ?
+                </h4>
+                <p>
+                    <i class="fa-solid fa-earth-europe fa-lg mr-3 text-lime-400"></i>
+                    Pour préserver l'environnement, je consigne mes pots pour éviter les déchets et gaspiller les pots en verre en vous permettant de me les rapporter.
+                </p>
+                <h4>
+                   Comment je suis arrivée ici ?
+                </h4>
+                <p>
+                    <i class="fa-regular fa-heart mr-3 text-amber-600"></i>
+                    J'ai toujours aimé la cuisine, c'est pourquoi j'ai décidé de lancer mon activité professionelle en vendant mes confitures, gelées et autres produits que vous pouvez découvrir ici.
+                </p>
+                <div class="flex items-center justify-center ">
+                    <a href="{{path('home.products')}}" class="text-center border rounded-md px-3 py-2 bg-[#804C62] text-white hover:bg-white hover:border-[#804C62] hover:border-2 hover:text-[#804C62]" href="route produit">
+                        Découvrir les produits !
+                    </a> 
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
