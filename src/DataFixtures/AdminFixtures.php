@@ -2,11 +2,12 @@
 
 namespace App\DataFixtures;
 
-use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
-use Doctrine\Bundle\FixturesBundle\Fixture;
-use Doctrine\Persistence\ObjectManager;
 use App\Entity\Admin;
-use DateTime;
+
+use Doctrine\Persistence\ObjectManager;
+use Doctrine\Bundle\FixturesBundle\Fixture;
+
+use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 
 /**
  * @author Alex <alexlegras@hotmail.com>
@@ -61,8 +62,6 @@ class AdminFixtures extends Fixture
             $newAdmin = new Admin;
             $newAdmin->setEmail($admin['email']);
             $newAdmin->setPseudonyme($admin['pseudonyme']);
-            $newAdmin->setCreatedAt(new DateTime('now'));
-            $newAdmin->setUpdatedAt(new DateTime('now'));
             $newAdmin->setPassword($this->passwordHasher->hashPassword($newAdmin, $admin['password']));
             $manager->persist($newAdmin);
         }

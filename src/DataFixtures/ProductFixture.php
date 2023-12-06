@@ -2,26 +2,24 @@
 
 namespace App\DataFixtures;
 
-use App\Repository\ProductCategoryRepository;
-use App\Repository\ProductRepository;
-use App\Entity\ProductReference;
 use App\Entity\Product;
-use App\Repository\ProductReferenceRepository;
-use Doctrine\Bundle\FixturesBundle\Fixture;
+use App\Entity\ProductReference;
+use App\Repository\ProductRepository;
+use App\Repository\ProductCategoryRepository;
+
 use Doctrine\Persistence\ObjectManager;
+use Doctrine\Bundle\FixturesBundle\Fixture;
 
 class ProductFixture extends Fixture
 {
 
     private ProductCategoryRepository $productCategoryRepository;
     private ProductRepository $productRepository;
-    private ProductReferenceRepository $productReferenceRepository;
 
-    public function __construct(ProductCategoryRepository $productCategoryRepository, ProductRepository $productRepository, ProductReferenceRepository $productReferenceRepository)
+    public function __construct(ProductCategoryRepository $productCategoryRepository, ProductRepository $productRepository)
     {
         $this->productCategoryRepository = $productCategoryRepository;
         $this->productRepository = $productRepository;
-        $this->productReferenceRepository = $productReferenceRepository;
     }
 
     public function load(ObjectManager $manager): void
@@ -49,7 +47,6 @@ class ProductFixture extends Fixture
                 $newProduct->setName($line[1]);
                 $newProduct->setCategory($categoriesByCategoryLabel[$line[0]]);
                 $manager->persist($newProduct);
-                $manager->flush();
             }else{
                 $newProduct = $newProduct[0];
             }
@@ -66,6 +63,7 @@ class ProductFixture extends Fixture
             if (!is_null($newProductReference)){
                 $manager->persist($newProductReference);
             }
+            $manager->flush();
         }
     }
 }

@@ -3,9 +3,9 @@
 namespace App\DataFixtures;
 
 use App\Entity\ProductCategory;
-use Doctrine\Bundle\FixturesBundle\Fixture;
+
 use Doctrine\Persistence\ObjectManager;
-;
+use Doctrine\Bundle\FixturesBundle\Fixture;
 
 class ProductCategoryFixture extends Fixture
 {

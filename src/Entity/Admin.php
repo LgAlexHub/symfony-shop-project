@@ -3,52 +3,55 @@
 namespace App\Entity;
 
 use App\Repository\AdminRepository;
-use DateTime;
+use App\Entity\Trait\TimestampableWithIdTrait;
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
-use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
-use Symfony\Component\Security\Core\User\UserInterface;
-use Symfony\Component\Validator\Constraints as Assert;
 
+use Symfony\Component\Validator\Constraints as Assert;
+use Symfony\Component\Security\Core\User\UserInterface;
+use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
+
+#[ORM\HasLifecycleCallbacks]
 #[ORM\Entity(repositoryClass: AdminRepository::class)]
 class Admin implements UserInterface, PasswordAuthenticatedUserInterface
 {
-    #[ORM\Id]
-    #[ORM\GeneratedValue]
-    #[ORM\Column]
-    private ?int $id = null;
+    use TimestampableWithIdTrait;
 
-    #[ORM\Column(type: 'string', nullable: false, unique: true)]
     #[Assert\NotBlank]
+    #[Assert\Length(min: 5)]
+    #[ORM\Column(type: Types::STRING, nullable: false, unique: true)]
+    private ?string $pseudonyme;
+
     #[Assert\Email]
+    #[Assert\NotBlank]
+    #[ORM\Column(type: Types::STRING, nullable: false, unique: true)]
     private ?string $email;
 
     #[Assert\NotBlank]
-    #[ORM\Column(type: 'string', nullable: false)]
+    #[ORM\Column(type: Types::STRING, nullable: false)]
     private ?string $password;
 
-    #[ORM\Column(type: 'json')]
+    #[ORM\Column(type: Types::JSON)]
     private array $roles = [];
 
-    #[ORM\Column(type: 'string', nullable: false, unique: true)]
-    #[Assert\NotBlank]
-    #[Assert\Length(min: 5)]
-    private ?string $pseudonyme;
-
-    #[ORM\Column(name: 'created_at', type: 'datetime', nullable: false, updatable: false)]
-    private ?DateTime $createdAt;
-
-    #[ORM\Column(name: 'updated_at', type: 'datetime', nullable: false, updatable: false)]
-    private ?DateTime $updatedAt;
-
+    /**
+     * Get the value of pseudonyme
+     */
+    public function getPseudonyme()
+    {
+        return $this->pseudonyme;
+    }
 
     /**
-     * Get the value of id
+     * Set the value of pseudonyme
      *
-     * @return integer|null
+     * @return  self
      */
-    public function getId(): ?int
+    public function setPseudonyme($pseudonyme)
     {
-        return $this->id;
+        $this->pseudonyme = $pseudonyme;
+
+        return $this;
     }
 
     public function getEmail(): ?string
@@ -59,36 +62,6 @@ class Admin implements UserInterface, PasswordAuthenticatedUserInterface
     public function setEmail(string $email): self
     {
         $this->email = $email;
-
-        return $this;
-    }
-
-
-    /**
-     * The public representation of the user (e.g. a username, an email address, etc.)
-     *
-     * @see UserInterface
-     */
-    public function getUserIdentifier(): string
-    {
-        return (string) $this->email;
-    }
-
-    /**
-     * @see UserInterface
-     */
-    public function getRoles(): array
-    {
-        $roles = $this->roles;
-        // guarantee every user at least has ROLE_USER
-        $roles[] = 'ROLE_USER';
-
-        return array_unique($roles);
-    }
-
-    public function setRoles(array $roles): self
-    {
-        $this->roles = $roles;
 
         return $this;
     }
@@ -111,69 +84,39 @@ class Admin implements UserInterface, PasswordAuthenticatedUserInterface
     /**
      * @see UserInterface
      */
+    public function getRoles(): array
+    {
+        $roles = $this->roles;
+        // guarantee every user at least has ROLE_USER
+        $roles[] = 'ROLE_USER';
+
+        return array_unique($roles);
+    }
+
+    public function setRoles(array $roles): self
+    {
+        $this->roles = $roles;
+
+        return $this;
+    }
+
+    /**
+     * The public representation of the user (e.g. a username, an email address, etc.)
+     *
+     * @see UserInterface
+     */
+    public function getUserIdentifier(): string
+    {
+        return (string) $this->email;
+    }
+
+    /**
+     * @see UserInterface
+     */
     public function eraseCredentials(): void
     {
         // If you store any temporary, sensitive data on the user, clear it here
         // $this->plainPassword = null;
     }
 
-    /**
-     * Get the value of createdAt
-     */
-    public function getCreatedAt()
-    {
-        return $this->createdAt;
-    }
-
-    /**
-     * Set the value of createdAt
-     *
-     * @return  self
-     */
-    public function setCreatedAt($createdAt)
-    {
-        $this->createdAt = $createdAt;
-
-        return $this;
-    }
-
-    /**
-     * Get the value of updatedAt
-     */
-    public function getUpdatedAt()
-    {
-        return $this->updatedAt;
-    }
-
-    /**
-     * Set the value of updatedAt
-     *
-     * @return  self
-     */
-    public function setUpdatedAt($updatedAt)
-    {
-        $this->updatedAt = $updatedAt;
-
-        return $this;
-    }
-
-    /**
-     * Get the value of pseudonyme
-     */
-    public function getPseudonyme()
-    {
-        return $this->pseudonyme;
-    }
-
-    /**
-     * Set the value of pseudonyme
-     *
-     * @return  self
-     */
-    public function setPseudonyme($pseudonyme)
-    {
-        $this->pseudonyme = $pseudonyme;
-
-        return $this;
-    }
 }

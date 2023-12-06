@@ -2,18 +2,21 @@
 
 namespace App\Entity;
 
+use App\Entity\Trait\TimestampableWithIdTrait;
 use App\Repository\ProductReferenceRepository;
+
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Validator\Constraints as Assert;
 
+#[ORM\HasLifecycleCallbacks]
 #[ORM\Entity(repositoryClass: ProductReferenceRepository::class)]
 class ProductReference
 {
-    #[ORM\Id]
-    #[ORM\GeneratedValue]
-    #[ORM\Column]
-    private ?int $id = null;
 
+    use TimestampableWithIdTrait;
+
+    #[Assert\NotNull]
     #[ORM\Column(type: Types::SMALLINT)]
     private ?int $price = null;
 
@@ -23,27 +26,16 @@ class ProductReference
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $weightType = null;
 
-    #[ORM\Column]
-    private ?\DateTimeImmutable $createdAt = null;
-
-    #[ORM\Column(type: Types::DATETIME_MUTABLE, nullable: true)]
-    private ?\DateTimeInterface $updatedAt = null;
-
-    #[ORM\ManyToOne(inversedBy: 'productReferences')]
     #[ORM\JoinColumn(nullable: false)]
+    #[ORM\ManyToOne(inversedBy: 'productReferences')]
     private ?Product $product = null;
 
-    #[ORM\Column(length: 1024, nullable: true)]
+    #[ORM\Column(length: 1024, nullable: true, type: Types::STRING)]
     private ?string $picPath = null;
 
     public function __construct(){
-        $this->createdAt = new \DateTimeImmutable("now");
     }
 
-    public function getId(): ?int
-    {
-        return $this->id;
-    }
 
     public function getPrice(): ?int
     {
@@ -77,30 +69,6 @@ class ProductReference
     public function setWeightType(?string $weightType): static
     {
         $this->weightType = $weightType;
-
-        return $this;
-    }
-
-    public function getCreatedAt(): ?\DateTimeImmutable
-    {
-        return $this->createdAt;
-    }
-
-    public function setCreatedAt(\DateTimeImmutable $createdAt): static
-    {
-        $this->createdAt = $createdAt;
-
-        return $this;
-    }
-
-    public function getUpdatedAt(): ?\DateTimeInterface
-    {
-        return $this->updatedAt;
-    }
-
-    public function setUpdatedAt(?\DateTimeInterface $updatedAt): static
-    {
-        $this->updatedAt = $updatedAt;
 
         return $this;
     }
