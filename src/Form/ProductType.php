@@ -4,17 +4,19 @@ namespace App\Form;
 
 use App\Entity\Product;
 use App\Entity\ProductCategory;
+use App\Repository\ProductCategoryRepository;
 
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
-use Symfony\Component\Form\AbstractType;
-use Symfony\Component\Form\Extension\Core\Type as Type;
-use Symfony\Component\Form\FormBuilderInterface;
-use Symfony\Component\OptionsResolver\OptionsResolver;
-use Symfony\Component\Validator\Constraints\Length;
-use Symfony\Component\Validator\Constraints\NotBlank;
-use Symfony\Component\Validator\Constraints\NotNull;
 
-class ProductFormType extends AbstractType
+use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\FormBuilderInterface;
+use Symfony\Component\Validator\Constraints\Length;
+use Symfony\Component\Validator\Constraints\NotNull;
+use Symfony\Component\Validator\Constraints\NotBlank;
+use Symfony\Component\OptionsResolver\OptionsResolver;
+use Symfony\Component\Form\Extension\Core\Type as Type;
+
+class ProductType extends AbstractType
 {
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
@@ -27,8 +29,8 @@ class ProductFormType extends AbstractType
             ])
             ->add('category', EntityType::class, [
                 'class' => ProductCategory::class,
-                
-                'choices' => $options['categories'],
+                'query_builder' => fn(ProductCategoryRepository $pcr) => $pcr->createQueryBuilder("cats")->orderBy("cats.label", "ASC"),
+                // 'choices' => $options['categories'],
                 'choice_label' => fn (ProductCategory $cat) => $cat->getLabel(),
                 'choice_value' => fn (?ProductCategory $cat) => ($cat ? $cat->getId() : '')
             ], [

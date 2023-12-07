@@ -47,6 +47,7 @@ class ProductFixture extends Fixture
                 $newProduct->setName($line[1]);
                 $newProduct->setCategory($categoriesByCategoryLabel[$line[0]]);
                 $manager->persist($newProduct);
+                $manager->flush();
             }else{
                 $newProduct = $newProduct[0];
             }
@@ -56,14 +57,9 @@ class ProductFixture extends Fixture
                 $newProductReference->setWeight(intval($line[2]));
                 $newProductReference->setWeightType($line[3]);
                 $newProductReference->setPrice(intval($line[4]));
-                $newProductReference->setPicPath("/products/".$line[1].$line[2].$line[3].".jpg");
+                $manager->persist($newProductReference);
                 $manager->flush();
             }
-            
-            if (!is_null($newProductReference)){
-                $manager->persist($newProductReference);
-            }
-            $manager->flush();
         }
     }
 }

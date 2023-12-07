@@ -2,6 +2,7 @@
 
 namespace App\Entity;
 
+use App\Entity\Trait\SluggableTrait;
 use App\Entity\Trait\TimestampableWithIdTrait;
 use App\Repository\ProductReferenceRepository;
 
@@ -11,10 +12,16 @@ use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\HasLifecycleCallbacks]
 #[ORM\Entity(repositoryClass: ProductReferenceRepository::class)]
+/**
+ * @author Aléki <alexlegras@hotmail.com>
+ * @version 1
+ * This class represent a reference of product, this class can be bind in Product Class to describe it's price and weight.
+ * This is class use Lifecycle callback throught traits.
+ */
 class ProductReference
 {
-
     use TimestampableWithIdTrait;
+    use SluggableTrait;
 
     #[Assert\NotNull]
     #[ORM\Column(type: Types::SMALLINT)]
@@ -30,18 +37,22 @@ class ProductReference
     #[ORM\ManyToOne(inversedBy: 'productReferences')]
     private ?Product $product = null;
 
-    #[ORM\Column(length: 1024, nullable: true, type: Types::STRING)]
-    private ?string $picPath = null;
-
-    public function __construct(){
-    }
-
-
+    /**
+     * Price getter
+     *
+     * @return integer|null
+     */
     public function getPrice(): ?int
     {
         return $this->price;
     }
 
+    /**
+     * Price setter
+     *
+     * @param integer $price
+     * @return static
+     */
     public function setPrice(int $price): static
     {
         $this->price = $price;
@@ -49,11 +60,22 @@ class ProductReference
         return $this;
     }
 
+    /**
+     * Weight getter
+     *
+     * @return integer|null
+     */
     public function getWeight(): ?int
     {
         return $this->weight;
     }
 
+    /**
+     * Weight setter
+     *
+     * @param integer|null $weight
+     * @return static
+     */
     public function setWeight(?int $weight): static
     {
         $this->weight = $weight;
@@ -61,11 +83,23 @@ class ProductReference
         return $this;
     }
 
+    /**
+     * Weight type getter , represent the unit of product reference weight 
+     * example : g, mg , L, mL
+     *
+     * @return string|null
+     */
     public function getWeightType(): ?string
     {
         return $this->weightType;
     }
 
+    /**
+     * Weight type setter
+     *
+     * @param string|null $weightType
+     * @return static
+     */
     public function setWeightType(?string $weightType): static
     {
         $this->weightType = $weightType;
@@ -73,27 +107,25 @@ class ProductReference
         return $this;
     }
 
+    /**
+     * Retrieve the parent product associated with this reference.
+     *
+     * This method is useful when you need to access the parent product of a reference.
+     *
+     * @return Product|null
+     */
     public function getProduct(): ?Product
     {
         return $this->product;
     }
 
-    public function setProduct(?Product $product): static
-    {
-        $this->product = $product;
 
-        return $this;
-    }
-
-    public function getPicPath(): ?string
-    {
-        return $this->picPath;
-    }
-
-    public function setPicPath(?string $picPath): static
-    {
-        $this->picPath = $picPath;
-
-        return $this;
+    /**
+     * Method use by SluggableTrait to get valid source to slug
+     *
+     * @return string
+     */
+    protected function getValueToSlugify(): string {
+        return "{$this->product->getName()} {$this->weight}{$this->weightType}";
     }
 }

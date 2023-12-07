@@ -7,6 +7,14 @@ use Doctrine\DBAL\Types\Types;
 
 use Symfony\Component\Validator\Constraints as Assert;
 
+/**
+ * @author Aléki <alexlegras@hotmail.com>
+ * @version 1
+ * This trait add to new property to binding class
+ * DateTimeImmutable createdAt
+ * DateTimeImmutable updetadAt
+ * Add methods to handle 2 news properties
+ */
 trait TimestampableWithIdTrait {
 
     #[ORM\Id]
@@ -24,12 +32,24 @@ trait TimestampableWithIdTrait {
     private ?\DateTimeInterface $updatedAt;
 
     #[ORM\PrePersist]
+    /**
+     * This medthod is call before data persistence in database
+     * on the 1st save, and will set createdAt and updatedAt properties
+     * to current server timestamp
+     * @return void
+     */
     public function prePersist() : void {
         $this->createdAt = new \DateTimeImmutable();
         $this->updatedAt = new \DateTimeImmutable();
     }
 
     #[ORM\PreUpdate]
+    /**
+     * This medthod is call before every update
+     * and will set updatedAt property
+     * to current server timestamp
+     * @return void
+     */
     public function preUpdate() : void {
         $this->updatedAt = new \DateTimeImmutable();
     }

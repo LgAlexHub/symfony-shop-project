@@ -24,8 +24,6 @@ class ProductCategoryFixture extends Fixture
             $newProductCategory->setLabel($category);
             $manager->persist($newProductCategory);
         }
-        // $product = new Product();
-        // $manager->persist($product);
 
         $manager->flush();
     }

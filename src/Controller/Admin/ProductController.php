@@ -5,7 +5,7 @@ namespace App\Controller\Admin;
 use App\Entity\Product;
 use App\Entity\ProductCategory;
 use App\Entity\ProductReference;
-use App\Form\ProductFormType;
+use App\Form\ProductType;
 use App\Form\ProductReferenceType;
 use DateTime;
 use Doctrine\ORM\EntityManagerInterface;
@@ -32,14 +32,8 @@ class ProductController extends AbstractController
 
     #[Route('/new', name: 'new')]
     public function create(Request $request, EntityManagerInterface $manager){
-        $productCategories = $manager->getRepository(ProductCategory::class)
-            ->createQueryBuilder("cat")
-            ->getQuery()
-            ->getResult();
 
-        $productForm = $this->createForm(ProductFormType::class, options:[
-            'categories' => $productCategories,
-        ]);
+        $productForm = $this->createForm(ProductType::class);
 
         $productForm->handleRequest($request);
 
@@ -91,20 +85,14 @@ class ProductController extends AbstractController
         $product = $entityManager->getRepository(Product::class)
             ->find($id);
         $this->checkEntityExistence($product, $id);
-        $productCategories = $entityManager->getRepository(ProductCategory::class)
-            ->createQueryBuilder("cat")
-            ->getQuery()
-            ->getResult();
 
-        $productForm = $this->createForm(ProductFormType::class, $product, [
-            'categories' => $productCategories
-        ]);
+        $productForm = $this->createForm(ProductType::class, $product);
         $productForm->handleRequest($request);
         if ($productForm->isSubmitted() && $productForm->isValid()){
             $updatedProduct = $productForm->getData();
-            $product->setName($updatedProduct->getName());
-            $product->setCategory($updatedProduct->getCategory());
-            $product->setUpdatedAt(new DateTime());
+            $product
+                ->setName($updatedProduct->getName())
+                ->setCategory($updatedProduct->getCategory());
             $entityManager->persist($product);
             $entityManager->flush();
             return $this->redirectToRoute('admin.products.home');
@@ -117,15 +105,17 @@ class ProductController extends AbstractController
     #[Route('/{id}/prices', name : 'prices')]
     public function showPrices(Request $request, int $id, EntityManagerInterface $manager){
         $newRef = new ProductReference;
-        $product = $manager->getRepository(Product::class)->find($id);
+        $product = $manager->getRepository(Product::class)
+            ->find($id);
         $this->checkEntityExistence($product, $id);
         $refForm = $this->createForm(ProductReferenceType::class, options: []);
         $refForm->handleRequest($request);
         if($refForm->isSubmitted() && $refForm->isValid()){
             $fomatedPrice = floatval(preg_replace('/\,/', '.', $request->get('product_reference')['price'] ?? 0)) * 100 ;
             $newRef = $refForm->getData();
-            $newRef->setProduct($product);
-            $newRef->setPrice($fomatedPrice);
+            $newRef
+                ->setProduct($product)
+                ->setPrice($fomatedPrice);
             $manager->persist($newRef);
             $manager->flush();
             return $this->redirect($request->headers->get('referer'));
@@ -155,9 +145,9 @@ class ProductController extends AbstractController
         if ($productRefForm->isSubmitted() && $productRefForm->isValid()){
             $fomatedPrice = floatval(preg_replace('/\,/', '.', $request->get('product_reference')['price'] ?? 0)) * 100 ;
             $updatedProductRef = $productRefForm->getData();
-            $ref->setWeight($updatedProductRef->getWeight());
-            $ref->setWeightType($updatedProductRef->getWeightType());
-            $ref->setPrice($fomatedPrice);
+            $ref->setWeight($updatedProductRef->getWeight())
+                ->setWeightType($updatedProductRef->getWeightType())
+                ->setPrice($fomatedPrice);
             $manager->persist($ref);
             $manager->flush();
             return $this->redirectToRoute('admin.products.prices', ['id' => $ref->getProduct()->getId()]);

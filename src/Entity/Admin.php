@@ -13,6 +13,10 @@ use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 
 #[ORM\HasLifecycleCallbacks]
 #[ORM\Entity(repositoryClass: AdminRepository::class)]
+/**
+ * This class represent an admin user who can log to back office and make update on database
+ * This is class use Lifecycle callback throught traits.
+ */
 class Admin implements UserInterface, PasswordAuthenticatedUserInterface
 {
     use TimestampableWithIdTrait;
@@ -54,11 +58,22 @@ class Admin implements UserInterface, PasswordAuthenticatedUserInterface
         return $this;
     }
 
+    /**
+     * Email getter
+     *
+     * @return string|null
+     */
     public function getEmail(): ?string
     {
         return $this->email;
     }
 
+    /**
+     * Email setter
+     *
+     * @param string $email
+     * @return self
+     */
     public function setEmail(string $email): self
     {
         $this->email = $email;
