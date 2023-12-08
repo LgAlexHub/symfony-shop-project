@@ -1,0 +1,29 @@
+{% extends 'admin/base.html.twig' %}
+{% block title %} - {{form.vars.value.id is null ? 'Ajouter'  : 'Modifier' }} une catégorie{% endblock %}
+
+{% block body %}
+    <h1 class="text-center mt-10 text-2xl">
+        {% if form.vars.value.id is null %}
+            Ajouter
+        {% else %}
+            Modifier : 
+            <strong>
+                {{form.vars.value.label}}
+            </strong> 
+        {% endif %}
+    </h1>
+    <hr class="mx-20 my-4">
+    <div class="container mt-3 h-full flex items-center justify-center">
+        {{ form_start(form, {attr: {'class' : 'w-full'}})}}
+                {{ form_errors(form) }}
+                <div class="">
+                    {{ form_label(form.label, 'Label :') }}
+                    {{ form_errors(form.label) }}
+                    {{ form_widget(form.label, {attr : {'class' : ' border rounded-sm border-slate-700 px-2 px-3', 'placeholder' : 'Jus de légumes'}} )}}
+                </div>
+                <div class="">
+                    {{ form_widget(form.submit, {label : form.vars.value.id is null ? 'Ajouter' : 'Modifier', attr : {'class' : 'w-3/6 my-5 border border-blue-400 rounded-md bg-sky-400 px-2 py-1 text-white hover:bg-blue-800 hover:border-transparent'}})}}
+                </div>
+        {{ form_end(form)}}
+    </div>
+{% endblock %}

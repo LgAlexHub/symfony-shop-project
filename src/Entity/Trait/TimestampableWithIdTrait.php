@@ -22,11 +22,8 @@ trait TimestampableWithIdTrait {
     #[ORM\Column]
     private ?int $id = null;
 
-    #[Assert\DateTime]
     #[ORM\Column(name: 'created_at', type: Types::DATETIME_IMMUTABLE, updatable: false, options: ['default' => 'CURRENT_TIMESTAMP'])]
     private ?\DateTimeInterface $createdAt;
-
-    #[Assert\DateTime]
 
     #[ORM\Column(name: 'updated_at', type: Types::DATETIME_IMMUTABLE, nullable: true)]
     private ?\DateTimeInterface $updatedAt;

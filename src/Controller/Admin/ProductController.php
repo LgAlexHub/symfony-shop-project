@@ -2,22 +2,38 @@
 
 namespace App\Controller\Admin;
 
+use App\Controller\Trait\ControllerToolsTrait;
 use App\Entity\Product;
-use App\Entity\ProductCategory;
-use App\Entity\ProductReference;
 use App\Form\ProductType;
+use App\Entity\ProductReference;
 use App\Form\ProductReferenceType;
-use DateTime;
+
 use Doctrine\ORM\EntityManagerInterface;
-use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
 #[Route('/admin/products', 'admin.products.')]
+/**
+ * Controller's routes are prefixed with /admin/products, and name are prefixed with admin.products.
+ * This controller handle product back office, allow admins to modify products content as their like.
+ * @author Aléki <alexlegras@hotmail.com>
+ * @version 1
+ */
 class ProductController extends AbstractController
 {
+    use ControllerToolsTrait;
+
     #[Route('/', name: 'home')]
+    /**
+     * Handling home admin route, first route after login
+     * render a list of all products
+     *
+     * @param EntityManagerInterface $manager
+     * @return Response containt form view
+     */
     public function index(EntityManagerInterface $manager): Response
     {
         $products = $manager->getRepository(Product::class)
@@ -31,7 +47,14 @@ class ProductController extends AbstractController
     }
 
     #[Route('/new', name: 'new')]
-    public function create(Request $request, EntityManagerInterface $manager){
+    /**
+     * This route render create product form, this route also handle the submit
+     *
+     * @param Request $request with form data
+     * @param EntityManagerInterface $manager Will persist data in DB
+     * @return Response either view or redirection
+     */
+    public function create(Request $request, EntityManagerInterface $manager) : Response {
 
         $productForm = $this->createForm(ProductType::class);
 
@@ -52,16 +75,20 @@ class ProductController extends AbstractController
    
     #[Route('/delete/{id}', name:'delete')]
     /**
-     * Try to delete a product by id 
-     * Note : 
-     *  * redirect_to "admin.products.home" route if delete is successful
-     * TDOO : add 404 exception if id not find
-     * @param Request $request
-     * @param integer $id
-     * @param EntityManagerInterface $entityManager
-     * @return void
+     * Attempts to delete a product by its ID.
+     *
+     * Note:
+     * - Redirects to the "admin.products.home" route if the deletion is successful.
+     * - TODO: Add a 404 exception if the ID is not found.
+     *
+     * @param EntityManagerInterface $entityManager The entity manager handling the database delete.
+     * @param int                    $id              The ID of the targeted product.
+     *
+     * @return Response Either a view or a redirection.
+     *
+     * @throws NotFoundHttpException If the targeted product is not found.
      */
-    public function delete(EntityManagerInterface $entityManager, int $id){
+    public function delete(EntityManagerInterface $entityManager, int $id) : Response {
         $productRepository = $entityManager->getRepository(Product::class);
         $product = $productRepository->find($id);
         $productsReferencesRepository = $entityManager->getRepository(ProductReference::class);
@@ -81,7 +108,20 @@ class ProductController extends AbstractController
     }
 
     #[Route('/edit/{id}', name : 'edit')]
-    public function edit(Request $request, int $id, EntityManagerInterface $entityManager){
+    /**
+     * Displays and processes the edit form for a specified product.
+     *
+     * This route retrieves and renders the edit form for a specific product identified by its ID.
+     *
+     * @param Request                $request
+     * @param int                    $id               The ID of the targeted product.
+     * @param EntityManagerInterface $entityManager   The entity manager used to retrieve and persist data.
+     *
+     * @return Response Either the rendered form view or a redirection.
+     *
+     * @throws NotFoundHttpException If the targeted product is not found.
+     */
+    public function edit(Request $request, int $id, EntityManagerInterface $entityManager) : Response {
         $product = $entityManager->getRepository(Product::class)
             ->find($id);
         $this->checkEntityExistence($product, $id);
@@ -103,6 +143,19 @@ class ProductController extends AbstractController
     }
 
     #[Route('/{id}/prices', name : 'prices')]
+    /**
+     * Displays and processes the form for managing prices of a specified product.
+     *
+     * This route allows users to view and manage prices for a specific product identified by its ID.
+     *
+     * @param Request                $request
+     * @param int                    $id              The ID of the targeted product.
+     * @param EntityManagerInterface $manager         The entity manager used to retrieve and persist data.
+     *
+     * @return Response Either the rendered view or a redirection.
+     *
+     * @throws NotFoundHttpException If the targeted product is not found.
+     */
     public function showPrices(Request $request, int $id, EntityManagerInterface $manager){
         $newRef = new ProductReference;
         $product = $manager->getRepository(Product::class)
@@ -128,15 +181,41 @@ class ProductController extends AbstractController
     }
 
     #[Route('/{productId}/prices/{productRefId}', name : 'prices.delete')]
+    /**
+     * Deletes a product reference by its ID.
+     *
+     * This route allows users to delete a specific product reference identified by its ID.
+     *
+     * @param Request                $request
+     * @param EntityManagerInterface $manager        The entity manager used to retrieve and persist data.
+     * @param int                    $productRefId   The ID of the targeted product reference.
+     *
+     * @return Response A redirection to the previous page.
+     *
+     * @throws NotFoundHttpException If the targeted product reference is not found.
+     */
     public function deletePrice(Request $request, EntityManagerInterface $manager, int $productRefId){
         $ref = $manager->getRepository(ProductReference::class)->find($productRefId);
         $this->checkEntityExistence($ref, $productRefId);
         $manager->remove($ref);
-            $manager->flush();
+        $manager->flush();
         return $this->redirect($request->headers->get('referer'));
     }
 
     #[Route('/{productId}/prices/{productRefId}/edit', name : 'prices.edit')]
+    /**
+     * Displays and processes the form for editing a product reference.
+     *
+     * This route allows users to edit the details of a specific product reference identified by its ID.
+     *
+     * @param Request                $request
+     * @param EntityManagerInterface $manager        The entity manager used to retrieve and persist data.
+     * @param int                    $productRefId   The ID of the targeted product reference.
+     *
+     * @return Response Either the rendered view or a redirection.
+     *
+     * @throws NotFoundHttpException If the targeted product reference is not found.
+     */
     public function editPrice(Request $request, EntityManagerInterface $manager, int $productRefId){
         $ref = $manager->getRepository(ProductReference::class)->find($productRefId);
         $this->checkEntityExistence($ref, $productRefId);
@@ -158,11 +237,4 @@ class ProductController extends AbstractController
         ]);
     }
 
-    private function checkEntityExistence(mixed $var, int $id){
-        if (!$var){
-            throw $this->createNotFoundException(
-                'No entity found for id '.$id
-            );
-        }
-    }
 }

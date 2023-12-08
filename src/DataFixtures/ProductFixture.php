@@ -10,6 +10,10 @@ use App\Repository\ProductCategoryRepository;
 use Doctrine\Persistence\ObjectManager;
 use Doctrine\Bundle\FixturesBundle\Fixture;
 
+/**
+ * @author Aléki <alexlegras@hotmail.com>
+ * Fixture class that load product and product reference database from a csv file
+ */
 class ProductFixture extends Fixture
 {
 

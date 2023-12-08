@@ -119,6 +119,19 @@ class ProductReference
         return $this->product;
     }
 
+    /**
+     * Bind product
+     *
+     * @param Product|null $product
+     * @return static
+     */
+    public function setProduct(?Product $product): static
+    {
+        $this->product = $product;
+
+        return $this;
+    }
+
 
     /**
      * Method use by SluggableTrait to get valid source to slug

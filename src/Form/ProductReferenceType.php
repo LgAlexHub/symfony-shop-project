@@ -11,8 +11,22 @@ use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\Validator\Constraints\NotNull;
 use Symfony\Component\Validator\Constraints\Positive;
 
+/**
+ * @author Aléki <alexlegras@hotmail.com>
+ * @version 1
+ * This class represents the form type for handling product reference data.
+ */
 class ProductReferenceType extends AbstractType
 {
+
+    /**
+     * Builds the product reference form.
+     *
+     * @param FormBuilderInterface $builder The form builder.
+     * @param array                $options The options for building the form.
+     *
+     * @throws \Symfony\Component\Form\Exception\InvalidArgumentException
+     */
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder
@@ -40,6 +54,11 @@ class ProductReferenceType extends AbstractType
         ;
     }
 
+     /**
+     * Configures the default options for the form.
+     *
+     * @param OptionsResolver $resolver The options resolver.
+     */
     public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefaults([

@@ -11,7 +11,7 @@ use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 
 /**
  * @author Alex <alexlegras@hotmail.com>
- * Class use too seed database with 5 fake admin users
+ * Class use too seed database with 6 fake admin users
  */
 class AdminFixtures extends Fixture
 {

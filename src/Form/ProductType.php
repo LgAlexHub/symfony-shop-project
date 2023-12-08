@@ -16,8 +16,23 @@ use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Form\Extension\Core\Type as Type;
 
+
+/**
+ * @author Aléki <alexlegras@hotmail.com>
+ * @version 1
+ * This class represents the form type for handling product data.
+ */
 class ProductType extends AbstractType
 {
+
+    /**
+     * Builds the product form.
+     *
+     * @param FormBuilderInterface $builder The form builder.
+     * @param array                $options The options for building the form.
+     *
+     * @throws \Symfony\Component\Form\Exception\InvalidArgumentException
+     */
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder
@@ -45,6 +60,11 @@ class ProductType extends AbstractType
         ;
     }
 
+     /**
+     * Configures the default options for the form.
+     *
+     * @param OptionsResolver $resolver The options resolver.
+     */
     public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefaults([

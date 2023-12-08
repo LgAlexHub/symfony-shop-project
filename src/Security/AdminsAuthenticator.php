@@ -16,6 +16,13 @@ use Symfony\Component\Security\Http\Authenticator\Passport\Passport;
 use Symfony\Component\Security\Http\SecurityRequestAttributes;
 use Symfony\Component\Security\Http\Util\TargetPathTrait;
 
+
+/**
+ * @author Aléki <alexlegras@hotmail.com>
+ * @version 1
+ * 
+ * This class containt the logic for authentication
+ */
 class AdminsAuthenticator extends AbstractLoginFormAuthenticator
 {
     use TargetPathTrait;
@@ -26,6 +33,13 @@ class AdminsAuthenticator extends AbstractLoginFormAuthenticator
     {
     }
 
+    /**
+     * Try to authenticate admin , if it's success create a passport that allow user
+     * to go on back office route
+     *
+     * @param Request $request
+     * @return Passport
+     */
     public function authenticate(Request $request): Passport
     {
         $email = $request->request->get('email', '');
@@ -42,7 +56,14 @@ class AdminsAuthenticator extends AbstractLoginFormAuthenticator
         );
     }
 
-    
+    /**
+     * Action that is trigger after passeport creation , redirect to home back office
+     *
+     * @param Request $request
+     * @param TokenInterface $token
+     * @param string $firewallName
+     * @return Response|null
+     */
     public function onAuthenticationSuccess(Request $request, TokenInterface $token, string $firewallName): ?Response
     {
         if ($targetPath = $this->getTargetPath($request->getSession(), $firewallName)) {
@@ -54,6 +75,12 @@ class AdminsAuthenticator extends AbstractLoginFormAuthenticator
         // throw new \Exception('TODO: provide a valid redirect inside '.__FILE__);
     }
 
+    /**
+     * Return a route for login form route
+     *
+     * @param Request $request
+     * @return string
+     */
     protected function getLoginUrl(Request $request): string
     {
         return $this->urlGenerator->generate(self::LOGIN_ROUTE);

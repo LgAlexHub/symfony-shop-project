@@ -6,7 +6,6 @@ use Doctrine\ORM\Mapping as ORM;
 use Doctrine\DBAL\Types\Types;
 
 use Symfony\Component\String\Slugger\AsciiSlugger;
-use Symfony\Component\Validator\Constraints as Assert;
 
 /**
  * @author Aléki <alexlegras@hotmail.com>
@@ -16,9 +15,7 @@ use Symfony\Component\Validator\Constraints as Assert;
  * Follow method must be implemented : getValueToSlugify
  */
 trait SluggableTrait {
-
-    #[Assert\NotNull]
-    #[Assert\NotBlank]
+    
     #[ORM\Column(name: 'slug', type: Types::STRING, length: 255, unique: true)]
     private ?string $slug;
 

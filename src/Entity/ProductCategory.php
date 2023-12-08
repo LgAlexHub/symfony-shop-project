@@ -39,7 +39,6 @@ class ProductCategory
         $this->products = new ArrayCollection();
     }
 
-
     /**
      * Category label getter
      *

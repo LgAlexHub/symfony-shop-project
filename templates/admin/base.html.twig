@@ -16,13 +16,20 @@
     <body class="font-sans">
         <nav class="flex items-center justify-between flex-wrap p-6 text-white bg-slate-700 mb-10">
             <div class="w-full block flex-grow lg:flex lg:items-center lg:w-auto">
-                <div class="text-sm lg:flex-grow">
+                <div class="text-sm lg:flex-grow space-x-2">
                     <a href="{{path('admin.products.home')}}" class="block lg:w-fit md:w-full md:text-center mt-4 lg:inline-block lg:mt-0 hover:bg-white px-4 py-2 rounded text-white border rounded border-white hover:border-transparent hover:text-[#804C62] mr-4">
                         Nos produits
+                    </a>
+                    <a href="{{path('admin.categories.index')}}" class="block lg:w-fit md:w-full md:text-center mt-4 lg:inline-block lg:mt-0 hover:bg-white px-4 py-2 rounded text-white border rounded border-white hover:border-transparent hover:text-[#804C62] mr-4">
+                        Nos Catégories
                     </a>
                     <a class="border rounded-full px-2 py-2 hover:border-transparent hover:bg-lime-600 border-lime-200 bg-lime-400 text-white" href="{{path('admin.products.new')}}">
                         <i class="fa-solid fa-plus"></i>
                         <span>Ajouter un produit</span>
+                    </a>
+                     <a class="border rounded-full px-2 py-2 hover:border-transparent hover:bg-amber-600 border-amber-200 bg-amber-400 text-white" href="{{path('admin.categories.add')}}">
+                        <i class="fa-solid fa-plus"></i>
+                        <span>Ajouter une catégorie</span>
                     </a>
 
                     <p class="block lg:w-fit md:w-full md:text-center mt-4 lg:inline-block lg:mt-0 px-4 py-2 rounded text-white mr-4 [&>span]:underline [&>span]:font-bold">
