@@ -95,7 +95,7 @@ class ProductController extends AbstractController
         }
         $manager->remove($product);
         $manager->flush();
-        return $this->redirectToRoute("admin.products.home");
+        return $this->redirectToRoute("admin.products.index");
     }
 
     #[Route('/{slug}/edit', name : 'edit')]
