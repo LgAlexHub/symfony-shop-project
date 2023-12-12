@@ -41,7 +41,7 @@ trait SluggableTrait {
      * this method should retreive the source string to make a slug 
      * @return string
      */
-    abstract protected function getValueToSlugify() : string;
+    abstract public function getValueToSlugify() : string;
 
     /**
      * Get the value of slug

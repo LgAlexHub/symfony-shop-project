@@ -9,7 +9,7 @@
             <input type="hidden" name="_csrf_token" value="{{ csrf_token('authenticate') }}">
             <div class="grid grid-cols-1 content-center justify-center [&>*]:m-auto [&>*]:py-1 [&>input]:my-1">
                 <label for="username">Email:</label>
-                <input type="text" class="border-2 rounded border-cyan-900 w-6/12 text-center text-black" id="username" name="email" value="{{ last_username }}">
+                <input type="text" class="border-2 rounded border-cyan-900 w-6/12 text-center text-black" id="username" name="email" value="{{ last_username is not null and last_username != '' ? last_username : (app.user is not null and app.user.userIdentifier is not null ? app.user.userIdentifier : '') }}">
                 <label for="password">Password: </label>
                 <input type="password" class="border-2 rounded border-cyan-900 w-6/12 text-center text-black" id="password" name="password">
                 {% if error %}

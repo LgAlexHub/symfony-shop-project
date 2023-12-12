@@ -53,7 +53,7 @@ class ProductCategoryController extends AbstractController
      * @return Response
      */
     public function add(Request $request, EntityManagerInterface $manager): Response {
-        $categoryForm = $this->createForm(ProductCategoryType::class, new ProductCategory);
+        $categoryForm = $this->createForm(ProductCategoryType::class);
         $categoryForm->handleRequest($request);
         if ($categoryForm->isSubmitted() && $categoryForm->isValid()){
             $newCategory = $categoryForm->getData();
@@ -62,42 +62,42 @@ class ProductCategoryController extends AbstractController
             return $this->redirectToRoute(self::$homeRoute);
         }
 
-        return $this->render(self::$templatePath."/form.html.twig", [
+        return $this->renderWithRefererUrl($request, self::$templatePath."/form.html.twig",[
             "form" => $categoryForm
         ]);
     }
 
-    #[Route('/{id}/delete', name: 'delete')]
+    #[Route('/{slug}/delete', name: 'delete')]
     /**  
      * Try to delete a  product category in database, will throw exception if it's incorrect
      * and will redirect to product categories home route if it's successfully deleted.
      * @param Request $request
      * @param EntityManagerInterface $manager
-     * @param integer $id
+     * @param string $slug
      * @throws createNotFoundException
      * @return void
      */
-    public function delete(Request $request, EntityManagerInterface $manager, int $id) : Response{
-        $category = $manager->getRepository(ProductCategory::class)->find($id);
-        $this->checkEntityExistence($category, $id);
+    public function delete(Request $request, EntityManagerInterface $manager, string $slug) : Response{
+        $category = $manager->getRepository(ProductCategory::class)->findBySlug($slug);
+        $this->checkEntityExistence($category, $slug);
         $manager->remove($category);
         $manager->flush();
         return $this->redirectToRoute(self::$homeRoute);
     }
 
-    #[Route('/{id}/edit', name :'edit')]
+    #[Route('/{slug}/edit', name :'edit')]
     /**
-     * This method will render a pre-filled form with targeted id, also handle the submit
+     * This method will render a pre-filled form with targeted slug, also handle the submit
      * Either render the form with error or redirect to home route.
      * @param Request $request
      * @param EntityManagerInterface $manager
-     * @param integer $id
-     * @throws createNotFoundException if product category's id not found
+     * @param string $slug
+     * @throws createNotFoundException if product category's slug not found
      * @return Response
      */
-    public function edit(Request $request, EntityManagerInterface $manager, int $id) : Response {
-        $category = $manager->getRepository(ProductCategory::class)->find($id);
-        $this->checkEntityExistence($category, $id);
+    public function edit(Request $request, EntityManagerInterface $manager, string $slug) : Response {
+        $category = $manager->getRepository(ProductCategory::class)->findBySlug($slug);
+        $this->checkEntityExistence($category, $slug);
         $categoryForm = $this->createForm(ProductCategoryType::class, $category);
         $categoryForm->handleRequest($request);
         if ($categoryForm->isSubmitted() && $categoryForm->isValid()){
@@ -107,8 +107,7 @@ class ProductCategoryController extends AbstractController
             $manager->flush();
             return $this->redirectToRoute(self::$homeRoute);
         }
-
-        return $this->render(self::$templatePath."/form.html.twig", [
+        return $this->renderWithNavigation($category, self::$templatePath."/form.html.twig",[
             "form" => $categoryForm
         ]);
     }

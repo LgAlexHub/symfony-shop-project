@@ -1,9 +1,15 @@
+{% import "admin/macros/navigation.twig" as nav %}
 {% extends 'admin/base.html.twig' %}
-{% block title %} - {{form.vars.value.id is null ? 'Ajouter'  : 'Modifier' }} une catégorie{% endblock %}
+{% block title %} - {{form.vars.value is null ? 'Ajouter'  : 'Modifier' }} une catégorie{% endblock %}
 
 {% block body %}
+    {% if form.vars.value is not null %}
+        {{nav.navigation(urls, lastLabel)}}
+    {% else %}
+        <a href={{url.route}}><i class="fa-solid fa-arrow-left px-1 mt-2"></i>{{url.label}}</a>
+    {% endif %}
     <h1 class="text-center mt-10 text-2xl">
-        {% if form.vars.value.id is null %}
+        {% if form.vars.value is null %}
             Ajouter
         {% else %}
             Modifier : 
@@ -21,9 +27,7 @@
                     {{ form_errors(form.label) }}
                     {{ form_widget(form.label, {attr : {'class' : ' border rounded-sm border-slate-700 px-2 px-3', 'placeholder' : 'Jus de légumes'}} )}}
                 </div>
-                <div class="">
-                    {{ form_widget(form.submit, {label : form.vars.value.id is null ? 'Ajouter' : 'Modifier', attr : {'class' : 'w-3/6 my-5 border border-blue-400 rounded-md bg-sky-400 px-2 py-1 text-white hover:bg-blue-800 hover:border-transparent'}})}}
-                </div>
+                {{ form_widget(form.submit, {label : form.vars.value is null ? 'Ajouter' : 'Modifier', attr : {'class' : 'w-3/6 my-5 border border-blue-400 rounded-md bg-sky-400 px-2 py-1 text-white hover:bg-blue-800 hover:border-transparent'}})}}
         {{ form_end(form)}}
     </div>
 {% endblock %}

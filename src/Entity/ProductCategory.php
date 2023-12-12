@@ -2,9 +2,8 @@
 
 namespace App\Entity;
 
-use App\Entity\Trait\SluggableTrait;
+use App\Entity\Trait as HelperTrait;
 use App\Repository\ProductCategoryRepository;
-use App\Entity\Trait\TimestampableWithIdTrait;
 
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
@@ -21,8 +20,8 @@ use Doctrine\Common\Collections\ArrayCollection;
  */
 class ProductCategory
 {
-    use TimestampableWithIdTrait;
-    use SluggableTrait;
+    use HelperTrait\TimestampableWithIdTrait;
+    use HelperTrait\SluggableTrait;
 
     #[ORM\Column(length: 255, nullable:false, type: Types::STRING)]
     private ?string $label = null;
@@ -110,7 +109,7 @@ class ProductCategory
      *
      * @return string
      */
-    protected function getValueToSlugify(): string {
+    public function getValueToSlugify(): string {
         return $this->label;
     }
 }

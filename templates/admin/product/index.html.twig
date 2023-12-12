@@ -4,7 +4,7 @@
 
 {% block body %}
     <h1 class="text-center my-3 text-2xl font-san underline text-slate-800">Mes produits</h1>
-    <div class="container mx-auto w-screen mt-3 ml-3">
+    <div class="container mx-auto mt-3 ml-3">
         <table class="table-fixed w-full border-separate border-spacing-2">
             <thead>
                 <tr>
@@ -28,7 +28,7 @@
                         <td class="border border-slate-300 px-2 w-1/6">{{product.name}}</td>
                         <td class="border border-slate-300 px-2 w-1/6">{{product.category.label}}</td>
                         <td class="border border-slate-300 text-center text-blue-800 w-2/6 border border-slate-300">
-                            <a href="{{path('admin.products.prices', {'id' : product.id})}}" class="hover:underline">
+                            <a href="{{path('admin.products.references.index', {'slug' : product.slug})}}" class="hover:underline">
                                 Prix disponible : <span class="rounded-full px-2 border border-purple-400 bg-purple-400 text-white">
                                     {{product.productReferences|length}}
                                 </span>
@@ -38,10 +38,10 @@
                             <a href="">
                                 <i class="fa-solid fa-magnifying-glass text-blue-700 border border-blue-700 hover:text-white hover:border-transparent hover:bg-blue-700 rounded-md px-3 py-3"></i>
                             </a>
-                            <a href="{{path('admin.products.edit', {'id' : product.id})}}">
+                            <a href="{{path('admin.products.edit', {'slug' : product.slug})}}">
                                 <i class="fa-solid fa-pen-to-square border text-slate-800 border-slate-800 hover:text-white hover:border-transparent hover:bg-slate-800 rounded-md px-3 py-3"></i>
                             </a>
-                            <a href="{{path('admin.products.delete', {'id' : product.id})}}" class="w-fit"><i class="fa-solid fa-circle-xmark border text-red-500 border-red-500 hover:text-white hover:border-transparent hover:bg-red-500 rounded-md px-3 py-3"></i></a>                     </div>
+                            <a href="{{path('admin.products.delete', {'slug' : product.slug})}}" class="w-fit"><i class="fa-solid fa-circle-xmark border text-red-500 border-red-500 hover:text-white hover:border-transparent hover:bg-red-500 rounded-md px-3 py-3"></i></a>                     </div>
                         </td>
                     </tr>
                 {% endfor %}

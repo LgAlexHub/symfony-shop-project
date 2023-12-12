@@ -2,8 +2,7 @@
 
 namespace App\Entity;
 
-use App\Entity\Trait\SluggableTrait;
-use App\Entity\Trait\TimestampableWithIdTrait;
+use App\Entity\Trait as HelperTrait;
 use App\Repository\ProductReferenceRepository;
 
 use Doctrine\DBAL\Types\Types;
@@ -20,8 +19,8 @@ use Symfony\Component\Validator\Constraints as Assert;
  */
 class ProductReference
 {
-    use TimestampableWithIdTrait;
-    use SluggableTrait;
+    use HelperTrait\TimestampableWithIdTrait;
+    use HelperTrait\SluggableTrait;
 
     #[Assert\NotNull]
     #[ORM\Column(type: Types::SMALLINT)]
@@ -138,7 +137,17 @@ class ProductReference
      *
      * @return string
      */
-    protected function getValueToSlugify(): string {
+    public function getValueToSlugify(): string {
         return "{$this->product->getName()} {$this->weight}{$this->weightType}";
+    }
+
+
+    /**
+     * Undocumented function
+     *
+     * @return string
+     */
+    public function toString() : string {
+        return "{$this->getWeight()} {$this->getWeightType()}";
     }
 }

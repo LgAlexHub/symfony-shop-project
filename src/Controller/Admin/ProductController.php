@@ -26,7 +26,10 @@ class ProductController extends AbstractController
 {
     use ControllerToolsTrait;
 
-    #[Route('/', name: 'home')]
+    private static string $templatePath = "admin/product";
+    private static string $homeRoute = "admin.products.index";
+
+    #[Route('/', name: 'index')]
     /**
      * Handling home admin route, first route after login
      * render a list of all products
@@ -41,12 +44,12 @@ class ProductController extends AbstractController
             ->orderBy("product.name", "ASC")
             ->getQuery()
             ->execute();
-        return $this->render('admin/product/index.html.twig', [
+        return $this->render(self::$templatePath.'/index.html.twig', [
             'products' => $products,
         ]);
     }
 
-    #[Route('/new', name: 'new')]
+    #[Route('/add', name: 'add')]
     /**
      * This route render create product form, this route also handle the submit
      *
@@ -54,78 +57,64 @@ class ProductController extends AbstractController
      * @param EntityManagerInterface $manager Will persist data in DB
      * @return Response either view or redirection
      */
-    public function create(Request $request, EntityManagerInterface $manager) : Response {
-
+    public function add(Request $request, EntityManagerInterface $manager) : Response {
         $productForm = $this->createForm(ProductType::class);
-
         $productForm->handleRequest($request);
-
         if($productForm->isSubmitted() && $productForm->isValid()){
             $newProduct = $productForm->getData();
             $manager->persist($newProduct);
             $manager->flush();
             $manager->detach($newProduct);
-            return $this->redirectToRoute('admin.products.home');
+            return $this->redirectToRoute(self::$homeRoute);
         }
-
-        return $this->render('admin/product/create.html.twig', [
+        return $this->renderWithRefererUrl($request, self::$templatePath.'/form.html.twig', [
             'form' => $productForm
         ]);
     }
    
-    #[Route('/delete/{id}', name:'delete')]
+    #[Route('/{slug}/delete', name:'delete')]
     /**
-     * Attempts to delete a product by its ID.
+     * Attempts to delete a product by its slug.
      *
      * Note:
      * - Redirects to the "admin.products.home" route if the deletion is successful.
-     * - TODO: Add a 404 exception if the ID is not found.
+     * - TODO: Add a 404 exception if the slug is not found.
      *
      * @param EntityManagerInterface $entityManager The entity manager handling the database delete.
-     * @param int                    $id              The ID of the targeted product.
+     * @param string                    $slug              The slug of the targeted product.
      *
      * @return Response Either a view or a redirection.
      *
      * @throws NotFoundHttpException If the targeted product is not found.
      */
-    public function delete(EntityManagerInterface $entityManager, int $id) : Response {
-        $productRepository = $entityManager->getRepository(Product::class);
-        $product = $productRepository->find($id);
-        $productsReferencesRepository = $entityManager->getRepository(ProductReference::class);
-        $productsReferences = $productsReferencesRepository
-            ->createQueryBuilder("proref")
-            ->where("proref.product = :product_id")
-            ->setParameter("product_id", $id)
-            ->getQuery()
-            ->execute();
-        $this->checkEntityExistence($product, $id);
-        foreach($productsReferences as $prodRef){
-            $entityManager->remove($prodRef);
+    public function delete(EntityManagerInterface $manager, string $slug) : Response {
+        $product = $manager->getRepository(Product::class)->findBySlug($slug);
+        $this->checkEntityExistence($product, $slug);
+        foreach($product->getProductReferences() as $ref){
+            $manager->remove($ref);
         }
-        $entityManager->remove($product);
-        $entityManager->flush();
+        $manager->remove($product);
+        $manager->flush();
         return $this->redirectToRoute("admin.products.home");
     }
 
-    #[Route('/edit/{id}', name : 'edit')]
+    #[Route('/{slug}/edit', name : 'edit')]
     /**
      * Displays and processes the edit form for a specified product.
      *
-     * This route retrieves and renders the edit form for a specific product identified by its ID.
+     * This route retrieves and renders the edit form for a specific product identified by its slug.
      *
      * @param Request                $request
-     * @param int                    $id               The ID of the targeted product.
+     * @param string                 $slug               The slug of the targeted product.
      * @param EntityManagerInterface $entityManager   The entity manager used to retrieve and persist data.
      *
      * @return Response Either the rendered form view or a redirection.
      *
      * @throws NotFoundHttpException If the targeted product is not found.
      */
-    public function edit(Request $request, int $id, EntityManagerInterface $entityManager) : Response {
-        $product = $entityManager->getRepository(Product::class)
-            ->find($id);
-        $this->checkEntityExistence($product, $id);
-
+    public function edit(Request $request, string $slug, EntityManagerInterface $entityManager) : Response {
+        $product = $entityManager->getRepository(Product::class)->findBySlug($slug);
+        $this->checkEntityExistence($product, $slug);
         $productForm = $this->createForm(ProductType::class, $product);
         $productForm->handleRequest($request);
         if ($productForm->isSubmitted() && $productForm->isValid()){
@@ -135,106 +124,10 @@ class ProductController extends AbstractController
                 ->setCategory($updatedProduct->getCategory());
             $entityManager->persist($product);
             $entityManager->flush();
-            return $this->redirectToRoute('admin.products.home');
+            return $this->redirectToRoute(self::$homeRoute);
         }
-        return $this->render('admin/product/edit.html.twig', [
+        return $this->renderWithNavigation($product, self::$templatePath.'/form.html.twig', [
             'form' => $productForm
         ]);
     }
-
-    #[Route('/{id}/prices', name : 'prices')]
-    /**
-     * Displays and processes the form for managing prices of a specified product.
-     *
-     * This route allows users to view and manage prices for a specific product identified by its ID.
-     *
-     * @param Request                $request
-     * @param int                    $id              The ID of the targeted product.
-     * @param EntityManagerInterface $manager         The entity manager used to retrieve and persist data.
-     *
-     * @return Response Either the rendered view or a redirection.
-     *
-     * @throws NotFoundHttpException If the targeted product is not found.
-     */
-    public function showPrices(Request $request, int $id, EntityManagerInterface $manager){
-        $newRef = new ProductReference;
-        $product = $manager->getRepository(Product::class)
-            ->find($id);
-        $this->checkEntityExistence($product, $id);
-        $refForm = $this->createForm(ProductReferenceType::class, options: []);
-        $refForm->handleRequest($request);
-        if($refForm->isSubmitted() && $refForm->isValid()){
-            $fomatedPrice = floatval(preg_replace('/\,/', '.', $request->get('product_reference')['price'] ?? 0)) * 100 ;
-            $newRef = $refForm->getData();
-            $newRef
-                ->setProduct($product)
-                ->setPrice($fomatedPrice);
-            $manager->persist($newRef);
-            $manager->flush();
-            return $this->redirect($request->headers->get('referer'));
-        }
-
-        return $this->render('admin/product/reference/index.html.twig', [
-                'product' => $product,
-            'refForm' => $refForm
-        ]);
-    }
-
-    #[Route('/{productId}/prices/{productRefId}', name : 'prices.delete')]
-    /**
-     * Deletes a product reference by its ID.
-     *
-     * This route allows users to delete a specific product reference identified by its ID.
-     *
-     * @param Request                $request
-     * @param EntityManagerInterface $manager        The entity manager used to retrieve and persist data.
-     * @param int                    $productRefId   The ID of the targeted product reference.
-     *
-     * @return Response A redirection to the previous page.
-     *
-     * @throws NotFoundHttpException If the targeted product reference is not found.
-     */
-    public function deletePrice(Request $request, EntityManagerInterface $manager, int $productRefId){
-        $ref = $manager->getRepository(ProductReference::class)->find($productRefId);
-        $this->checkEntityExistence($ref, $productRefId);
-        $manager->remove($ref);
-        $manager->flush();
-        return $this->redirect($request->headers->get('referer'));
-    }
-
-    #[Route('/{productId}/prices/{productRefId}/edit', name : 'prices.edit')]
-    /**
-     * Displays and processes the form for editing a product reference.
-     *
-     * This route allows users to edit the details of a specific product reference identified by its ID.
-     *
-     * @param Request                $request
-     * @param EntityManagerInterface $manager        The entity manager used to retrieve and persist data.
-     * @param int                    $productRefId   The ID of the targeted product reference.
-     *
-     * @return Response Either the rendered view or a redirection.
-     *
-     * @throws NotFoundHttpException If the targeted product reference is not found.
-     */
-    public function editPrice(Request $request, EntityManagerInterface $manager, int $productRefId){
-        $ref = $manager->getRepository(ProductReference::class)->find($productRefId);
-        $this->checkEntityExistence($ref, $productRefId);
-        $productRefForm = $this->createForm(ProductReferenceType::class, $ref);
-        $productRefForm->handleRequest($request);
-        if ($productRefForm->isSubmitted() && $productRefForm->isValid()){
-            $fomatedPrice = floatval(preg_replace('/\,/', '.', $request->get('product_reference')['price'] ?? 0)) * 100 ;
-            $updatedProductRef = $productRefForm->getData();
-            $ref->setWeight($updatedProductRef->getWeight())
-                ->setWeightType($updatedProductRef->getWeightType())
-                ->setPrice($fomatedPrice);
-            $manager->persist($ref);
-            $manager->flush();
-            return $this->redirectToRoute('admin.products.prices', ['id' => $ref->getProduct()->getId()]);
-        }
-
-        return $this->render('admin/product/reference/edit.html.twig', [
-            'refForm' => $productRefForm
-        ]);
-    }
-
 }
