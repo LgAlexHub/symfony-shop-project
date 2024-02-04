@@ -21,9 +21,12 @@ Encore
      * and one CSS file (e.g. app.css) if your JavaScript imports CSS.
      */
     .addEntry('app', './assets/app.js')
-
+    .enableVueLoader()
+    .enableStimulusBridge('./assets/controllers.json')
     // When enabled, Webpack "splits" your files into smaller pieces for greater optimization.
     .splitEntryChunks()
+
+    // enables the Symfony UX Stimulus bridge (used in assets/bootstrap.js)
     .enablePostCssLoader()
     // will require an extra script tag for runtime.js
     // but, you probably want this, unless you're building a single-page app

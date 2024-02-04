@@ -54,6 +54,7 @@ class ProductType extends AbstractType
                     // new Type(ProductCategory::class)
                 ]
             ])
+            ->add('description', Type\TextareaType::class)
             ->add('submit', Type\SubmitType::class, [
                 'label' => 'Ajouter'
             ])

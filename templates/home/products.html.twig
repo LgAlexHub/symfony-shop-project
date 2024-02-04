@@ -5,7 +5,7 @@
 {% block body %}
     <div class="grid grid-cols-5 gap-4 px-2 py-3">
         {% for product in products %}
-            <div class="max-w-sm rounded overflow-hidden shadow-lg">
+            <div onclick="location.href='{{product.viewPageUrl}}'" class="max-w-sm rounded overflow-hidden shadow-lg">
                 {% if product.productReferences|length > 0 %}
                     <img src="/products/{{product.productReferences[0].slug}}.jpg" class="w-full"  alt="Sunset in the mountains">
                 

@@ -5,8 +5,6 @@ namespace App\Controller\Admin;
 use App\Controller\Trait\ControllerToolsTrait;
 use App\Entity\Product;
 use App\Form\ProductType;
-use App\Entity\ProductReference;
-use App\Form\ProductReferenceType;
 
 use Doctrine\ORM\EntityManagerInterface;
 
@@ -120,6 +118,7 @@ class ProductController extends AbstractController
         if ($productForm->isSubmitted() && $productForm->isValid()){
             $updatedProduct = $productForm->getData();
             $product
+                ->setDescription($updatedProduct->getDescription())
                 ->setName($updatedProduct->getName())
                 ->setCategory($updatedProduct->getCategory());
             $entityManager->persist($product);

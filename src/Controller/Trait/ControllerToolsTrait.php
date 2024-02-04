@@ -7,15 +7,20 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use App\Entity as Entity;
 
+/**
+ * @author Aléki <alexlegras@hotmail.com>
+ * @version 1.0.0
+ */
 trait ControllerToolsTrait
 {
 
+
     /**
-     * Undocumented function
+     * Check if entity with given slug exist
      *
-     * @param mixed $var
-     * @param integer $id
-     * @return void
+     * @param mixed $var Enity instance
+     * @param string $slug targeted slug
+     * @throws NotFoundException
      */
     protected function checkEntityExistence(mixed $var, string $slug)
     {
@@ -25,7 +30,7 @@ trait ControllerToolsTrait
     }
 
     /**
-     * Undocumented function
+     * Chec
      *
      * @param Request $request
      * @param FormInterface $form

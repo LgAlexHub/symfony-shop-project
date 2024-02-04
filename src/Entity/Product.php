@@ -29,6 +29,9 @@ class Product
     #[ORM\Column(length: 255, nullable:false, type: Types::STRING)]
     private ?string $name = null;
 
+    #[ORM\Column(length: 2048, nullable:true, type:Types::TEXT)]
+    private ?string $description = null;
+
     #[ORM\ManyToOne(inversedBy: 'products')]
     private ?ProductCategory $category = null;
 
@@ -129,5 +132,34 @@ class Product
      */
     public function getValueToSlugify(): string {
         return $this->name;
+    }
+
+    /**
+     * Get the value of description
+     */ 
+    public function getDescription()
+    {
+        return $this->description;
+    }
+
+    /**
+     * Set the value of description
+     *
+     * @return  self
+     */ 
+    public function setDescription($description)
+    {
+        $this->description = $description;
+
+        return $this;
+    }
+
+    /**
+     * Generate url view page of a product using slug
+     *
+     * @return string
+     */
+    public function getViewPageUrl() : string {
+        return "/produits/{$this->slug}";
     }
 }
