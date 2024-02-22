@@ -23,7 +23,10 @@
 ###> symfony/webpack-encore-bundle ###
 /node_modules/
 /public/build/
+/public/images/products/
 npm-debug.log
 yarn-error.log
 ###< symfony/webpack-encore-bundle ###
 startUp.bat
+
+/backup/
