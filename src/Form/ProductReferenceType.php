@@ -10,6 +10,7 @@ use Symfony\Component\Form\Extension\Core\Type as Type;
 use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\Validator\Constraints\NotNull;
 use Symfony\Component\Validator\Constraints\Positive;
+use Vich\UploaderBundle\Form\Type\VichImageType;
 
 /**
  * @author Aléki <alexlegras@hotmail.com>
@@ -48,6 +49,7 @@ class ProductReferenceType extends AbstractType
                     new NotBlank()
                 ]
             ])
+            ->add('imageFile', VichImageType::class)
             ->add('submit', Type\SubmitType::class, [
                 'label' => 'Ajouter'
             ])

@@ -9,6 +9,7 @@ use App\Repository\ProductCategoryRepository;
 
 use Doctrine\Persistence\ObjectManager;
 use Doctrine\Bundle\FixturesBundle\Fixture;
+use Vich\UploaderBundle\FileAbstraction\ReplacingFile;
 
 /**
  * @author Aléki <alexlegras@hotmail.com>
@@ -63,6 +64,17 @@ class ProductFixture extends Fixture
                 $newProductReference->setPrice(intval($line[4]));
                 $manager->persist($newProductReference);
                 $manager->flush();
+                $imageData = [
+                    $newProductReference->getSlug(),
+                    sprintf("C:\\Users\\alexl\\Documents\\5_CODE\\symfony\\shop-project\\public\\products\\%s.jpg", $newProductReference->getSlug())
+                    
+                ];
+                $imageData[] = file_exists($imageData[1]);
+                if ($imageData[2]){
+                    $newProductReference->setImageFile(new ReplacingFile($imageData[1]));
+                    $manager->persist($newProductReference);
+                    $manager->flush();
+                }
             }
         }
     }

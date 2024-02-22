@@ -7,8 +7,13 @@ use App\Repository\ProductReferenceRepository;
 
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+
+use Symfony\Component\HttpFoundation\File\File;
 use Symfony\Component\Validator\Constraints as Assert;
 
+use Vich\UploaderBundle\Mapping\Annotation as Vich;
+
+#[Vich\Uploadable]
 #[ORM\HasLifecycleCallbacks]
 #[ORM\Entity(repositoryClass: ProductReferenceRepository::class)]
 /**
@@ -17,7 +22,7 @@ use Symfony\Component\Validator\Constraints as Assert;
  * This class represent a reference of product, this class can be bind in Product Class to describe it's price and weight.
  * This is class use Lifecycle callback throught traits.
  */
-class ProductReference
+class ProductReference 
 {
     use HelperTrait\TimestampableWithIdTrait;
     use HelperTrait\SluggableTrait;
@@ -35,6 +40,16 @@ class ProductReference
     #[ORM\JoinColumn(nullable: false)]
     #[ORM\ManyToOne(inversedBy: 'productReferences')]
     private ?Product $product = null;
+    
+    // NOTE: This is not a mapped field of entity metadata, just a simple property.
+    #[Vich\UploadableField(mapping: 'products', fileNameProperty: 'imageName', size: 'imageSize')]
+    private ?File $imageFile = null;
+
+    #[ORM\Column(nullable: true, type: Types::STRING)]
+    private ?string $imageName = null;
+
+    #[ORM\Column(nullable: true, type: Types::INTEGER)]
+    private ?int $imageSize = null;
 
     /**
      * Price getter
@@ -143,11 +158,93 @@ class ProductReference
 
 
     /**
-     * Undocumented function
+     * return a string with weight and weight type of a reference 
      *
      * @return string
      */
     public function toString() : string {
         return "{$this->getWeight()} {$this->getWeightType()}";
+    }
+
+
+      /**
+     * If manually uploading a file (i.e. not using Symfony Form) ensure an instance
+     * of 'UploadedFile' is injected into this setter to trigger the update. If this
+     * bundle's configuration parameter 'inject_on_load' is set to 'true' this setter
+     * must be able to accept an instance of 'File' as the bundle will inject one here
+     * during Doctrine hydration.
+     *
+     * @param File|\Symfony\Component\HttpFoundation\File\UploadedFile|null $imageFile
+     */
+    public function setImageFile(?File $imageFile = null): void
+    {
+        $this->imageFile = $imageFile;
+
+        if (null !== $imageFile) {
+            // It is required that at least one field changes if you are using doctrine
+            // otherwise the event listeners won't be called and the file is lost
+            $this->updatedAt = new \DateTimeImmutable();
+        }
+    }
+
+    /**
+     * Getter for a ImageFile attribute
+     *
+     * @return File|null
+     */
+    public function getImageFile(): ?File
+    {
+        return $this->imageFile;
+    }
+
+    /**
+     * Setter for a imageName attribute
+     *
+     * @param string|null $imageName
+     * @return void
+     */
+    public function setImageName(?string $imageName): void
+    {
+        $this->imageName = $imageName;
+    }
+
+    /**
+     * Getter for a imageName attribute
+     *
+     * @return string|null
+     */
+    public function getImageName(): ?string
+    {
+        return $this->imageName;
+    }
+
+    /**
+     * Setter for a imageSize attribute
+     *
+     * @param integer|null $imageSize
+     * @return void
+     */
+    public function setImageSize(?int $imageSize): void
+    {
+        $this->imageSize = $imageSize;
+    }
+
+    /**
+     * Getter for a imageSize attribute
+     *
+     * @return integer|null
+     */
+    public function getImageSize(): ?int
+    {
+        return $this->imageSize;
+    }
+
+    /**
+     * Virtual property , retreive image path
+     *
+     * @return string
+     */
+    public function getImageUrl() : string {
+        return sprintf("/images/products/%s", $this->imageName ?? '');
     }
 }
