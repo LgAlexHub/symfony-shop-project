@@ -4,14 +4,18 @@ namespace App\Entity;
 
 use App\Entity\Trait as HelperTrait;
 use App\Repository\OrderRepository;
-use Doctrine\Common\Collections\ArrayCollection;
-use Doctrine\Common\Collections\Collection;
+
+use Symfony\Component\Uid\Uuid;
+
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Bridge\Doctrine\Types\UuidType;
+use Doctrine\Common\Collections\Collection;
+use Doctrine\Common\Collections\ArrayCollection;
 
 #[ORM\HasLifecycleCallbacks]
-#[ORM\Entity(repositoryClass: OrderRepository::class)]
 #[ORM\Table(name: '`order`')]
+#[ORM\Entity(repositoryClass: OrderRepository::class)]
 /**
  * @author Aléki <alexlegras@hotmail.com>
  * @access public
@@ -21,15 +25,10 @@ use Doctrine\ORM\Mapping as ORM;
  * This is class use Lifecycle callback throught traits.
  * 
  */
-class Order
+class Order 
 {
 
     use HelperTrait\TimestampableWithIdTrait;
-
-    #[ORM\Id]
-    #[ORM\GeneratedValue]
-    #[ORM\Column]
-    private ?int $id = null;
 
     #[ORM\Column(length: 255)]
     private ?string $clientFirstName = null;
@@ -44,11 +43,28 @@ class Order
     private ?string $comment = null;
 
     #[ORM\OneToMany(targetEntity:OrderProductRef::class, mappedBy: "order")]
-    private Collection $orderProducts;
+    private Collection $items;
+
+    #[ORM\Column(type: UuidType::NAME, unique: true)]
+    #[ORM\GeneratedValue]
+    private Uuid $uuid;
+
+    #[ORM\Column(type: Types::BOOLEAN, nullable: false, options: ['default' => false])]
+    private bool $isValid;
 
     public function __construct()
     {
-        $this->orderProducts = new ArrayCollection();
+        $this->items = new ArrayCollection();
+    }
+
+    /**
+     * Method use to normalize uuid object into string
+     *
+     * @return string
+     */
+    public function getSerializeUuid(): string
+    {
+        return $this->uuid->toRfc4122();
     }
 
      /**
@@ -149,5 +165,86 @@ class Order
         return $this;
     }
 
-   
+    /**
+     * Get the value of uuid
+     */ 
+    public function getUuid()
+    {
+        return $this->uuid;
+    }
+
+    /**
+     * Set the value of uuid
+     *
+     * @return  self
+     */ 
+    public function setUuid($uuid)
+    {
+        $this->uuid = $uuid;
+
+        return $this;
+    }
+
+    /**
+     * Get the value of isValid
+     */ 
+    public function getIsValid()
+    {
+        return $this->isValid;
+    }
+
+    /**
+     * Set the value of isValid
+     *
+     * @return  self
+     */ 
+    public function setIsValid($isValid)
+    {
+        $this->isValid = $isValid;
+
+        return $this;
+    }
+
+    /**
+     * Return a collection of OrderProductRef
+     *
+     * @return Collection
+     */
+    public function getItems() : Collection
+    {
+        return $this->items;
+    }
+
+    /**
+     * Add an instance of OrderProductRef to Order
+     *
+     * @param OrderProductRef $item
+     * @return static
+     */
+    public function addItem(OrderProductRef $item): static
+    {
+        if (!$this->items->contains($item)) {
+            $this->items->add($item);
+            $item->setOrder($this);
+        }
+        return $this;
+    }
+
+    /**
+     * Remove an item from Order basket
+     *
+     * @param OrderProductRef $item
+     * @return static
+     */
+    public function removeItem(OrderProductRef $item): static
+    {
+        if ($this->items->removeElement($item)) {
+            // set the owning side to null (unless already changed)
+            if ($item->getOrder() === $this) {
+                $item->setOrder(null);
+            }
+        }
+
+        return $this;
+    }
 }

@@ -2,25 +2,52 @@
 
 namespace App\Entity;
 
-
-use App\Repository\OrderProductRefRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
+use App\Repository\OrderProductRefRepository;
+
+#[ORM\HasLifecycleCallbacks]
 #[ORM\Entity(repositoryClass: OrderProductRefRepository::class)]
-class OrderProductRef
+/**
+ * @author Aléki <alexlegras@hotmail.com>
+ * @access public
+ * @version 1
+ * 
+ * This class represent the many to many relationship between an order and productRef table.
+ * One instance represent a product link to an order with pivot quantity attribute.
+ * This is class use Lifecycle callback throught traits.
+ * 
+ */
+class OrderProductRef 
 {
+
+    #[ORM\Id]
+    #[ORM\GeneratedValue]
+    #[ORM\Column]
+    private ?int $id = null;
+
     #[ORM\Column(type: Types::INTEGER, options: ["default" => 1])]
     private int $quantity;
 
-    #[ORM\ManyToOne(targetEntity:Order::class)]
     #[ORM\JoinColumn(nullable:false)]
-    #[ORM\Id]
+    #[ORM\ManyToOne(targetEntity:Order::class, inversedBy: 'items')]
     private Order $order;
     
+    #[ORM\JoinColumn(nullable:false)]
     #[ORM\ManyToOne(targetEntity:ProductReference::class)]
-    #[ORM\Id]
     private ProductReference $item;
+
+     /**
+     * Get the value of id
+     *
+     * @return integer|null
+     */
+    public function getId(): ?int
+    {
+        return $this->id;
+    }
+
 
     /**
      * Get the value of quantity

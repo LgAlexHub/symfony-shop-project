@@ -1,0 +1,25 @@
+{% extends 'base.html.twig' %}
+
+{% block title %} - Commander{% endblock %}
+
+{% block body %}
+    <h1 class="text-center text-2xl my-10">Demande commande</h1>
+    <div class="flex h-fit justify-center">
+        {{ form_start(form, {attr: {'class' : 'space-y-9 w-2/4'}})}}
+            {# force twig to not generate item input from form because we use a custom one to pass json string into hidden input  #}
+            {% do form.items.setRendered %}
+            {{ form_errors(form)}}
+            {{form_row(form.clientFirstName, {label : 'Prénom :', attr : {'class' : 'w-full border rounded-sm border-slate-700 ml-3 px-2 px-3', 'placeholder' : 'Jonathan...'}})}}
+            {{form_row(form.clientLastName, {label : 'Nom :', attr : {'class' : 'w-full border rounded-sm border-slate-700 ml-3 px-2 px-3', 'placeholder' : 'Françoise...'}})}}
+            {{form_row(form.email, {label : 'Email :', attr : {'class' : 'w-full border rounded-sm border-slate-700 ml-3 px-2 px-3', 'placeholder' : 'jonathan.francoise@gmail.com...'}})}}
+            {{form_row(form.comment, {label : 'Commentaire :', attr : {'class' : 'h-1/4 w-full border rounded-sm border-slate-700 ml-3 px-2 px-3'}})}}
+            {% if  preSelectedOrderItemJson is defined and preSelectedOrderItemJson is not null and preSelectedOrderItemJson is not empty %}
+                <input type="hidden" name="order[items]" value="{{preSelectedOrderItemJson}}">
+            {% endif %}
+            <div class="flex justify-center">
+                {{ form_widget(form.submit, {label : 'Choisir ses produits', attr : {'class' : 'w-1/2  border border-blue-400 rounded-md bg-sky-400 px-2 py-1 text-white hover:bg-blue-800 hover:border-transparent'}})}}
+            </div>
+            {# <div {{ vue_component('products/formOrderProduct', { 'linkItem': productRefJson }) }}></div>    #}
+        {{ form_end(form)}}
+    </div>
+{% endblock %}

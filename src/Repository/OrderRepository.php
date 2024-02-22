@@ -3,6 +3,7 @@
 namespace App\Repository;
 
 use App\Entity\Order;
+use App\Repository\Trait\RepositoryToolTrait;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
@@ -16,9 +17,30 @@ use Doctrine\Persistence\ManagerRegistry;
  */
 class OrderRepository extends ServiceEntityRepository
 {
+    use RepositoryToolTrait;
+    
     public function __construct(ManagerRegistry $registry)
     {
         parent::__construct($registry, Order::class);
+    }
+
+    public function findByUuid(mixed $value){
+        return $this->createQueryBuilder("o")
+            ->where("o.uuid = :uuid")
+            ->setParameter("uuid", $value, 'uuid')
+            ->setMaxResults(1)
+            ->getQuery()
+            ->getOneOrNullResult();
+    }
+
+    public function findByUuidWithRelated(mixed $value){
+        return $this->createQueryBuilder("o")
+            ->innerJoin('o.items', 'items')
+            ->addSelect("items")
+            ->where("o.uuid = :uuid")
+            ->setParameter("uuid", $value, 'uuid')
+            ->getQuery()
+            ->getOneOrNullResult();
     }
 
 //    /**
