@@ -22,10 +22,10 @@ trait ControllerToolsTrait
      * @param string $slug targeted slug
      * @throws NotFoundException
      */
-    protected function checkEntityExistence(mixed $var, string $slug)
+    protected function checkEntityExistence(mixed $var, string $attributeName, string $attributeValue)
     {
         if (!$var) {
-            throw $this->createNotFoundException("No entity found for slug : $slug");
+            throw $this->createNotFoundException(sprintf("No [%s] entity found for attribute [%s] with value %s", $var::class, $attributeName, $attributeValue));
         }
     }
 

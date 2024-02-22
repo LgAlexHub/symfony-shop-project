@@ -57,8 +57,7 @@ class ProductController extends AbstractController
      */
     public function add(Request $request, EntityManagerInterface $manager) : Response {
         $productForm = $this->createForm(ProductType::class);
-        $productForm->handleRequest($request);
-        if($productForm->isSubmitted() && $productForm->isValid()){
+        if($this->handleAndCheckForm($request, $productForm)){
             $newProduct = $productForm->getData();
             $manager->persist($newProduct);
             $manager->flush();
@@ -87,7 +86,7 @@ class ProductController extends AbstractController
      */
     public function delete(EntityManagerInterface $manager, string $slug) : Response {
         $product = $manager->getRepository(Product::class)->findBySlug($slug);
-        $this->checkEntityExistence($product, $slug);
+        $this->checkEntityExistence($product, "slug", $slug);
         foreach($product->getProductReferences() as $ref){
             $manager->remove($ref);
         }
@@ -112,10 +111,9 @@ class ProductController extends AbstractController
      */
     public function edit(Request $request, string $slug, EntityManagerInterface $entityManager) : Response {
         $product = $entityManager->getRepository(Product::class)->findBySlug($slug);
-        $this->checkEntityExistence($product, $slug);
+        $this->checkEntityExistence($product,"slug" ,$slug);
         $productForm = $this->createForm(ProductType::class, $product);
-        $productForm->handleRequest($request);
-        if ($productForm->isSubmitted() && $productForm->isValid()){
+        if ($this->handleAndCheckForm($request, $productForm)){
             $updatedProduct = $productForm->getData();
             $product
                 ->setDescription($updatedProduct->getDescription())

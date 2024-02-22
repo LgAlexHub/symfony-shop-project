@@ -84,7 +84,7 @@ trait TimestampableWithIdTrait {
     /**
      * Get the value of updatedAt
      */ 
-    public function getUpdatedAt() : ?\DateTime
+    public function getUpdatedAt() : ?\DateTimeImmutable 
     {
         return $this->updatedAt;
     }

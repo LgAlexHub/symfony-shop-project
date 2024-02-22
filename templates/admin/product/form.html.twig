@@ -16,8 +16,8 @@
         {% endif %}
     </h1>
     <hr class="mx-20 my-4">
-        <div class="container mt-3 h-full flex items-center justify-center">
-            {{ form_start(form, {attr: {'class' : 'space-y-9'}})}}
+    <div class="container mt-3 h-full flex items-center justify-center">
+        {{ form_start(form, {attr: {'class' : 'space-y-9'}})}}
             {{ form_errors(form)}}
             {{form_row(form.name, {label : 'Nom du produit :', attr : {'class' : 'border rounded-sm border-slate-700 ml-3 px-2 px-3', 'placeholder' : 'Confiture de kiwi...'}})}}
             {{form_row(form.category, {label : 'Catégorie :', attr : {'class' : 'border rounded-sm border-slate-700 ml-3 px-2 px-3'}})}}
