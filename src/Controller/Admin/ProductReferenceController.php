@@ -40,7 +40,7 @@ class ProductReferenceController extends AbstractController
     public function index(Request $request, EntityManagerInterface $manager, string $slug): Response
     {
         $product = $manager->getRepository(Product::class)->findBySlug($slug);
-        $this->checkEntityExistence($product, $slug);
+        $this->checkEntityExistence($product, "slug", $slug);
         $productRefFrom = $this->createForm(ProductReferenceType::class);
         if ($this->handleAndCheckForm($request, $productRefFrom)) {
             $fomatedPrice = floatval(preg_replace('/\,/', '.', $request->get('product_reference')['price'] ?? 0)) * 100;
@@ -70,7 +70,7 @@ class ProductReferenceController extends AbstractController
     public function delete(Request $request, EntityManagerInterface $manager, string $refSlug): Response
     {
         $productRef = $manager->getRepository(ProductReference::class)->findBySlug($refSlug);
-        $this->checkEntityExistence($productRef, $refSlug);
+        $this->checkEntityExistence($productRef, "slug", $refSlug);
         $manager->remove($productRef);
         $manager->flush();
         return $this->redirect($request->headers->get('referer'));
@@ -93,7 +93,7 @@ class ProductReferenceController extends AbstractController
     public function edit(Request $request, EntityManagerInterface $manager, string $refSlug)
     {
         $ref = $manager->getRepository(ProductReference::class)->findBySlug($refSlug)[0];
-        $this->checkEntityExistence($ref, $refSlug);
+        $this->checkEntityExistence($ref, "slug", $refSlug);
         $productRefForm = $this->createForm(ProductReferenceType::class, $ref);
         if ($this->handleAndCheckForm($request, $productRefForm)) {
             $fomatedPrice = floatval(preg_replace('/\,/', '.', $request->get('product_reference')['price'] ?? 0)) * 100;

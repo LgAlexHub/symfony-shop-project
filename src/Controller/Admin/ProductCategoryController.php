@@ -55,7 +55,7 @@ class ProductCategoryController extends AbstractController
     public function add(Request $request, EntityManagerInterface $manager): Response {
         $categoryForm = $this->createForm(ProductCategoryType::class);
         $categoryForm->handleRequest($request);
-        if ($categoryForm->isSubmitted() && $categoryForm->isValid()){
+        if ($this->handleAndCheckForm($request, $categoryForm)){
             $newCategory = $categoryForm->getData();
             $manager->persist($newCategory);
             $manager->flush();
@@ -71,15 +71,14 @@ class ProductCategoryController extends AbstractController
     /**  
      * Try to delete a  product category in database, will throw exception if it's incorrect
      * and will redirect to product categories home route if it's successfully deleted.
-     * @param Request $request
      * @param EntityManagerInterface $manager
      * @param string $slug
      * @throws createNotFoundException
      * @return void
      */
-    public function delete(Request $request, EntityManagerInterface $manager, string $slug) : Response{
+    public function delete(EntityManagerInterface $manager, string $slug) : Response{
         $category = $manager->getRepository(ProductCategory::class)->findBySlug($slug);
-        $this->checkEntityExistence($category, $slug);
+        $this->checkEntityExistence($category, "slug", $slug);
         $manager->remove($category);
         $manager->flush();
         return $this->redirectToRoute(self::$homeRoute);
@@ -97,10 +96,10 @@ class ProductCategoryController extends AbstractController
      */
     public function edit(Request $request, EntityManagerInterface $manager, string $slug) : Response {
         $category = $manager->getRepository(ProductCategory::class)->findBySlug($slug);
-        $this->checkEntityExistence($category, $slug);
+        $this->checkEntityExistence($category, "slug", $slug);
         $categoryForm = $this->createForm(ProductCategoryType::class, $category);
         $categoryForm->handleRequest($request);
-        if ($categoryForm->isSubmitted() && $categoryForm->isValid()){
+        if ($this->handleAndCheckForm($request, $categoryForm)){
             $newCategory = $categoryForm->getData();
             $category->setLabel($newCategory->getLabel());
             $manager->persist($category);
