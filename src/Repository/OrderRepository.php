@@ -43,6 +43,14 @@ class OrderRepository extends ServiceEntityRepository
             ->getOneOrNullResult();
     }
 
+    public function findAllRelated(){
+        return $this->createQueryBuilder("o")
+            ->innerJoin('o.items', 'items')
+            ->addSelect("items")
+            ->getQuery()
+            ->getResult();
+    }
+
 //    /**
 //     * @return Order[] Returns an array of Order objects
 //     */

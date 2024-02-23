@@ -5,11 +5,11 @@ namespace App\Controller;
 use App\Entity\Order;
 use App\Entity\OrderProductRef;
 use App\Entity\ProductReference;
+use App\Service\EnhancedEntityJsonSerializer;
 
 use Doctrine\ORM\EntityManagerInterface;
 use App\Repository\ProductReferenceRepository;
 use App\Controller\Trait\ControllerToolsTrait;
-
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
 use Symfony\Component\HttpFoundation\Request;
@@ -20,100 +20,163 @@ use Symfony\Component\Form\Extension\Core\Type as Type;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
 use Symfony\Component\Uid\Uuid;
-use Symfony\Component\Serializer\Serializer;
-use Symfony\Component\Serializer\Encoder\JsonEncoder;
 use Symfony\Component\Serializer\Normalizer\AbstractNormalizer;
-use Symfony\Component\Serializer\Normalizer\ObjectNormalizer;
 
 
 #[Route('api', 'api.')]
+/**
+ * @author Aléki <alexlegras@hotmail.com>
+ * @version 1
+ * Controller that handle api endpoint for order  routes
+ */
 class ApiOrderController extends AbstractController
 {
     use ControllerToolsTrait;
 
-    #[Route('/api/order', name: 'app_api_order')]
-    public function index(): Response
-    {
-        return $this->render('api_order/index.html.twig', [
-            'controller_name' => 'ApiOrderController',
-        ]);
-    }
-
     #[Route('/produits/recherche', name: 'query')]
-    public function queryProductApiEndPoint(ProductReferenceRepository $manager, Request $request): Response
+    /**
+     * API Endpoint: get product refrences by name.
+     *
+     * @param ProductReferenceRepository $productReferenceRepository
+     * @param Request $request
+     * @param EnhancedEnityJsonSerializer $enhancedEnityJsonSerializer
+     * @return Response
+     */
+    public function searchProductReferencesByQueryApi(ProductReferenceRepository $productReferenceRepository, Request $request, EnhancedEntityJsonSerializer $enhancedEnityJsonSerializer): Response
     {
         $queryString = $request->get('nom');
-        $products = [];
-
         if (empty($queryString) || is_null($queryString))
             return new Response(null, 401, ['Content-Type' => 'application/json']);
-
-
-        $products = $manager->refByQueryWithRelated($queryString);
-        $jsonSerialiser = new Serializer(
-            [new ObjectNormalizer()],
-            ['json' => new JsonEncoder()]
-        );
-        $orderItemsJsonSerialized = $jsonSerialiser->serialize($products, 'json', [
-            AbstractNormalizer::CIRCULAR_REFERENCE_HANDLER => fn (object $orderProductRef, string $format, array $context) => $orderProductRef->getId(),
-            AbstractNormalizer::ATTRIBUTES => [
+        $productReferences = $productReferenceRepository->refByQueryWithRelated($queryString);
+        $enhancedEnityJsonSerializer
+            ->setObjectToSerialize($productReferences)
+            ->setOptions([AbstractNormalizer::CIRCULAR_REFERENCE_HANDLER => fn (object $orderProductRef, string $format, array $context) => $orderProductRef->getId()])
+            ->setAttributes([
                 'price', 'weight', 'weightType', 'slug', 'imageUrl', 'product' => [
                     'name', 'description', 'slug'
                 ]
-            ]
-        ]);
-        // dd($orderItemsJsonSerialized);
-        return new Response($orderItemsJsonSerialized, headers: [
+            ]);
+        return new Response($enhancedEnityJsonSerializer->serialize(), headers: [
             'Content-Type' => 'application/json'
         ]);
     }
 
     #[Route('/commandes/{uuidOrder}/ajouter-produit', name: 'add-product-to-basket', methods: ['POST'])]
-    public function addProductToBasket(Request $request, string $uuidOrder, EntityManagerInterface $manager)
+    /**
+     * API Endpoint: Try to link an item to targeted order or if it exist will increase the quantity.
+     *
+     * @param Request $request
+     * @param string $uuidOrder
+     * @param EntityManagerInterface $manager
+     * @return Response
+     */
+    public function addProductToBasket(Request $request, string $uuidOrder, EntityManagerInterface $manager): Response
     {
-        if (empty($uuidOrder) || is_null($uuidOrder) || !Uuid::isValid($uuidOrder))
-            return $this->json(['Erreur : commande '],status: 404);
-
-        $form = $this->createFormBuilder(null, ['csrf_protection' => false])
-            ->add('productReferenceSlug', Type\TextType::class, ['constraints' => [
-                new NotBlank(),
-            ]])
-            ->getForm();
-        
-        if (!$this->handleAndCheckForm($request, $form)) 
-            return new Response('forbiden', 401, ['Content-Type' => 'application/json']);
-
-        $data = $form->getData();
-        $productRef = $manager->getRepository(ProductReference::class)->findBySlug($data["productReferenceSlug"]);
-        $order = $manager->getRepository(Order::class)->findByUuidWithRelated($uuidOrder);
-        $this->checkEntityExistence($order, "uuid" ,$uuidOrder);
-        $orderProductRef = $manager->getRepository(OrderProductRef::class)->findProductInOrder($order->getId(), $productRef->getId());
-
-        if (is_null($productRef))
-            return new Response('forbiden', 401, ['Content-Type' => 'application/json']);
-    
-
-        match(is_null($orderProductRef)){
+        $orderAndProductRef = $this->checkOrderAndProductRefExistance($request, $uuidOrder, $manager);
+        if(isset($orderAndProductRef->error))
+            return $this->json(["Erreur" => $orderAndProductRef->error['msg']], status: $orderAndProductRef->error['code']);
+        // We try to look items already in order to see if we just need to increase quantity or if we need to link it to current order
+        $orderProductRef = $manager->getRepository(OrderProductRef::class)->findProductInOrder($orderAndProductRef->order->getId(), $orderAndProductRef->productRef->getId());
+        match (is_null($orderProductRef)) {
             true =>  $orderProductRef = (new OrderProductRef())
-                ->setOrder($order)
-                ->setItem($productRef)
+                ->setOrder($orderAndProductRef->order)
+                ->setItem($orderAndProductRef->productRef)
                 ->setQuantity(1),
             false => $orderProductRef->setQuantity($orderProductRef->getQuantity() + 1)
         };
-        
+
         $manager->persist($orderProductRef);
         $manager->flush();
         $manager->detach($orderProductRef);
 
-        return new Response('ok', 200, ['Content-Type' => 'application/json']);
+        return $this->json('OK', status: 200);
+    }
+
+    #[Route('/commandes/{uuidOrder}/supprimer-produit', name: 'delete-product-from-basket', methods: ['POST'])]
+    /**
+     * Undocumented function
+     *
+     * @return Response
+     */
+    public function removeProductFromBasket(Request $request, string $uuidOrder, EntityManagerInterface $manager): Response
+    {
+        $orderAndProductRef = $this->checkOrderAndProductRefExistance($request, $uuidOrder, $manager);
+        if(isset($orderAndProductRef->error))
+            return $this->json(["Erreur" => $orderAndProductRef->error['msg']], status: $orderAndProductRef->error['code']);
+        // We try to look items already in order to see if we just need to increase quantity or if we need to link it to current order
+        $orderProductRef = $manager->getRepository(OrderProductRef::class)->findProductInOrder($orderAndProductRef->order->getId(), $orderAndProductRef->productRef->getId());
+        if(is_null($orderProductRef))
+            return $this->json(['erreur' => 'Le produit dans votre panier que vous recherchez n\'existe pas'], 404);
+        match ($orderProductRef->getQuantity() < 2) {
+            true =>  $manager->remove($orderProductRef),
+            false => $orderProductRef->setQuantity($orderProductRef->getQuantity() - 1)
+        };
+        $manager->flush();
+        return $this->json("OK", 200);
     }
 
     /**
      * Undocumented function
      *
-     * @return void
+     * @param Request $request
+     * @param string $uuidOrder
+     * @param EntityManagerInterface $manager
+     * @return object
      */
-    public function removeProductFromBasket(){
-
+    private function checkOrderAndProductRefExistance(Request $request, string $uuidOrder, EntityManagerInterface $manager) : object
+    {
+        if (empty($uuidOrder) || is_null($uuidOrder) || !Uuid::isValid($uuidOrder))
+            return  (object)['error' => ['code' => 422, 'msg' =>'UUID absent ou erroné']];
+        $order = $manager->getRepository(Order::class)->findByUuidWithRelated($uuidOrder);
+        if (is_null($order))
+            return  (object)['error' => ['code' => 404, 'msg' => sprintf("Commande avec l'UUID %s inexistante", $uuidOrder)]];
+        
+        $productRefSlugForm = $this->createFormBuilder(null, ['csrf_protection' => false])
+            ->add('productReferenceSlug', Type\TextType::class, [
+                'constraints' => [
+                    new NotBlank(),
+                ]
+            ])
+            ->getForm();
+        if (!$this->handleAndCheckForm($request, $productRefSlugForm))
+            return  (object)['error' => ['code' => 422, 'msg' => "Formulaire incomplent, slug manquant"]];
+        
+        $productRef = $manager->getRepository(ProductReference::class)->findBySlug($productRefSlugForm->getData()["productReferenceSlug"]);
+        if (is_null($productRef))
+            return  (object)['error' => ['code' => 404, 'msg' => sprintf("Référence de produit avec le slug %s inexistant", $productRefSlugForm->getData()["productReferenceSlug"])]];
+        
+        return (object)[
+            'order' => $order,
+            'productRef' => $productRef
+        ];
     }
+    
+    #[Route('/commandes', name: 'orders.all', methods: ['GET'])]
+    public function dumpAllOrder(Request $request, EntityManagerInterface $manager, EnhancedEntityJsonSerializer $enhancedEnityJsonSerializer){
+        $orders = $manager->getRepository(Order::class)->findAllRelated();
+        $enhancedEnityJsonSerializer
+            ->setObjectToSerialize($orders)
+            ->setOptions([AbstractNormalizer::CIRCULAR_REFERENCE_HANDLER => fn (object $orderProductRef, string $format, array $context) => $orderProductRef->getId()])
+            ->setAttributes([
+                'serializeUuid',
+                'clientFirstName',
+                'clientLastName',
+                'email',
+                'comment',
+                'isValid',
+                'items' => [
+                    'quantity',
+                    'item' => [
+                        'price', 'weight', 'weightType', 'slug', 'imageUrl', 'product' => [
+                            'name', 'description', 'slug'
+                        ]
+                    ]
+                ]
+            ]);
+        return new Response($enhancedEnityJsonSerializer->serialize(), headers: [
+            'Content-Type' => 'application/json'
+        ]);
+    }
+
+
 }

@@ -59,6 +59,16 @@ class ProductReferenceRepository extends ServiceEntityRepository
             ->getResult();
     }
 
+    
+    public function findBySlug(mixed $value){
+        return $this->createQueryBuilder("entity")
+            ->where("entity.slug = :slug")
+            ->setParameter("slug", $value)
+            ->setMaxResults(1)
+            ->getQuery()
+            ->getOneOrNullResult();
+    }
+
 //    /**
 //     * @return ProductReferences[] Returns an array of ProductReferences objects
 //     */
