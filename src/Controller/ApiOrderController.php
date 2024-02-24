@@ -151,7 +151,7 @@ class ApiOrderController extends AbstractController
         ];
     }
     
-    #[Route('/commandes', name: 'orders.all', methods: ['GET'])]
+    #[Route('/commandes', name: 'orders.all', methods: ['GET'], env: 'dev')]
     public function dumpAllOrder(Request $request, EntityManagerInterface $manager, EnhancedEntityJsonSerializer $enhancedEnityJsonSerializer){
         $orders = $manager->getRepository(Order::class)->findAllRelated();
         $enhancedEnityJsonSerializer
