@@ -31,7 +31,7 @@ trait SluggableTrait {
      * @param string $value
      * @return string
      */
-    private function generateSlug(string $value) : string {
+    public function generateSlug(string $value) : string {
         $slugger = new AsciiSlugger();
         return $slugger->slug($value)->lower();
     }
@@ -48,6 +48,8 @@ trait SluggableTrait {
      */ 
     public function getSlug() : ?string
     {
+        if (is_null($this->slug))
+            $this->updateSlug();
         return $this->slug;
     }
 
