@@ -28,5 +28,5 @@ npm-debug.log
 yarn-error.log
 ###< symfony/webpack-encore-bundle ###
 startUp.bat
-
+startUpV2.bat
 /backup/
