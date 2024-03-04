@@ -215,6 +215,10 @@ class Order
         return $this->items;
     }
 
+    public function setItems (Collection $collection){
+        $this->items = $collection;
+    }
+
     /**
      * Add an instance of OrderProductRef to Order
      *

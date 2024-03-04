@@ -25,12 +25,7 @@ class OrderRepository extends ServiceEntityRepository
     }
 
     public function findByUuid(mixed $value){
-        return $this->createQueryBuilder("o")
-            ->where("o.uuid = :uuid")
-            ->setParameter("uuid", $value, 'uuid')
-            ->setMaxResults(1)
-            ->getQuery()
-            ->getOneOrNullResult();
+        return $this->findOneBy(['uuid' => $value]);
     }
 
     public function findByUuidWithRelated(mixed $value){
@@ -40,7 +35,7 @@ class OrderRepository extends ServiceEntityRepository
             ->where("o.uuid = :uuid")
             ->setParameter("uuid", $value, 'uuid')
             ->getQuery()
-            ->getOneOrNullResult();
+            ->getResult();
     }
 
     public function findAllRelated(){

@@ -8,7 +8,8 @@ use App\Entity\Order;
 use App\Form\OrderType;
 use App\Entity\OrderProductRef;
 use App\Entity\ProductReference;
-
+use App\Service\EnhancedEntityJsonSerializer;
+use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -28,6 +29,13 @@ class OrderController extends AbstractController
     use ControllerToolsTrait;
 
     #[Route('/commander', name: 'order')]
+    /**
+     * Undocumented function
+     *
+     * @param Request $request
+     * @param EntityManagerInterface $manager
+     * @return Response
+     */
     public function askOrder(Request $request, EntityManagerInterface $manager): Response
     {
         $templateVariables = ["form" => $this->createForm(OrderType::class)];
@@ -37,16 +45,6 @@ class OrderController extends AbstractController
         // a non valid slug will pass through this test but will not be add to order 
         if (!is_null($productRefSlugFromURL) && !empty($productRefSlugFromURL))
             $templateVariables["preSelectedOrderItemJson"] = $productRefSlugFromURL;
-        //     $jsonSerialiser = new Serializer(
-        //         [new GetSetMethodNormalizer()],
-        //         ['json' => new JsonEncoder()]
-        //     );
-        //     $templateVariables["preSelectedOrderItemJson"] = $jsonSerialiser->serialize($productRef, 'json', [
-        //         'circular_reference_handler' => fn ($object) => $object->getId(),
-        //         AbstractNormalizer::ATTRIBUTES => ['price', 'slug', 'weight', 'weightType', 'product' => ['name']]
-        //     ]);
-        // }
-
 
         if ($this->handleAndCheckForm($request, $templateVariables['form'])) {
             $newOrder = $templateVariables['form']->getData();
@@ -68,45 +66,47 @@ class OrderController extends AbstractController
             }
             $manager->detach($newOrder);
             return $this->redirectToRoute("orders.choose-products", ['commande' => urlencode($newOrder->getUuid())]);
-            // $newOrder = $orderForm->getData();
-            // $serializedData = $orderForm->get('items')->getData();
-            // dd($request->request->all());           //TODO : Création de l'entité en db , création order + orderItems 
             // TODO ++ : Déclencer un envoi de mail + notification B-O
         }
 
         return $this->render('order/form.html.twig', $templateVariables);
     }
 
-    #[Route('/{commande}/choisir-ses-produits', name: 'choose-products')]
-    public function askOrderProductsView(string $commande, EntityManagerInterface $manager)
+    #[Route('/{uuid}/choisir-ses-produits', name: 'choose-products')]
+    /**
+     * Undocumented function
+     *
+     * @param string $uuid
+     * @param EntityManagerInterface $manager
+     * @return void
+     */
+    public function askOrderProductsView(string $uuid, EntityManagerInterface $manager, EnhancedEntityJsonSerializer $enhancedEnityJsonSerializer): Response
     {
-        $order = $manager->getRepository(Order::class)->findByUuidWithRelated($commande);
+        $order = $manager->getRepository(Order::class)->findByUuid($uuid);
 
-        if (is_null($order)) {
-            throw $this->createNotFoundException("No entity found for uuid : $commande");
-        }
+        if (is_null($order))
+            throw $this->createNotFoundException("No entity found for uuid : $uuid");
 
-        $jsonSerialiser = new Serializer(
-            [new ObjectNormalizer()],
-            ['json' => new JsonEncoder()]
-        );
-        $orderItemsJsonSerialized = $jsonSerialiser->serialize($order->getItems(), 'json', [
-            AbstractNormalizer::CIRCULAR_REFERENCE_HANDLER => fn (object $orderProductRef, string $format, array $context) => $orderProductRef->getId(),
-            AbstractNormalizer::ATTRIBUTES => [
+        $orderItems = new ArrayCollection($manager->getRepository(OrderProductRef::class)->findBy([
+            'order' => $order->getId()
+        ]));
+
+        $order->setItems($orderItems);
+
+        $enhancedEnityJsonSerializer
+            ->setObjectToSerialize($order->getItems())
+            ->setOptions([AbstractNormalizer::CIRCULAR_REFERENCE_HANDLER => fn (object $orderProductRef, string $format, array $context) => $orderProductRef->getId()])
+            ->setAttributes([
                 'quantity',
-                // 'order' => ['clientFirstName', 'clientLastName', 'email', 'comment', 'serializeUuid'],
-                'item'  => [
-                    'price', 'weight', 'weightType', 'slug', 'imageUrl', 'product' => [
-                        'name', 'description', 'slug'
-                    ]
-                ],
-            ]
-        ]);
-        // dd($order->getItems()[0]->getItem()->getImageUrl());
+                'item' =>
+                ['price', 'weight', 'weightType', 'slug', 'imageUrl', 'product' => [
+                    'name', 'description', 'slug'
+                ]]
+            ]);
+
         return $this->render("order/products.html.twig", [
             "orderUuid" => $order->getUuid(),
-            "orderItems" => $orderItemsJsonSerialized
+            "orderItems" => $enhancedEnityJsonSerializer->serialize()
         ]);
     }
-
 }

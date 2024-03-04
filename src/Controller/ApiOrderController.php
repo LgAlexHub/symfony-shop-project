@@ -10,6 +10,7 @@ use App\Service\EnhancedEntityJsonSerializer;
 use Doctrine\ORM\EntityManagerInterface;
 use App\Repository\ProductReferenceRepository;
 use App\Controller\Trait\ControllerToolsTrait;
+use Doctrine\Common\Collections\ArrayCollection;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
 use Symfony\Component\HttpFoundation\Request;
@@ -116,7 +117,7 @@ class ApiOrderController extends AbstractController
     }
 
     /**
-     * Undocumented function
+     * Check if targeted productRef belongs to targeted order
      *
      * @param Request $request
      * @param string $uuidOrder
@@ -127,7 +128,11 @@ class ApiOrderController extends AbstractController
     {
         if (empty($uuidOrder) || is_null($uuidOrder) || !Uuid::isValid($uuidOrder))
             return  (object)['error' => ['code' => 422, 'msg' =>'UUID absent ou erroné']];
-        $order = $manager->getRepository(Order::class)->findByUuidWithRelated($uuidOrder);
+        $order = $manager->getRepository(Order::class)->findByUuid($uuidOrder);
+        $orderItems = new ArrayCollection($manager->getRepository(OrderProductRef::class)->findBy([
+            'order' => $order->getId()
+        ]));
+        $order->setItems($orderItems);
         if (is_null($order))
             return  (object)['error' => ['code' => 404, 'msg' => sprintf("Commande avec l'UUID %s inexistante", $uuidOrder)]];
         
@@ -152,7 +157,13 @@ class ApiOrderController extends AbstractController
     }
     
     #[Route('/commandes', name: 'orders.all', methods: ['GET'], env: 'dev')]
-    public function dumpAllOrder(Request $request, EntityManagerInterface $manager, EnhancedEntityJsonSerializer $enhancedEnityJsonSerializer){
+    /**
+     * Dev env method , to dump all orders available in db
+     * @param EntityManagerInterface $manager
+     * @param EnhancedEntityJsonSerializer $enhancedEnityJsonSerializer
+     * @return Response
+     */
+    public function dumpAllOrder(EntityManagerInterface $manager, EnhancedEntityJsonSerializer $enhancedEnityJsonSerializer) : Response {
         $orders = $manager->getRepository(Order::class)->findAllRelated();
         $enhancedEnityJsonSerializer
             ->setObjectToSerialize($orders)
