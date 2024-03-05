@@ -93,13 +93,13 @@ class ApiOrderController extends AbstractController
         return $this->json('OK', status: 200);
     }
 
-    #[Route('/commandes/{uuidOrder}/supprimer-produit', name: 'delete-product-from-basket', methods: ['POST'])]
+    #[Route('/commandes/{uuidOrder}/diminuer-produit', name: 'decrease-product-from-basket', methods: ['POST'])]
     /**
      * Undocumented function
      *
      * @return Response
      */
-    public function removeProductFromBasket(Request $request, string $uuidOrder, EntityManagerInterface $manager): Response
+    public function decreaseProductFromBasket(Request $request, string $uuidOrder, EntityManagerInterface $manager): Response
     {
         $orderAndProductRef = $this->checkOrderAndProductRefExistance($request, $uuidOrder, $manager);
         if(isset($orderAndProductRef->error))
@@ -114,6 +114,28 @@ class ApiOrderController extends AbstractController
         };
         $manager->flush();
         return $this->json("OK", 200);
+    }
+
+    #[Route('/commandes/{uuidOrder}/supprimer-produit', name: 'decrease-product-from-basket', methods: ['POST'])]
+    /**
+     * Undocumented function
+     *
+     * @param Request $request
+     * @param string $uuidOrder
+     * @param EntityManagerInterface $manager
+     * @return Response
+     */
+    public function deleteProductFromBasket(Request $request, string $uuidOrder, EntityManagerInterface $manager) : Response {
+        $orderAndProductRef = $this->checkOrderAndProductRefExistance($request, $uuidOrder, $manager);
+        if(isset($orderAndProductRef->error))
+            return $this->json(["Erreur" => $orderAndProductRef->error['msg']], status: $orderAndProductRef->error['code']);
+        $orderProductRef = $manager->getRepository(OrderProductRef::class)->findProductInOrder($orderAndProductRef->order->getId(), $orderAndProductRef->productRef->getId());
+        if(is_null($orderProductRef))
+            return $this->json(['erreur' => 'Le produit dans votre panier que vous recherchez n\'existe pas'], 404);
+        $manager->remove($orderProductRef);
+        $manager->flush();
+        return $this->json("OK", 200);
+
     }
 
     /**

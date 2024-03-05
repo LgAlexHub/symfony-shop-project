@@ -11,6 +11,7 @@ use App\Entity\ProductReference;
 use App\Service\EnhancedEntityJsonSerializer;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\EntityManagerInterface;
+use Doctrine\ORM\Mapping\Entity;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
@@ -65,7 +66,7 @@ class OrderController extends AbstractController
                 $manager->detach($newOrderProductRef);
             }
             $manager->detach($newOrder);
-            return $this->redirectToRoute("orders.choose-products", ['commande' => urlencode($newOrder->getUuid())]);
+            return $this->redirectToRoute("orders.choose-products", ['uuid' => urlencode($newOrder->getUuid())]);
             // TODO ++ : Déclencer un envoi de mail + notification B-O
         }
 
@@ -108,5 +109,35 @@ class OrderController extends AbstractController
             "orderUuid" => $order->getUuid(),
             "orderItems" => $enhancedEnityJsonSerializer->serialize()
         ]);
+    }
+
+    #[Route('/{uuidOrder}/valider', name: 'order-confirm')]
+    /**
+     * Undocumented function
+     *
+     * @param Request $request
+     * @param string $uuidOrder
+     * @param EntityManagerInterface $manager
+     * @return null|Response
+     */
+    public function confirmOrder(Request $request, string $uuidOrder, EntityManagerInterface $manager) : null|Response {
+        if (empty($uuidOrder) || is_null($uuidOrder) || !Uuid::isValid($uuidOrder)){
+            // Feedback utilisateur commande inexistante
+            return null;
+        }
+        
+        $orderWithProducts = $manager->getRepository(Order::class)->findByUuidWithRelated($uuidOrder);
+        if($orderWithProducts->getItems()->count() < 1){
+            // Feedback utilisateur on ne peut pas commander sans produit
+            return null;
+        }
+        
+        $orderWithProducts->setIsValid(true);
+        $manager->persist($orderWithProducts);
+        $manager->flush();
+        $manager->detach($orderWithProducts);
+
+        // redirection avec feedback, voir pour faire une page récap commande , voir pdf avec 
+        return $this->redirectToRoute("home");
     }
 }

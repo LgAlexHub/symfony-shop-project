@@ -1,5 +1,5 @@
 <template>
-  <toast v-if="feedbackMessage !== null && feedbackType !== null" :propsMessage="feedbackMessage"
+  <toast v-if="canBeRender" @popup-toggle="onPopupDisappear()" :propsMessage="feedbackMessage"
     :propsType="feedbackType"></toast>
   <div class="grid grid-cols-5 gap-5 my-2">
     <div class="px-5 col-span-2 h-100 overflow-scroll">
@@ -42,6 +42,11 @@
       </div>
     </div>
   </div>
+  <div>
+    <a class="border border-blue-400 rounded-md bg-sky-400 px-2 py-1 text-white hover:bg-blue-800 hover:border-transparent" :href="'/commandes/'+orderUuid+'/valider'">
+      Valider la commande
+    </a>
+  </div>
 </template>
 
 <script>
@@ -68,40 +73,44 @@ export default {
   data() {
     return {
       orderItems: [],
-      productQueryString: "",
-      debounceTimeout: null,
       feedbackMessage: null,
       feedbackType: null,
     };
   },
   methods: {
+    removeItem(slug){
+      let itemIndex = this.findItemIndexBySlug(slug);
+      if (itemIndex === -1){
+        this.setToastMessage(`Erreur : ${slug} introuvable` , 'danger');
+        return;
+      }
+      this.orderItems.splice(itemIndex, 1);
+      this.persistChangeInDatabase('delete', slug);
+    },
     /**
      * action type bool , true for addition , false sub
      */
     editQuantity(slug, actionType) {
       let itemIndex = this.findItemIndexBySlug(slug);
-      let targetedProduct = this.orderItems[itemIndex];
-
       if (itemIndex === -1) {
-        this.feedbackMessage = "Erreur : produit dans le panier introuvable !"
-        this.feedbackType = "danger";
+        this.setToastMessage("Erreur : produit dans le panier introuvable !", "danger");
         return;
       }
 
       // addition
-      if(actionType){
+      if (actionType) {
         this.orderItems[itemIndex].quantity += 1;
-        this.persistChangeInDatabase('addition', targetedProduct.item.slug);
+        this.persistChangeInDatabase('addition', slug);
       }
 
       // soustraction
-      if(!actionType){
-        if (this.orderItems[itemIndex].quantity < 2){
+      if (!actionType) {
+        if (this.orderItems[itemIndex].quantity < 2) {
           this.orderItems.splice(itemIndex, 1);
-        }else{
+        } else {
           this.orderItems[itemIndex].quantity -= 1
         }
-        this.persistChangeInDatabase('substraction', targetedProduct.item.slug);
+        this.persistChangeInDatabase('substraction', slug);
       }
     },
     findItemIndexBySlug(slug) {
@@ -132,15 +141,17 @@ export default {
       switch (action) {
         case 'addition':
           apiEndPoint = 'ajouter-produit'
-        break;
+          break;
         case 'substraction':
+          apiEndPoint = 'diminuer-produit'
+          break;
+        case 'delete':
           apiEndPoint = 'supprimer-produit'
-        break;
       }
 
-      if(slug === null || apiEndPoint === null){
+      if (slug === null || apiEndPoint === null) {
         // ajouter un feedback et dire pourquoi on envoie rien au serveur
-        return ;
+        return;
       }
       let bodyFormData = new FormData();
       bodyFormData.append("form[productReferenceSlug]", slug);
@@ -149,18 +160,22 @@ export default {
         .then((res) => {
           this.setToastMessage('Panier sauvegardé avec succès !', 'success')
         })
-        .catch((err) => console.error(err));
+        .catch((err) => this.setToastMessage(err.message, 'danger'));
     },
-    setToastMessage(message, type){
-      this.feedbackMessage = message; 
+    setToastMessage(message, type) {
+      this.feedbackMessage = message;
       this.feedbackType = type;
-      setTimeout(() => {
-        this.feedbackMessage = null;
-        this.feedbackType = null;
-      } , 3 * 1000);
+    },
+    onPopupDisappear() {
+      this.feedbackMessage = null;
+      this.feedbackType = null;
     }
   },
-
+  computed: {
+    canBeRender() {
+      return this.feedbackMessage !== null && this.feedbackType !== null;
+    },
+  },
   mounted() {
     this.orderItems = JSON.parse(this.prefetchOrderItem);
     // vm.$forceUpdate();

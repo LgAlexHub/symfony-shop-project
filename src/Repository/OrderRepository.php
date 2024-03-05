@@ -28,14 +28,15 @@ class OrderRepository extends ServiceEntityRepository
         return $this->findOneBy(['uuid' => $value]);
     }
 
-    public function findByUuidWithRelated(mixed $value){
+
+    public function findByUuidWithRelated(string $uuid){
         return $this->createQueryBuilder("o")
-            ->innerJoin('o.items', 'items')
+            ->leftJoin('o.items', 'items')
             ->addSelect("items")
             ->where("o.uuid = :uuid")
-            ->setParameter("uuid", $value, 'uuid')
+            ->setParameter("uuid", $uuid, 'uuid')
             ->getQuery()
-            ->getResult();
+            ->getOneOrNullResult();
     }
 
     public function findAllRelated(){
