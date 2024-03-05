@@ -68,37 +68,58 @@
 				</div>
 			</div>
 			<div class="col-span-9">
-				<div class="container mx-3">
+				<div class="w-full px-3">
 					<div class="px-2 py-1 mx-2 my-4 border-2 border-red-700 rounded">
 						<h1 class="text-center my-3 text-2xl font-san underline text-slate-800">Todo list</h1>
+
+
 						<ul class="list-none">
 							<li>
 								<i class="fa-solid fa-check"></i>
-								<strong class="line-through">
-									- Finir la création de commande</strong>
+								<strong class="line-through">- Finir la création de commande</strong>
 							</li>
-							{# <li><strong><i class="fa-solid fa-pencil"></i> - Finir la création de commande</strong></li> #}
-							<li class="">
-								<i class="fa-solid fa-check"></i>
-								<strong class="line-through">
-								- Afficher les commandes dans le back-office</strong></li>
-							<li class="text-slate-600">
-								<i class="fa-solid fa-hourglass-start"></i>
-								- Gérer les commandes le back-office</li>
-                                <ul class="[&>li]:indent-12">
-									<li>* Afficher les produits de la commandes</li>
-									<li>* Afficher si la commandes est complète (possède des produits)</li>
+							<li class="text-red-600">
+								<i class="fa-solid fa-pencil"></i>
+								Gérer les commandes le back-office
+								<ul class="[&>li]:indent-12">
+									<li class="line-through">* Afficher les produits de la commandes</li>
+									<li class="line-through">* Afficher si la commandes est complète (possède des produits)</li>
+									<li class="">* Ajouter une addresse de livraison dans la commande</li>
+									<li>* Ajouter une variable pour dire si l'owner du site à déjà gérer la commande</li>
 								</ul>
+							</li>
 							<li class="text-slate-600">
 								<i class="fa-solid fa-hourglass-start"></i>
-								- Améliorer l'affichage de la page produits</li>
+								Affichage front 
+								<ul class="[&>*]:indent-12">
+									<li>* Paginer les résultats pour alléger les requêtes de la bdd</li>
+									<li>* Ajouter des filtres par catégories</li>
+								</ul>
+							</li>
 							<li class="text-slate-600">
 								<i class="fa-solid fa-hourglass-start"></i>
-								- Améliorer l'ui/ux de la commande /commandes/{uuid}/choisir-produits</li>
+								Améliorer l'ui/ux de la prise de commande commande
+								<ul class="[&>*]:indent-12">
+									<li>* Afficher une liste de produit au chargement de la page , le tout paginer</li>
+									<li>* Rendre la page responsive</li>
+									<li>* Améliorer le desgin</li>
+								</ul>
+							</li>
 							<li class="text-slate-600">
 								<i class="fa-solid fa-hourglass-start"></i>
-								- Ajouter une page récap de commande , possibilité de générer un pdf</li>
-							
+								Back-Office
+								<ul class="[&>*]:indent-12">
+									<li>Ajouter des filtres dans le BO pour produits, commandes </li>
+								</ul>
+							</li>
+							<li class="text-sky-600">
+								<i class="fa-solid fa-arrow-up"></i> Amélioration à faire plus tard
+								<ul class="[&>*]:indent-12">
+									<li>* Ne pu actualiser la bdd à chaque clique côté client lors de la sélection product</li>
+									<li>* Ajouter une page récap de commande , possibilité de générer un pdf</li>
+									<li>* Montrer les étapes pour passer une commande</li>
+								</ul>
+							</li>
 						</ul>
 					</div>
 					{% block body %}{% endblock %}

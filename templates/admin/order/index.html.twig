@@ -1,57 +1,67 @@
 {% extends 'admin/base.html.twig' %}
 
-{% block title %} - Commandes{% endblock %}
+{% block title %}
+	- Commandes
+{% endblock %}
 
 {% block body %}
-    <h1 class="text-center my-3 text-2xl font-san underline text-slatea-800">Mes commandes</h1>
+<h1 class="text-center my-3 text-2xl font-san underline text-slatea-800">Mes commandes</h1>
 
-    <div class="container mx-auto mt-3 ml-3">
-        <table class="table-fixed w-full border-separate border-spacing-2">
-            <thead>
-                <tr>
-                    <td class="bg-slate-600 border border-slate-300 text-white px-2 py-1">
-                        Prénom
-                    </td>
-                    <td class="bg-slate-600 text-white border border-slate-300 px-2 py-1">
-                        Nom
-                    </td>
-                    <td class="bg-slate-600 text-white border border-slate-300 px-2 py-1">
-                        Email
-                    </td>
-                    <td class="bg-slate-600 text-white border border-slate-300 px-2 py-1">
-                        Nombre de produits
-                    </td>
-                    <td class="bg-slate-600 text-white border border-slate-300 px-2 py-1">
-                        Date de la commande
-                    </td>
-                </tr>
-            </thead>
-            <tbody>
-                {% for order in orders %}
-                    <tr class="even:bg-white odd:bg-blue-50">
-                        <td class="border border-slate-300 px-2 w-1/6">{{order.clientFirstName}}</td>
-                        <td class="border border-slate-300 px-2 w-1/6">{{order.clientLastName}}</td>
-                        <td class="border border-slate-300 px-2 w-1/6">{{order.email}}</td>
-                        <td class="border border-slate-300 text-center text-blue-800 w-2/6 border border-slate-300">
-                            <a href="" class="hover:underline">
-                                <span class="rounded-full px-2 border border-purple-400 bg-purple-400 text-white">
-                                    {{order.items|length}}
-                                </span>
-                            </a>
-                        </td>
-                        <td class="border border-slate-300 px-2 w-1/6">{{order.createdAt|date("d/m/Y à H:i")}}</td>
-                        {# <td class="w-1/6 space-x-8 py-3 px-3 bg-white text-center">
-                            <a href="">
-                                <i class="fa-solid fa-magnifying-glass text-blue-700 border border-blue-700 hover:text-white hover:border-transparent hover:bg-blue-700 rounded-md px-3 py-3"></i>
-                            </a>
-                            <a href="{{path('admin.products.edit', {'slug' : product.slug})}}">
-                                <i class="fa-solid fa-pen-to-square border text-slate-800 border-slate-800 hover:text-white hover:border-transparent hover:bg-slate-800 rounded-md px-3 py-3"></i>
-                            </a>
-                            <a href="{{path('admin.products.delete', {'slug' : product.slug})}}" class="w-fit"><i class="fa-solid fa-circle-xmark border text-red-500 border-red-500 hover:text-white hover:border-transparent hover:bg-red-500 rounded-md px-3 py-3"></i></a>                     </div>
-                        </td> #}
-                    </tr>
-                {% endfor %}
-            </tbody>
-        </table>
-    </div>
-{% endblock %}
+<div class="container mx-auto mt-3 ml-3">
+	<table class="table-fixed w-full border-separate border-spacing-2">
+		<thead>
+			<tr>
+				<td class="bg-slate-600 border border-slate-300 text-white px-2 py-1">
+					Prénom
+				</td>
+				<td class="bg-slate-600 text-white border border-slate-300 px-2 py-1">
+					Nom
+				</td>
+				<td class="bg-slate-600 text-white border border-slate-300 px-2 py-1">
+					Email
+				</td>
+				<td class="bg-slate-600 text-white border border-slate-300 px-2 py-1">
+					Nombre de produits
+				</td>
+				<td class="bg-slate-600 text-white border border-slate-300 px-2 py-1">
+					Commande validée
+				</td>
+				<td class="bg-slate-600 text-white border border-slate-300 px-2 py-1">
+					Date de la commande
+				</td>
+				
+				<th class="bg-slate-600 text-white border border-slate-300 px-2 py-1"></th>
+			</tr>
+		</thead>
+		<tbody>
+			{% for order in orders %}
+				<tr class="even:bg-white odd:bg-blue-50">
+					<td class="border border-slate-300 px-2 w-1/6">{{order.clientFirstName}}</td>
+					<td class="border border-slate-300 px-2 w-1/6">{{order.clientLastName}}</td>
+					<td class="border border-slate-300 px-2 w-1/6">{{order.email}}</td>
+					<td class="border border-slate-300 text-center text-blue-800 w-2/6 border border-slate-300">
+						<a href="" class="hover:underline">
+							<span class="rounded-full px-2 border border-purple-400 bg-purple-400 text-white">
+								{{order.items|length}}
+							</span>
+						</a>
+					</td>
+					{% if order.isValid %}
+						<td class="text-green-600 border text-center border-slate-300 px-2 w-1/6"><strong>Oui</strong></td>
+					{% else %}
+						<td class="text-red-600 border text-center border-slate-300 px-2 w-1/6"><strong>Non</strong></td>
+					{% endif %}
+					<td class="border border-slate-300 px-2 w-1/6 text-center">{{order.createdAt|date("d/m/Y à H:i")}}</td>
+					<td class="w-1/6 space-x-8 py-3 px-3 bg-white text-center">
+						<a href="{{path('admin.orders.show', {'uuid' :order.uuid})}}">
+							<i class="fa-solid fa-magnifying-glass text-blue-700 border border-blue-700 hover:text-white hover:border-transparent hover:bg-blue-700 rounded-md px-3 py-3"></i>
+						</a>
+						<a href="" class="w-fit">
+							<i class="fa-solid fa-circle-xmark border text-red-500 border-red-500 hover:text-white hover:border-transparent hover:bg-red-500 rounded-md px-3 py-3"></i>
+						</a>
+					</td>
+				</tr>
+			</div>
+		</tbody>
+	</td>
+</tr>{% endfor %}</tbody></table></div>{% endblock %}

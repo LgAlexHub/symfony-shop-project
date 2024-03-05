@@ -1,0 +1,61 @@
+{% extends 'admin/base.html.twig' %}
+
+{% block title %}
+	- Commandes n°
+	{{order.uuid}}
+{% endblock %}
+
+{% block body %}
+	<div class="mt-3 ml-3">
+        <a class="hover:text-[#804C62]" href="{{ path('admin.orders.index') }}">
+            <i class="fa-solid fa-arrow-left"></i> Retour
+        </a>
+		<h1 class="text-center my-3 text-2xl font-san underline text-slatea-800">Commande n°
+			{{order.id}}</h1>
+		<p>Identifiant publique de la commande :
+			{{order.uuid}}</p>
+		<h4 class="text-2xl">
+			Information client
+		</h4>
+		<div class="indent-12 space-y-3">
+			<p>Nom :
+				{{order.clientFirstName}}</p>
+			<p>Prénom :
+				{{order.clientLastName}}</p>
+			<p>Email :
+				{{order.email}}</p>
+			<p>Commentaire :
+				{{order.comment}}</p>
+            <p>Date de la commande :
+				{{order.createdAt|date('d/m/Y à H:i')}}</p>
+		</div>
+        <table class="table-fixed w-full border-separate border-spacing-1 border-2 border-slate-700 rounded">
+            <thead>
+                <tr class="[&>*]:bg-slate-600 [&>*]:border [&>*]:border-slate-300 [&>*]:text-white [&>*]:text-center px-2 py-1">
+                    <td>Produit</td>
+                    <td>Poids</td>
+                    <td>Prix</td>
+                    <td>Quantité</td>
+                </tr>
+            </thead>
+            <tbody>
+                {% for orderItem in order.items %}
+                    <tr class="even:bg-white odd:bg-blue-50 [&>*]:text-center">
+                        <td>
+                            {{orderItem.item.product.name}}
+                        </td>
+                        <td>
+                            {{orderItem.item.weight}} {{orderItem.item.weightType}}
+                        </td>
+                        <td>
+                            {{orderItem.item.price/100|number_format(2)}} €
+                        </td>
+                        <td>
+                            {{orderItem.quantity}}
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+	</div>
+{% endblock %}

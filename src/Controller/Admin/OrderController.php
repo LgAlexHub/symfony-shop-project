@@ -3,10 +3,8 @@
 namespace App\Controller\Admin;
 
 use App\Controller\Trait\ControllerToolsTrait;
-use App\Entity\Order;
 use App\Repository\OrderRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 
@@ -34,6 +32,18 @@ class OrderController extends AbstractController
             'orders' => $orders,
         ]);
     }
+
+    #[Route('/{uuid}', name: 'show')]
+    public function show(OrderRepository $manager, string $uuid) : Response {
+        $order = $manager->findByUuidWithRelated($uuid);
+        if (is_null($order))
+            return new Response(null, 404);
+        return $this->render(self::$templatePath.'/show.html.twig', [
+            'order' => $order
+        ]);
+    }
+
+    
    
     // #[Route('/{slug}/delete', name:'delete')]
     // /**
