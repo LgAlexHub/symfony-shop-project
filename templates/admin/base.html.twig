@@ -1,71 +1,110 @@
 <!DOCTYPE html>
 <html>
-    <head>
-        <meta charset="UTF-8">
-        <title>{{ app_name }}{% block title %}{% endblock %}</title>
-        <link rel="icon" href="/icon.png" sizes="32x32" type="image/png">
+	<head>
+		<meta charset="UTF-8">
+		<title>{{ app_name }}
+			{% block title %}{% endblock %}
+		</title>
+		<link rel="icon" href="/icon.png" sizes="32x32" type="image/png">
 
-        {% block stylesheets %}
-            {{ encore_entry_link_tags('app') }}
-        {% endblock %}
+		{% block stylesheets %}
+			{{ encore_entry_link_tags('app') }}
+		{% endblock %}
 
-        {% block javascripts %}
-            {{ encore_entry_script_tags('app') }}
-        {% endblock %}
-    </head>
-    <body class="font-sans">
-        <div class="grid grid-cols-10 h-screen">
-            <div class="col-span-1">
-                <div class="min-h-0 w-full h-full flex-1 flex overflow-hidden">
-                    <nav aria-label="Sidebar" class="block bg-gray-800 w-full overflow-y-auto">
-                        {% if is_granted('IS_AUTHENTICATED_FULLY') %}
-                            <p class="block mb-2 md:text-center text-sm px-2 mt-4 rounded text-white [&>span]:underline [&>span]:font-bold">
-                                Connecté.e : <span>{{app.user.pseudonyme}}</span>
-                            </p>
-                            <hr class="mx-12 my-1">
-                            <p class="block mb-2 text-center text-sm  rounded text-white [&>span]:underline [&>span]:font-bold">
-                                {{app.user.email}}
-                            </p>  
-                            <hr>
-                            <a href="{{path('logout')}}" class="w-full block text-center text-white hover:bg-gray-700">
-                                Déconnexion
-                            </a>
-                            <hr>
-                        {% endif %} 
-                        <div class="relative flex flex-shrink-0 space-y-2 flex-col p-3">
-                            <a href="{{path('admin.products.index')}}" class="text-gray-400 text-center hover:text-red-700">
-                                <i class="fa fa-shopping-cart"></i>
-                                Produits
-                            </a>
-                            <a href="{{path('admin.products.add')}}" class="mx-5 border rounded-full text-center text-sm px-1 py-1 hover:border-transparent hover:bg-lime-800 border-lime-200 bg-lime-400 text-white">
-                                <i class="fa fa-plus"></i>
-                                Ajouter
-                            </a>
-                            <hr>
-                            <a href="{{path('admin.categories.index')}}" class="text-gray-400 text-center hover:text-red-700">
-                                <i class="fa-solid fa-list"></i>
-                                Catégories
-                            </a>
-                              <a href="{{path('admin.categories.add')}}" class="mx-5 border rounded-full text-center text-sm px-1 py-1 hover:border-transparent hover:bg-lime-800 border-lime-200 bg-lime-400 text-white">
-                                <i class="fa fa-plus"></i>
-                                Ajouter
-                            </a>
-                            <hr>
-                             <a href="{{path('home')}}" class="text-gray-400 text-center hover:text-red-700">
-                                <i class="fa fa-info"></i>
-                                Affichage client
-                            </a>
-                        </div>
-                    </nav>
-                </div>
-            </div>
-            <div class="col-span-9">
-                <div class="container mx-3">
-                    {% block body %}
-                    {% endblock %}
-                </div>
-            </div>
-        </div>
-        
-    </body>
+		{% block javascripts %}
+			{{ encore_entry_script_tags('app') }}
+		{% endblock %}
+	</head>
+	<body class="font-sans">
+		<div class="grid grid-cols-10 h-screen">
+			<div class="col-span-1">
+				<div class="min-h-0 w-full h-full flex-1 flex overflow-hidden">
+					<nav aria-label="Sidebar" class="block bg-gray-800 w-full overflow-y-auto">
+						{% if is_granted('IS_AUTHENTICATED_FULLY') %}
+							<p class="block mb-2 md:text-center text-sm px-2 mt-4 rounded text-white [&>span]:underline [&>span]:font-bold">
+								Connecté.e :
+								<span>{{app.user.pseudonyme}}</span>
+							</p>
+							<hr class="mx-12 my-1">
+							<p class="block mb-2 text-center text-sm  rounded text-white [&>span]:underline [&>span]:font-bold">
+								{{app.user.email}}
+							</p>
+							<hr>
+							<a href="{{path('logout')}}" class="w-full block text-center text-white hover:bg-gray-700">
+								Déconnexion
+							</a>
+							<hr>
+						{% endif %}
+						<div class="relative flex flex-shrink-0 space-y-2 flex-col p-3">
+							<a href="{{path('admin.products.index')}}" class="text-gray-400 text-center hover:text-red-700">
+								<i class="fa fa-shopping-cart"></i>
+								Produits
+							</a>
+							<a href="{{path('admin.products.add')}}" class="mx-5 border rounded-full text-center text-sm px-1 py-1 hover:border-transparent hover:bg-lime-800 border-lime-200 bg-lime-400 text-white">
+								<i class="fa fa-plus"></i>
+								Ajouter
+							</a>
+							<hr>
+							<a href="{{path('admin.categories.index')}}" class="text-gray-400 text-center hover:text-red-700">
+								<i class="fa-solid fa-list"></i>
+								Catégories
+							</a>
+							<a href="{{path('admin.categories.add')}}" class="mx-5 border rounded-full text-center text-sm px-1 py-1 hover:border-transparent hover:bg-lime-800 border-lime-200 bg-lime-400 text-white">
+								<i class="fa fa-plus"></i>
+								Ajouter
+							</a>
+							<hr>
+							<a href="{{path('admin.orders.index')}}" class="text-gray-400 text-center hover:text-red-700">
+								<i class="fa-solid fa-box"></i>
+								Commandes
+							</a>
+							<hr>
+							<a href="{{path('home')}}" class="text-gray-400 text-center hover:text-red-700">
+								<i class="fa fa-info"></i>
+								Affichage client
+							</a>
+						</div>
+					</nav>
+				</div>
+			</div>
+			<div class="col-span-9">
+				<div class="container mx-3">
+					<div class="px-2 py-1 mx-2 my-4 border-2 border-red-700 rounded">
+						<h1 class="text-center my-3 text-2xl font-san underline text-slate-800">Todo list</h1>
+						<ul class="list-none">
+							<li>
+								<i class="fa-solid fa-check"></i>
+								<strong class="line-through">
+									- Finir la création de commande</strong>
+							</li>
+							{# <li><strong><i class="fa-solid fa-pencil"></i> - Finir la création de commande</strong></li> #}
+							<li class="">
+								<i class="fa-solid fa-check"></i>
+								<strong class="line-through">
+								- Afficher les commandes dans le back-office</strong></li>
+							<li class="text-slate-600">
+								<i class="fa-solid fa-hourglass-start"></i>
+								- Gérer les commandes le back-office</li>
+                                <ul class="[&>li]:indent-12">
+									<li>* Afficher les produits de la commandes</li>
+									<li>* Afficher si la commandes est complète (possède des produits)</li>
+								</ul>
+							<li class="text-slate-600">
+								<i class="fa-solid fa-hourglass-start"></i>
+								- Améliorer l'affichage de la page produits</li>
+							<li class="text-slate-600">
+								<i class="fa-solid fa-hourglass-start"></i>
+								- Améliorer l'ui/ux de la commande /commandes/{uuid}/choisir-produits</li>
+							<li class="text-slate-600">
+								<i class="fa-solid fa-hourglass-start"></i>
+								- Ajouter une page récap de commande , possibilité de générer un pdf</li>
+							
+						</ul>
+					</div>
+					{% block body %}{% endblock %}
+				</div>
+			</div>
+		</div>
+
+	</body>
 </html>
