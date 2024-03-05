@@ -13,6 +13,12 @@
             {{form_row(form.clientLastName, {label : 'Nom :', attr : {'class' : 'w-full border rounded-sm border-slate-700 ml-3 px-2 px-3', 'placeholder' : 'Françoise...'}})}}
             {{form_row(form.email, {label : 'Email :', attr : {'class' : 'w-full border rounded-sm border-slate-700 ml-3 px-2 px-3', 'placeholder' : 'jonathan.francoise@gmail.com...'}})}}
             {{form_row(form.comment, {label : 'Commentaire :', attr : {'class' : 'h-1/4 w-full border rounded-sm border-slate-700 ml-3 px-2 px-3'}})}}
+            <hr>
+            <h1 class="text-2xl text-center">Adresse</h1>
+            {{form_row(form.adressCity, {label : 'Ville :', attr : {'class' : 'h-1/4 w-full border rounded-sm border-slate-700 ml-3 px-2 px-3', 'placeholder' : 'Paris'}})}}
+            {{form_row(form.adressCityCode, {label : 'Code postal :', attr : {'class' : 'w-full border rounded-sm border-slate-700 ml-3 px-2 px-3', 'placeholder' : '75000', 'maxlength' : 5}})}}
+            {{form_row(form.adressStreetInfo, {label : 'Adresse :', attr : {'class' : 'w-full border rounded-sm border-slate-700 ml-3 px-2 px-3', 'placeholder' : '73 rue des paquerettes, immeubles des tulipes, apt 2'}})}}
+
             {% if  preSelectedOrderItemJson is defined and preSelectedOrderItemJson is not null and preSelectedOrderItemJson is not empty %}
                 <input type="hidden" name="order[items]" value="{{preSelectedOrderItemJson}}">
             {% endif %}

@@ -49,6 +49,15 @@ class Order
     #[ORM\GeneratedValue]
     private Uuid $uuid;
 
+    #[ORM\Column(type: Types::STRING, nullable: false)]
+    private ?string $adressCity = null;
+    
+    #[ORM\Column(type: Types::STRING, length: 6, nullable: false)]
+    private ?string $adressCityCode = null;
+    
+    #[ORM\Column(type: Types::TEXT, nullable: false)]
+    private string $adressStreetInfo;
+
     #[ORM\Column(type: Types::BOOLEAN, nullable: false, options: ['default' => false])]
     private bool $isValid;
 
@@ -248,6 +257,66 @@ class Order
                 $item->setOrder(null);
             }
         }
+
+        return $this;
+    }
+
+    /**
+     * Get the value of adressCityCode
+     */ 
+    public function getAdressCityCode()
+    {
+        return $this->adressCityCode;
+    }
+
+    /**
+     * Set the value of adressCityCode
+     *
+     * @return  self
+     */ 
+    public function setAdressCityCode($adressCityCode)
+    {
+        $this->adressCityCode = $adressCityCode;
+
+        return $this;
+    }
+
+    /**
+     * Get the value of adressCity
+     */ 
+    public function getAdressCity()
+    {
+        return $this->adressCity;
+    }
+
+    /**
+     * Set the value of adressCity
+     *
+     * @return  self
+     */ 
+    public function setAdressCity($adressCity)
+    {
+        $this->adressCity = $adressCity;
+
+        return $this;
+    }
+
+    /**
+     * Get the value of adressStreetInfo
+     */ 
+    public function getAdressStreetInfo()
+    {
+        return $this->adressStreetInfo;
+    }
+
+    /**
+     * Set the value of adressStreetInfo
+     *
+     * @return  self
+     */ 
+    public function setAdressStreetInfo($adressStreetInfo)
+    {
+        $this->adressStreetInfo = $adressStreetInfo;
 
         return $this;
     }

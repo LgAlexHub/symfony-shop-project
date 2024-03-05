@@ -88,6 +88,10 @@ class OrderController extends AbstractController
         if (is_null($order))
             throw $this->createNotFoundException("No entity found for uuid : $uuid");
 
+        if($order->getIsValid())
+            // Ajouter un feedback, on ne peut éditer une commande déjà confirmer
+            return new Response(null, 500);
+
         $orderItems = new ArrayCollection($manager->getRepository(OrderProductRef::class)->findBy([
             'order' => $order->getId()
         ]));
