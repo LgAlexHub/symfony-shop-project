@@ -7,6 +7,8 @@ use Doctrine\ORM\Mapping as ORM;
 
 use App\Entity\Trait as HelperTrait;
 use App\Repository\ProductCategoryRepository;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 
 #[ORM\HasLifecycleCallbacks]
 #[ORM\Entity(repositoryClass: ProductCategoryRepository::class)]
@@ -24,12 +26,58 @@ class ProductCategory
     #[ORM\Column(length: 255, nullable:false, type: Types::STRING)]
     private ?string $label = null;
 
+    #[ORM\OneToMany(mappedBy: 'category', targetEntity: Product::class)]
+    private Collection $products;
+
     /**
      * TODO : Check le lazy loading, j'ai pas envie de charger les produits à chaque fois
      * que je veux une catégorie
      */
     public function __construct()
     {
+        $this->products = new ArrayCollection();
+    }
+
+     /**
+     * @return Collection<int, Product>
+     */
+    public function getProducts(): Collection
+    {
+        return $this->products;
+    }
+
+    /**
+     * This method allow to set bind product to category
+     *
+     * @param Product $product
+     * @return static
+     */
+    public function addProduct(Product $product): static
+    {
+        if (!$this->products->contains($product)) {
+            $this->products->add($product);
+            $product->setCategory($this);
+        }
+
+        return $this;
+    }
+
+    /**
+     * This method allow a category to unbind a product
+     *
+     * @param Product $product
+     * @return static
+     */
+    public function removeProduct(Product $product): static
+    {
+        if ($this->products->removeElement($product)) {
+            // set the owning side to null (unless already changed)
+            if ($product->getCategory() === $this) {
+                $product->setCategory(null);
+            }
+        }
+
+        return $this;
     }
 
     /**

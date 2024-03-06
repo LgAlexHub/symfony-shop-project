@@ -2,7 +2,7 @@
 
 {% block title %}
 	- Commandes n°
-	{{order.uuid}}
+	{{order.id}}
 {% endblock %}
 
 {% block body %}
@@ -29,13 +29,21 @@
             <p>Date de la commande :
 				{{order.createdAt|date('d/m/Y à H:i')}}</p>
 		</div>
-        <table class="table-fixed w-full border-separate border-spacing-1 border-2 border-slate-700 rounded">
+        <hr class="my-4">
+        <h4 class="text-2xl">Information adresse</h4>
+        <div class="indent-12 space-y-3">
+            <p>Ville : {{order.adressCity}}</p>
+            <p>Code Postal : {{order.adressCityCode}}</p>
+            <p>Voie : {{order.adressStreetInfo}}</p>
+        </div>
+        <table class="table-fixed w-full border-separate border-spacing-1 border-2 border-slate-700 rounded mt-3 mb-10">
             <thead>
                 <tr class="[&>*]:bg-slate-600 [&>*]:border [&>*]:border-slate-300 [&>*]:text-white [&>*]:text-center px-2 py-1">
                     <td>Produit</td>
                     <td>Poids</td>
                     <td>Prix</td>
                     <td>Quantité</td>
+                    <td>Prix x Quantité</td>
                 </tr>
             </thead>
             <tbody>
@@ -53,8 +61,16 @@
                         <td>
                             {{orderItem.quantity}}
                         </td>
+                        <td> {{orderItem.item.price/100|number_format(2) * orderItem.quantity}} €</td>
                     </tr>
                 {% endfor %}
+                <tr class="even:bg-white odd:bg-blue-50">
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td class="text-center">Total :</td>
+                    <td class="text-center">{{orderTotalPrice/100|number_format(2)}} €</td>
+                </tr>
             </tbody>
         </table>
 	</div>
