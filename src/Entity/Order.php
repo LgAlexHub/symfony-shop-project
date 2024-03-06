@@ -61,6 +61,9 @@ class Order
     #[ORM\Column(type: Types::BOOLEAN, nullable: false, options: ['default' => false])]
     private bool $isValid;
 
+    #[ORM\Column(type: Types::BOOLEAN, nullable: false, options: ['default' => false])]
+    private bool $isDone;
+
     public function __construct()
     {
         $this->items = new ArrayCollection();
@@ -317,6 +320,27 @@ class Order
     public function setAdressStreetInfo($adressStreetInfo)
     {
         $this->adressStreetInfo = $adressStreetInfo;
+
+        return $this;
+    }
+
+
+    /**
+     * Get the value of isDone
+     */ 
+    public function getIsDone()
+    {
+        return $this->isDone;
+    }
+
+    /**
+     * Set the value of isDone
+     *
+     * @return  self
+     */ 
+    public function setIsDone($isDone)
+    {
+        $this->isDone = $isDone;
 
         return $this;
     }

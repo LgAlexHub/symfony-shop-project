@@ -3,7 +3,9 @@
 namespace App\Controller\Admin;
 
 use App\Controller\Trait\ControllerToolsTrait;
+use App\Entity\Order;
 use App\Repository\OrderRepository;
+use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
@@ -50,6 +52,17 @@ class OrderController extends AbstractController
         ]);
     }
 
+    #[Route('/{uuid}/valider', name: 'validate')]
+    public function changeIsValidState(EntityManagerInterface $manager, string $uuid) : Response {
+        $order = $manager->getRepository(Order::class)->findByUuid($uuid);
+        if (is_null($order))
+            return new Response(null, 404);
+        $order->setIsDone(!$order->getIsDone());
+        $manager->persist($order);
+        $manager->flush();
+        $manager->detach($order);
+        return $this->redirectToRoute(self::$homeRoute);
+    }
 
     
    

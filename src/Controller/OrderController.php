@@ -52,6 +52,7 @@ class OrderController extends AbstractController
             // dd($templateVariables['form']->get('items')->getData());
             $newOrder
                 ->setIsValid(false)
+                ->setIsDone(false)
                 ->setUuid(Uuid::v4());
             $manager->persist($newOrder);
             $manager->flush();
