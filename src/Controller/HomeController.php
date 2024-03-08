@@ -3,8 +3,10 @@
 namespace App\Controller;
 
 use App\Entity\Product;
+use App\Entity\ProductCategory;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 
@@ -36,14 +38,19 @@ class HomeController extends AbstractController
      * @return void
      */
     #[Route('/nos-produits', name:'home.products')]
-    public function products(EntityManagerInterface $manager){
-        $products = $manager->getRepository(Product::class)
-            ->createQueryBuilder("product")
-            ->getQuery()
-            ->execute();
+    public function products(Request $request, EntityManagerInterface $manager){
+        $page = $request->get('page') ?? 1;
+        $category = $request->get('categorie') !== null ? urldecode($request->get('categorie')) :  null;
+        $paginatedProduct = $manager->getRepository(Product::class)->productOrderByNamePaginate($page, category : $category);
+        $productCategories = $manager->getRepository(ProductCategory::class)->findCategoryWithProduct();
         return $this->render('home/products.html.twig', [
-            'products' => $products
+            'selectedCategory' => $category,
+            'categories' => $productCategories,
+            'totalPage' => $paginatedProduct->maxPage,
+            'page' => $paginatedProduct->page,
+            'products' => $paginatedProduct->productPaginator
         ]);
+        // dd($product, ($page - 1) * $perPage);    
     }
 
 }

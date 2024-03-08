@@ -5,6 +5,7 @@ namespace App\Repository;
 use App\Entity\Product;
 use App\Repository\Trait\RepositoryToolTrait;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use Doctrine\ORM\Tools\Pagination\Paginator;
 use Doctrine\Persistence\ManagerRegistry;
 
 /**
@@ -31,6 +32,49 @@ class ProductRepository extends ServiceEntityRepository
             ->setParameter('query', "%$query%")
             ->getQuery()
             ->getResult();
+    }
+
+    public function productOrderByNamePaginate(int $page = 1, int $perPage = 12, $category = null){
+        $productCountQuery = $this->createQueryBuilder('product')
+            ->innerJoin('product.productReferences', 'prodRef');
+
+        if (!is_null($category)){
+            $productCountQuery->innerJoin('product.category', 'prodCat')
+                ->addSelect('prodCat')
+                ->where('prodCat.label = :cat')
+                ->setParameter("cat", $category);
+        }
+
+        $productCountQuery = $productCountQuery
+            ->select('count(DISTINCT product.id)')
+            ->getQuery()
+            ->getSingleScalarResult();
+
+        $maxPage = ceil($productCountQuery/$perPage);
+        // if ($page > $maxPage){
+        //     $page = $maxPage;
+        // }
+        $productQuery = $this->createQueryBuilder('product')
+            ->innerJoin('product.productReferences', 'prodRef');
+           
+        if (!is_null($category)){
+            $productQuery->innerJoin('product.category', 'prodCat')
+                ->addSelect('prodCat')
+                ->where('prodCat.label = :cat')
+                ->setParameter("cat", $category);
+        }
+
+        $productQuery =  $productQuery->setFirstResult(($page - 1) * $perPage)
+            ->setMaxResults($perPage)
+            ->orderBy('product.name', 'ASC')
+            ->getQuery();
+
+
+        return (object)[
+            'productPaginator' => new Paginator($productQuery),
+            'maxPage' => (int)$maxPage,
+            'page' => $page
+        ];
     }
 
 
