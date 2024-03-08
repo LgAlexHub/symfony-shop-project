@@ -24,7 +24,7 @@
 						Nombre de référence
 					</td>
 					<td class="bg-slate-600 text-white border border-slate-300 px-2 py-1">
-						Commande validée
+						Commande valide 
 					</td>
 					<td class="bg-slate-600 text-white border border-slate-300 px-2 py-1">
 						Total Panier
@@ -43,7 +43,7 @@
 					<tr class="even:bg-white odd:bg-blue-50">
 						<td class="border border-slate-300 px-2">{{order['order'].clientFirstName}}</td>
 						<td class="border border-slate-300 px-2">{{order['order'].clientLastName}}</td>
-						<td class="border border-slate-300 px-2 w-auto">{{order['order'].email}}</td>
+						<td class="border border-slate-300 px-2 w-auto text-sm">{{order['order'].email}}</td>
 						<td class="border border-slate-300 text-center text-blue-800 w-2/6 border border-slate-300">
 							<span class="rounded-full px-2 border border-purple-400 bg-purple-400 text-white">
 								{{order['order'].items|length}}
