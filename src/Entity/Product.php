@@ -38,6 +38,9 @@ class Product
     #[ORM\OneToMany(mappedBy: 'product', targetEntity: ProductReference::class)]
     private Collection $productReferences;
 
+    #[ORM\Column(type: Types::BOOLEAN, nullable: false, options: ['default' => false])]
+    private bool $isFavorite;
+
     public function __construct()
     {
         $this->productReferences = new ArrayCollection();
@@ -161,5 +164,25 @@ class Product
      */
     public function getViewPageUrl() : string {
         return "/produits/{$this->slug}";
+    }
+
+    /**
+     * Get the value of isFavorite
+     */ 
+    public function getIsFavorite()
+    {
+        return $this->isFavorite;
+    }
+
+    /**
+     * Set the value of isFavorite
+     *
+     * @return  self
+     */ 
+    public function setIsFavorite($isFavorite)
+    {
+        $this->isFavorite = $isFavorite;
+
+        return $this;
     }
 }
