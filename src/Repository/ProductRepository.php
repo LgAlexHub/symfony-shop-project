@@ -34,7 +34,7 @@ class ProductRepository extends ServiceEntityRepository
             ->getResult();
     }
 
-    public function productOrderByNamePaginate(int $page = 1, int $perPage = 12, $category = null){
+    public function productOrderByNamePaginate(int $page = 1, int $perPage = 12, $category = null, $query = null){
         $productCountQuery = $this->createQueryBuilder('product')
             ->innerJoin('product.productReferences', 'prodRef');
 
@@ -43,6 +43,13 @@ class ProductRepository extends ServiceEntityRepository
                 ->addSelect('prodCat')
                 ->where('prodCat.label = :cat')
                 ->setParameter("cat", $category);
+        }
+
+        // WARNING : Peut-être un overextend de regarder les slugs des productsRefs quand on peut direct checker le product slug
+        if (!is_null($query)){
+            $productCountQuery
+                ->where('LOWER(prodRef.slug) LIKE :query')
+                ->setParameter('query', '%'.$query.'%');
         }
 
         $productCountQuery = $productCountQuery
@@ -64,6 +71,12 @@ class ProductRepository extends ServiceEntityRepository
                 ->setParameter("cat", $category);
         }
 
+        if (!is_null($query)){
+            $productQuery
+                ->where('LOWER(prodRef.slug) LIKE :query')
+                ->setParameter('query', '%'.$query.'%');
+        }
+
         $productQuery =  $productQuery->setFirstResult(($page - 1) * $perPage)
             ->setMaxResults($perPage)
             ->orderBy('product.name', 'ASC')
@@ -73,7 +86,8 @@ class ProductRepository extends ServiceEntityRepository
         return (object)[
             'productPaginator' => new Paginator($productQuery),
             'maxPage' => (int)$maxPage,
-            'page' => $page
+            'page' => $page, 
+            'nbResult' => $productCountQuery
         ];
     }
 

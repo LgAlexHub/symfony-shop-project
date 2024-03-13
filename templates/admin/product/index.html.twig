@@ -3,8 +3,51 @@
 {% block title %} - Produits{% endblock %}
 
 {% block body %}
-    <h1 class="text-center my-3 text-2xl font-san underline text-slate-800">Mes produits</h1>
+    <h1 class="text-center my-3 text-4xl font-sans font-light text-slate-800">Mes produits</h1>
+    {% if query is defined %}
+            <p class="font-bold">Terme recherché "{{query}}"</p>
+            <a class="text-orange-600 hover:underline text-center" href="{{path('admin.products.index')}}">
+                <i class="fa-solid fa-xmark"></i>
+                Afficher tout les produits
+            </a>
+            
+    {% endif %}
+    <form action="{{path('admin.products.index')}}">
+        <div class="flex items-center w-full rounded-lg border-4 border-black">
+            <input type="text" name="query" id="" class="w-11/12 rounded-lg" placeholder="Confiture de fraise...">
+            <button type="submit" class="w-1/12 flex justify-center border-l-2 border-black rounded hover:bg-black hover:text-white">
+                <i class="fa-solid fa-magnifying-glass my-1"></i>
+            </button>
+        </div>
+    </form>
+    
     <div class="container mx-auto mt-3 ml-3">
+        <div class="h-30 flex justify-center my-8">
+            <nav aria-label="Page navigation example">
+                <ul class="list-style-none flex">
+                    {% if page > 1 %}
+                        <li>
+                            <a class="relative hover:bg-black hover:text-white block border-rounded border-2 border-black rounded px-3 py-1.5 text-sm text-black" href="{{path('admin.products.index', {'page': page - 1, 'categorie' : category is defined ? category|url_encode : null, query : query is defined ? query|url_encode : null})}}"><i class="fa-solid fa-arrow-left-long"></i></a>
+                        </li>
+                    {% endif %}
+                    <li aria-current="page">
+                        <p class="relative border-rounded border-2 border-black mr-3 ml-3 block rounded px-3 py-1.5 text-sm text-black">{{page}}</p>
+                    </li>
+                    {% if totalPage > page  %}
+                        <li aria-current="page">
+                            <a class="relative hover:bg-black hover:text-white block border-rounded border-2 border-black rounded px-3 py-1.5 text-sm text-black" href="{{path('admin.products.index', {'page': page + 1, 'categorie' : category is defined ? category|url_encode : null, query : query is defined ? query|url_encode : null})}}">
+                                <i class="fa-solid fa-arrow-right-long"></i>
+                            </a>
+                        </li>
+                    {% endif %}
+                    <li class="relative border-rounded border-2 border-black mr-3 ml-3 block rounded px-3 py-1.5 text-sm text-black">...</li>
+                    <li aria-current="page">
+                        <p class="relative border-rounded border-2 border-gray-500 mr-3 ml-3 block rounded px-3 py-1.5 text-sm text-gray-500 bg-gray-300">{{ totalPage }}</p>
+                    </li>
+                </ul>
+            </nav>
+        </div>
+        <p> Nombre de résultats : <span class="font-bold">{{ nbResult }}</span></p>
         <table class="table-fixed w-full border-separate border-spacing-2">
             <thead>
                 <tr>

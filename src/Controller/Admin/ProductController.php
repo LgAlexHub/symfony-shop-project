@@ -35,16 +35,30 @@ class ProductController extends AbstractController
      * @param EntityManagerInterface $manager
      * @return Response containt form view
      */
-    public function index(EntityManagerInterface $manager): Response
+    public function index(Request $request, EntityManagerInterface $manager): Response
     {
-        $products = $manager->getRepository(Product::class)
-            ->createQueryBuilder("product")
-            ->orderBy("product.name", "ASC")
-            ->getQuery()
-            ->execute();
-        return $this->render(self::$templatePath.'/index.html.twig', [
-            'products' => $products,
-        ]);
+        // dd($request->get('query'));
+        $page = $request->get('page') ?? 1;
+        $query = $request->get('activeQuery') ?? null;
+        $newQuery = $request->get('query') ?? null;
+        // dd(['new' => $newQuery, 'old' => $query]);
+        if (!is_null($newQuery))
+            $query = $newQuery;
+        $paginatedProduct = $manager
+            ->getRepository(Product::class)
+            ->productOrderByNamePaginate($page, category : null, query : $query);
+
+        $renderArray =  [
+            'products'  => $paginatedProduct->productPaginator,
+            'totalPage' => $paginatedProduct->maxPage,
+            'nbResult'  => $paginatedProduct->nbResult,
+            'page'      => $paginatedProduct->page,
+        ];
+        if (!is_null($query)){
+            $renderArray['query'] = $query; 
+        }
+
+        return $this->render(self::$templatePath.'/index.html.twig', $renderArray);
     }
 
     #[Route('/add', name: 'add')]
