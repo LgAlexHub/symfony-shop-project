@@ -15,18 +15,18 @@
                         {% for product in products %}
                             <div class="rounded sm:my-3 relative lg:w-80 sm:w-60">
                                 <img src="{{product.productReferences[0].getImageUrl}}" class="z-1 rounded" alt="">
-                                <div class="absolute bg-red-100 bottom-0 z-3 lg:w-80 sm:w-60 rounded-t-lg rounded-b bg-white">
+                                <div class="absolute bg-red-100 bottom-0 z-3 lg:w-80 sm:w-60 rounded-t-lg rounded-b">
                                     <p class="text-center my-1 font-sans font-semibold text-slate-600">{{product.name}}</p>
                                     <div class="flex justify-center [&>*]:mx-1">
                                         {% for ref in product.productReferences %}
-                                            <span class="rounded-xl bg-white px-1 py-1 text-sm">
+                                            <span class="rounded-xl bg-red-300 text-white font-semibold px-1 py-1 text-sm">
                                                 {{ref.weight}} {{ref.weightType}}
                                             </span>
                                         {% endfor %}
                                     </div>
-                                    <button class="bg-red-200 rounded w-full z-3 mt-5">
+                                    <a href="{{product.viewPageUrl}}" class="block text-center bg-red-200 rounded w-full z-3 mt-5 hover:bg-red-600 hover:text-white hover:font-bold">
                                         Voir produit
-                                    </button>
+                                    </a>
                                 </div>
                             </div>
                         {% endfor %}
