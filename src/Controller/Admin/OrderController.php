@@ -28,15 +28,26 @@ class OrderController extends AbstractController
      */
     public function index(OrderRepository $manager): Response
     {
-        $ordersWithTotalPrice = array_map(
-            fn ($order) : array => [
-                'order'      => $order,
-                'totalPrice' => $order->getItems()->reduce(fn(int $acc, object $orderItem) => $acc + ($orderItem->getItem()->getPrice() * $orderItem->getQuantity()), 0)],
-            $manager->findBy([], array('createdAt' => 'ASC'))
-        );
-        return $this->render(self::$templatePath.'/index.html.twig', [
-            'orders' => $ordersWithTotalPrice,
-        ]);
+        $orders = $manager->orderPagination();
+        $ordersWithTotalPrices = [];
+        foreach($orders->paginator as $order){
+            $ordersWithTotalPrices[] = [
+                'order' => $order,
+                'totalPrice' => $order->getItems()->reduce(
+                    fn(int $accumulator, object $orderItem) => $accumulator + ($orderItem->getItem()->getPrice() * $orderItem->getQuantity()),
+                    0
+                )
+            ];
+        }
+
+        $renderArray =  [
+            'orders'  => $ordersWithTotalPrices,
+            'totalPage' => $orders->maxPage,
+            'nbResult'  => $orders->nbResult,
+            'page'      => $orders->page,
+        ];
+
+        return $this->render(self::$templatePath.'/index.html.twig', $renderArray);
     }
 
     #[Route('/{uuid}', name: 'show')]

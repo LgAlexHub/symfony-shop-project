@@ -5,6 +5,7 @@ namespace App\Repository;
 use App\Entity\Order;
 use App\Repository\Trait\RepositoryToolTrait;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use Doctrine\ORM\Tools\Pagination\Paginator;
 use Doctrine\Persistence\ManagerRegistry;
 
 /**
@@ -45,6 +46,56 @@ class OrderRepository extends ServiceEntityRepository
             ->addSelect("items")
             ->getQuery()
             ->getResult();
+    }
+
+    public function orderPagination(int $page = 1, int $perPage = 12, string $queryString = null, string $orderBy = null, bool $asc = true) {
+        $orderQuery = $this->createQueryBuilder('o')
+            ->innerJoin('o.items', 'orderItems')
+            ->addSelect('orderItems');
+        
+        $orderCountQuery = $this->createQueryBuilder('orders')
+            ->innerJoin('orders.items', 'items')
+            ->addSelect('items')
+            ->select('COUNT(DISTINCT orders.id)')
+            ->getQuery()
+            ->getSingleScalarResult();
+        
+        $maxPage = ceil($orderCountQuery/$perPage);
+
+        if (!is_null($queryString)){
+            $terms = explode(" ", $queryString);
+            // First iteration outside loop to set one Where clause , then unset variable to use the foreach loop as usual
+            $orderQuery
+                ->where("o.clientFirstName LIKE :term_0")
+                ->orWhere("o.clientLastName LIKE :term_0")
+                ->orWhere("o.email LIKE :term_0")
+                ->setParameter("term_0", $terms[0]);
+            unset($terms[0]);
+
+            foreach ($terms as $index => $term) {
+                $orderQuery
+                    ->orWhere("o.clientFirstName LIKE :term_".$index)
+                    ->orWhere("o.clientLastName LIKE :term_".$index)
+                    ->orWhere("o.email LIKE :term_".$index)
+                    ->setParameter("term_".$index, $term);
+            }
+        }
+
+        if (!is_null($orderBy)){
+            $orderQuery->orderBy("o.".$orderBy, $asc ? 'ASC' : 'DESC');
+        }else{
+            $orderQuery->orderBy("o.createdAt", $asc ? 'ASC' : 'DESC');
+        }
+
+
+        $orderQuery->getQuery();
+
+        return (object)[
+            'paginator' => new Paginator($orderQuery),
+            'maxPage'   => (int) $maxPage,
+            'page'      => $page,
+            'nbResult'  => $orderCountQuery
+        ];
     }
 
 //    /**

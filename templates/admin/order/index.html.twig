@@ -5,23 +5,66 @@
 {% endblock %}
 
 {% block body %}
-	<h1 class="text-center my-3 text-2xl font-san underline text-slatea-800">Mes commandes</h1>
-
+	<h1 class="text-center my-3 text-2xl font-sans underline text-slatea-800">Mes commandes</h1>
+	<div class="bloc [&>*]:mr-1">
+		{# Ajout des boutons filtres #}
+		<a class="border-2 border-{{isValid is defined ? 'green' : 'red'}}-500 rounded text-white bg-green-300 px-2 py-1 hover:bg-green-400 hover:font-bold" href="{{ path('admin.orders.index', {'valide' : isValid is defined ? false : true}) }}">
+			Commandes 
+			{% if isValid is not defined %}
+				non
+			{% endif %}
+			validées
+			<i class="fa-solid fa-check"></i>
+		</a>
+		<a class="border-2 border-green-500 rounded text-white bg-green-300 px-2 py-1 hover:bg-green-400 hover:font-bold" href="{{ path('admin.orders.index', {'fini' : true}) }}">
+			Commandes fini
+			<i class="fa-solid fa-check"></i>
+		</a>
+	</div>
+	<div class="my-2">
+		<form action="{{path('admin.orders.index')}}">
+			<div class="flex items-center w-full rounded-lg border-4 border-black">
+				<input type="text" name="query" id="" class="w-11/12 rounded-lg" placeholder="Dupont, dupont.jp@hotmail.fr...">
+				<button type="submit" class="w-1/12 flex justify-center border-l-2 border-black rounded hover:bg-black hover:text-white">
+					<i class="fa-solid fa-magnifying-glass my-1"></i>
+				</button>
+			</div>
+    	</form>
+	</div>
+	<div class="h-30 flex justify-center my-8">
+		<nav aria-label="Page navigation example">
+			<ul class="list-style-none flex">
+				{% if page > 1 %}
+					<li>
+						<a class="relative hover:bg-black hover:text-white block border-rounded border-2 border-black rounded px-3 py-1.5 text-sm text-black" href="{{path('admin.orders.index', {'page': page - 1} ) }}"><i class="fa-solid fa-arrow-left-long"></i></a>
+					</li>
+				{% endif %}
+				<li aria-current="page">
+					<p class="relative border-rounded border-2 border-black mr-3 ml-3 block rounded px-3 py-1.5 text-sm text-black">{{page}}</p>
+				</li>
+				{% if totalPage > page  %}
+					<li aria-current="page">
+						<a class="relative hover:bg-black hover:text-white block border-rounded border-2 border-black rounded px-3 py-1.5 text-sm text-black" href="{{path('admin.orders.index', {'page': page - 1} ) }}">
+							<i class="fa-solid fa-arrow-right-long"></i>
+						</a>
+					</li>
+				{% endif %}
+				<li class="relative border-rounded border-2 border-black mr-3 ml-3 block rounded px-3 py-1.5 text-sm text-black">...</li>
+				<li aria-current="page">
+					<p class="relative border-rounded border-2 border-gray-500 mr-3 ml-3 block rounded px-3 py-1.5 text-sm text-gray-500 bg-gray-300">{{ totalPage }}</p>
+				</li>
+			</ul>
+		</nav>
+	</div>
 	<div class="mx-auto mt-3 ml-3">
 		<table class="table-fixed w-full border-separate border-spacing-2">
 			<thead>
 				<tr>
-					<td class="bg-slate-600 border border-slate-300 text-white px-2 py-1">
-						Prénom
-					</td>
 					<td class="bg-slate-600 text-white border border-slate-300 px-2 py-1">
 						Nom
 					</td>
 					<td class="bg-slate-600 text-white border border-slate-300 px-2 py-1">
 						Email
-					</td>
-					<td class="bg-slate-600 text-white border border-slate-300 px-2 py-1">
-						Nombre de référence
 					</td>
 					<td class="bg-slate-600 text-white border border-slate-300 px-2 py-1">
 						Commande valide 
@@ -32,8 +75,10 @@
 					<td class="bg-slate-600 text-white border border-slate-300 px-2 py-1">
 						Statut la commande
 					</td>
-					<td class="bg-slate-600 text-white border border-slate-300 px-2 py-1">
+					<td class="bg-slate-600 text-white border border-slate-300 px-2 py-1 hover:underline">
 						Date de la commande
+						<i class="fa-solid fa-arrow-up"></i>
+
 					</td>
 					<td class="bg-slate-600 text-white border border-slate-300 px-2 py-1"></td>
 				</tr>
@@ -41,14 +86,8 @@
 			<tbody>
 				{% for order in orders %}
 					<tr class="even:bg-white odd:bg-blue-50">
-						<td class="border border-slate-300 px-2">{{order['order'].clientFirstName}}</td>
 						<td class="border border-slate-300 px-2">{{order['order'].clientLastName}}</td>
 						<td class="border border-slate-300 px-2 w-auto text-sm">{{order['order'].email}}</td>
-						<td class="border border-slate-300 text-center text-blue-800 w-2/6 border border-slate-300">
-							<span class="rounded-full px-2 border border-purple-400 bg-purple-400 text-white">
-								{{order['order'].items|length}}
-							</span>
-						</td>
 						{% if order['order'].isValid %}
 							<td class="text-green-600 border text-center border-slate-300 px-2 "><strong>Oui</strong></td>
 						{% else %}

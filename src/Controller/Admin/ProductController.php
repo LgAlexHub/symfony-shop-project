@@ -54,6 +54,7 @@ class ProductController extends AbstractController
             'nbResult'  => $paginatedProduct->nbResult,
             'page'      => $paginatedProduct->page,
         ];
+        
         if (!is_null($query)){
             $renderArray['query'] = $query; 
         }
