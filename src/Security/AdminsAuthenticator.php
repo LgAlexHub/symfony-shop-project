@@ -2,6 +2,7 @@
 
 namespace App\Security;
 
+use App\Service\SessionTokenManager;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -16,7 +17,6 @@ use Symfony\Component\Security\Http\Authenticator\Passport\Passport;
 use Symfony\Component\Security\Http\SecurityRequestAttributes;
 use Symfony\Component\Security\Http\Util\TargetPathTrait;
 
-
 /**
  * @author Aléki <alexlegras@hotmail.com>
  * @version 1
@@ -29,7 +29,7 @@ class AdminsAuthenticator extends AbstractLoginFormAuthenticator
 
     public const LOGIN_ROUTE = 'login';
 
-    public function __construct(private UrlGeneratorInterface $urlGenerator)
+    public function __construct(private UrlGeneratorInterface $urlGenerator, private SessionTokenManager $sessionTokenManager)
     {
     }
 
@@ -66,10 +66,10 @@ class AdminsAuthenticator extends AbstractLoginFormAuthenticator
      */
     public function onAuthenticationSuccess(Request $request, TokenInterface $token, string $firewallName): ?Response
     {
+        $this->sessionTokenManager->setApiToken();
         if ($targetPath = $this->getTargetPath($request->getSession(), $firewallName)) {
             return new RedirectResponse($targetPath);
         }
-
         // For example:
         return new RedirectResponse($this->urlGenerator->generate('admin.products.index'));
         // throw new \Exception('TODO: provide a valid redirect inside '.__FILE__);

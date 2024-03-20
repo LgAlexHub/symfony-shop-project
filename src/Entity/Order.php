@@ -344,4 +344,16 @@ class Order
 
         return $this;
     }
+
+    /**
+     * Return the total price (in french cents) of the order
+     *
+     * @return int|float
+     */
+    public function getTotalPrice() : int|float {
+        return $this->getItems()->reduce(
+            fn(int $accumulator, object $orderItem) => $accumulator + ($orderItem->getItem()->getPrice() * $orderItem->getQuantity()),
+            0
+        );
+    }
 }
