@@ -56,10 +56,7 @@ class Order
     private ?string $adressCityCode = null;
     
     #[ORM\Column(type: Types::TEXT, nullable: false)]
-    private string $adressStreetInfo;
-
-    #[ORM\Column(type: Types::BOOLEAN, nullable: false, options: ['default' => false])]
-    private bool $isValid;
+    private ?string $adressStreetInfo;
 
     #[ORM\Column(type: Types::BOOLEAN, nullable: false, options: ['default' => false])]
     private bool $isDone;
@@ -102,7 +99,7 @@ class Order
     /**
      * Order client first name setter
      *
-     * @return string|null
+     * @return this
      */
     public function setClientFirstName(string $clientFirstName): static
     {
@@ -124,7 +121,7 @@ class Order
      /**
      * Order client last name setter
      *
-     * @return string|null
+     * @return this
      */
     public function setClientLastName(string $clientLastName): static
     {
@@ -146,9 +143,9 @@ class Order
      /**
      * Order client email setter
      *
-     * @return string|null
+     * @return this
      */
-    public function setEmail(string $email): static
+    public function setEmail(string $email): self
     {
         $this->email = $email;
 
@@ -168,9 +165,9 @@ class Order
     /**
      * Order client comment setter
      *
-     * @return string|null
+     * @return this
      */
-    public function setComment(?string $comment): static
+    public function setComment(?string $comment): self
     {
         $this->comment = $comment;
 
@@ -193,26 +190,6 @@ class Order
     public function setUuid($uuid)
     {
         $this->uuid = $uuid;
-
-        return $this;
-    }
-
-    /**
-     * Get the value of isValid
-     */ 
-    public function getIsValid()
-    {
-        return $this->isValid;
-    }
-
-    /**
-     * Set the value of isValid
-     *
-     * @return  self
-     */ 
-    public function setIsValid($isValid)
-    {
-        $this->isValid = $isValid;
 
         return $this;
     }

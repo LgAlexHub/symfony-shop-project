@@ -31,12 +31,14 @@ class OrderController extends AbstractController
             ->setObjectToSerialize($orders->paginator)
             ->setOptions([AbstractNormalizer::CIRCULAR_REFERENCE_HANDLER => fn (object $order, string $format, array $context) => $order->getId()])
             ->setAttributes([
+                'id',
                 'serializeUuid',
                 'clientFirstName',
                 'clientLastName',
                 'email',
                 'comment',
                 'isValid',
+                'isDone',
                 'totalPrice',
                 'items' => [
                     'quantity',
@@ -47,11 +49,11 @@ class OrderController extends AbstractController
                     ]
                 ]
             ]);
-        return new Response(sprintf("{
-                'orders' : %s,
-                'totalPage' : %d,
-                'nbResult' : %d,
-                'page' : %d
+        return new Response(
+            sprintf("{\n\t\"orders\": %s,
+                \"totalPage\": %d,
+                \"nbResult\": %d,
+                \"page\": %d
             }", $enhancedEntityJsonSerializer->serialize(), $orders->maxPage, $orders->nbResult, $orders->page), 
             headers: [ 'Content-Type' => 'application/json']
         );

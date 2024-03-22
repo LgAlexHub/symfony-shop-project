@@ -50,9 +50,10 @@ class OrderController extends AbstractController
         return $this->render(self::$templatePath.'/index.html.twig', $renderArray);
     }
 
-    #[Route('/{uuid}', name: 'show')]
-    public function show(OrderRepository $manager, string $uuid) : Response {
-        $order = $manager->findByUuidWithRelated($uuid);
+    #[Route('/{id}', name: 'show')]
+    public function show(OrderRepository $manager, int $id) : Response {
+        $order = $manager->findOneBy(['id' => $id]);
+        dd($order);
         $total = $order->getItems()->reduce(fn(int $accumulator, object $orderItem) : int => $accumulator + ($orderItem->getQuantity() * $orderItem->getItem()->getPrice()), 0);
         if (is_null($order))
             return new Response(null, 404);

@@ -50,6 +50,7 @@ class ProductFixture extends Fixture
             if (count($newProduct) < 1){
                 $newProduct = new Product;
                 $newProduct->setName($line[1]);
+                $newProduct->setIsFavorite(false);
                 $newProduct->setCategory($categoriesByCategoryLabel[$line[0]]);
                 $manager->persist($newProduct);
                 $manager->flush();
