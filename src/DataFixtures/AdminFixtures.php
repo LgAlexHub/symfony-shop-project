@@ -6,6 +6,7 @@ use App\Entity\Admin;
 
 use Doctrine\Persistence\ObjectManager;
 use Doctrine\Bundle\FixturesBundle\Fixture;
+use Doctrine\Bundle\FixturesBundle\FixtureGroupInterface;
 
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 
@@ -13,45 +14,62 @@ use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
  * @author Alex <alexlegras@hotmail.com>
  * Class use too seed database with 6 fake admin users
  */
-class AdminFixtures extends Fixture
+class AdminFixtures extends Fixture implements FixtureGroupInterface
 {
-    private UserPasswordHasherInterface $passwordHasher;
 
-    public function __construct(UserPasswordHasherInterface $hasher)
+    public function __construct(private UserPasswordHasherInterface $hasher){}
+
+    /**
+     * Returns the groups this fixture belongs to.
+     *
+     * This method is required by the FixtureGroupInterface and is used to specify
+     * the groups to which this fixture belongs. These groups can be used to control
+     * the execution of fixtures based on environment or functionality.
+     *
+     * @return array
+    */
+    public static function getGroups(): array
     {
-        $this->passwordHasher = $hasher;
+        return [
+            'dev',
+        ];
     }
 
-
+    /**
+     * Will load fake admin into database
+     *
+     * @param ObjectManager $manager
+     * @return void
+     */
     public function load(ObjectManager $manager): void
     {
         $admins = array(
-            array(
+            (object) array(
                 'email' => 'alex@hotmail.com',
                 'password' => 'azerty',
                 'pseudonyme' => 'Aléki'
             ),
-            array(
+            (object) array(
                 'email' => 'john.doe@example.com',
                 'password' => 'johnsPass123',
                 'pseudonyme' => 'johnny'
             ),
-            array(
+            (object) array(
                 'email' => 'jane.smith@example.com',
                 'password' => 'secureJanePass',
                 'pseudonyme' => 'jane'
             ),
-            array(
+            (object) array(
                 'email' => 'bob.jones@example.com',
                 'password' => 'bobsPassword',
                 'pseudonyme' => 'bob'
             ),
-            array(
+            (object) array(
                 'email' => 'alice.white@example.com',
                 'password' => 'alicePass',
                 'pseudonyme' => 'alice'
             ),
-            array(
+            (object) array(
                 'email' => 'charlie.brown@example.com',
                 'password' => 'charliesSecret',
                 'pseudonyme' => 'charlie'
@@ -59,10 +77,10 @@ class AdminFixtures extends Fixture
         );
 
         foreach($admins as $admin) {
-            $newAdmin = new Admin;
-            $newAdmin->setEmail($admin['email']);
-            $newAdmin->setPseudonyme($admin['pseudonyme']);
-            $newAdmin->setPassword($this->passwordHasher->hashPassword($newAdmin, $admin['password']));
+            $newAdmin = (new Admin);
+            $newAdmin->setEmail($admin->email);
+            $newAdmin->setPseudonyme($admin->pseudonyme);
+            $newAdmin->setPassword($this->hasher->hashPassword($newAdmin, $admin->password));
             $manager->persist($newAdmin);
         }
         $manager->flush();
