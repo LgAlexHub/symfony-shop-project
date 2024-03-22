@@ -3,9 +3,6 @@
 namespace App\DataFixtures;
 
 use App\Entity\Order;
-use App\Entity\OrderProductRef;
-use App\Entity\ProductReference;
-use App\Repository\ProductReferenceRepository;
 
 use Doctrine\Persistence\ObjectManager;
 use Doctrine\Bundle\FixturesBundle\Fixture;
@@ -27,7 +24,7 @@ class OrderFixture extends Fixture implements DependentFixtureInterface, Fixture
     private Generator $fakerGenerator;
     private int $maxCreate;
 
-    public function __construct(private ProductReferenceRepository $prodRefRep)
+    public function __construct()
     {
         $this->fakerGenerator = Factory::create();
         $this->maxCreate = 20;
@@ -64,22 +61,8 @@ class OrderFixture extends Fixture implements DependentFixtureInterface, Fixture
     {
         return [
             'dev',
+            'order'
         ];
-    }
-
-    /**
-     * Retrieve a random list of product references.
-     *
-     * This method retrieves a random list of product references from the database.
-     *
-     * @return ProductReference[] An array containing the retrieved product references.
-     */
-    protected function getRandomProductRefs() : array {
-        return $this->prodRefRep->createQueryBuilder('pr')
-            ->setMaxResults($this->fakerGenerator->numberBetween(1, 10))
-            ->orderBy('RAND()')
-            ->getQuery()
-            ->getResult();
     }
 
     /**
@@ -104,17 +87,7 @@ class OrderFixture extends Fixture implements DependentFixtureInterface, Fixture
                 ->setIsDone($this->fakerGenerator->boolean());
             
             $manager->persist($order);
-            $manager->flush();
-            
-            $productsRefs = $this->getRandomProductRefs();
-            foreach($productsRefs as $prodRef){
-                $newOrderProdRef = new OrderProductRef;
-                $newOrderProdRef->setQuantity($this->fakerGenerator->numberBetween(1,15));
-                $newOrderProdRef->setOrder($order);
-                $newOrderProdRef->setItem($prodRef);
-                $manager->persist($newOrderProdRef);
-            }
-            $manager->flush();
         }
+        $manager->flush();
     }
 }
