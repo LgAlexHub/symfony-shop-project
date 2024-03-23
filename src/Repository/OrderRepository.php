@@ -87,8 +87,9 @@ class OrderRepository extends ServiceEntityRepository
             $orderQuery->orderBy("o.createdAt", $asc ? 'ASC' : 'DESC');
         }
 
-
-        $orderQuery->getQuery();
+        $orderQuery->setFirstResult(($page - 1) * $perPage)
+            ->setMaxResults($perPage)
+            ->getQuery();
 
         return (object)[
             'paginator' => new Paginator($orderQuery),

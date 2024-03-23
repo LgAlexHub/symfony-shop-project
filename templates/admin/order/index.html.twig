@@ -5,6 +5,12 @@
 {% endblock %}
 
 {% block body %}
-	<h1 class="text-center my-3 text-2xl font-sans underline text-slatea-800">Mes commandes</h1>
-		<div class="" {{ vue_component('admin/orders/table', {'apiToken' : api_token}) }}></div>
+		<h2 class="flex flex-row flex-nowrap items-center my-12">
+			<span class="flex-grow block border-t border-black"></span>
+			<span class="flex-none block mx-4 px-4 py-2.5 text-xl rounded leading-none font-medium bg-blue-200 text-white">
+				Mes commandes
+			</span>
+			<span class="flex-grow block border-t border-black"></span>
+		</h2>
+		<div class="my-10 mx-10" {{ vue_component('admin/orders/table', {'apiToken' : api_token}) }}></div>
 {% endblock %}
