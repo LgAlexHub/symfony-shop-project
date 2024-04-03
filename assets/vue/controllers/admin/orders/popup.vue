@@ -93,11 +93,23 @@ export default {
                 }
             })
             .then((_) => this.editingOrder.isDone = !   this.editingOrder.isDone)
-            .error((err) => console.error(err));
+            .catch((err) => console.error(err));
+        },
+        fetchOrderProduct(){
+            axios.get(`/api/admin/commandes/${this.editingOrder.id}/produits`,{
+                headers : {
+                    "Authorization" : `Bearer ${this.apiToken}`
+                }
+            })
+            .then((res) => {
+                this.editingOrder.items = res.data
+            })
+            .catch((err) => console.error(err));
         }
     },
     mounted() {
         this.editingOrder = this.order;
+        this.fetchOrderProduct();
     }
 }
 </script>

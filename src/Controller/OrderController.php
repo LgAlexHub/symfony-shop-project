@@ -27,7 +27,7 @@ class OrderController extends AbstractController
 
     #[Route('/commander', name: 'order')]
     /**
-     * Undocumented function
+     * This method handle route /commander which is a form to order an item from shop
      *
      * @param Request $request
      * @param EntityManagerInterface $manager
@@ -72,11 +72,11 @@ class OrderController extends AbstractController
 
     #[Route('/{uuid}/choisir-ses-produits', name: 'choose-products')]
     /**
-     * Undocumented function
+     * This method handle route /uuid/choisir-ses-produits which is a form to add or remove products from ur order
      *
      * @param string $uuid
      * @param EntityManagerInterface $manager
-     * @return void
+     * @return Response
      */
     public function askOrderProductsView(string $uuid, EntityManagerInterface $manager, EnhancedEntityJsonSerializer $enhancedEnityJsonSerializer): Response
     {
@@ -112,24 +112,24 @@ class OrderController extends AbstractController
         ]);
     }
 
-    #[Route('/{uuidOrder}/valider', name: 'order-confirm')]
+    #[Route('/{uuid}/valider', name: 'order-confirm')]
     /**
-     * Undocumented function
+     * This method handle route handle /uuid/valider which is the last step to order
      *
      * @param Request $request
-     * @param string $uuidOrder
+     * @param string $uuid
      * @param EntityManagerInterface $manager
      * @return null|Response
      */
-    public function confirmOrder(Request $request, string $uuidOrder, EntityManagerInterface $manager) : null|Response {
-        if (empty($uuidOrder) || is_null($uuidOrder) || !Uuid::isValid($uuidOrder)){
-            // Feedback utilisateur commande inexistante
+    public function confirmOrder(Request $request, string $uuid, EntityManagerInterface $manager) : null|Response {
+        if (empty($uuid) || is_null($uuid) || !Uuid::isValid($uuid)){
+            // TODO : Feedback utilisateur commande inexistante
             return null;
         }
         
-        $orderWithProducts = $manager->getRepository(Order::class)->findOneBy(['uuid' => $uuidOrder]);
+        $orderWithProducts = $manager->getRepository(Order::class)->findOneBy(['uuid' => $uuid]);
         if($orderWithProducts->getItems()->count() < 1){
-            // Feedback utilisateur on ne peut pas commander sans produit
+            // TODO : Feedback utilisateur on ne peut pas commander sans produit
             return null;
         }
         
@@ -138,7 +138,7 @@ class OrderController extends AbstractController
         $manager->flush();
         $manager->detach($orderWithProducts);
 
-        // redirection avec feedback, voir pour faire une page récap commande , voir pdf avec 
+        // TODO : redirection avec feedback, voir pour faire une page récap commande , voir pdf avec 
         return $this->redirectToRoute("home");
     }
 }

@@ -21,20 +21,6 @@ class OrderProductRefRepository extends ServiceEntityRepository
         parent::__construct($registry, OrderProductRef::class);
     }
 
-   /**
-    * @return OrderProductRef[] Returns an array of OrderProductRef objects
-    */
-   public function findByExampleField($value): array
-   {
-       return $this->createQueryBuilder('o')
-           ->andWhere('o.exampleField = :val')
-           ->setParameter('val', $value)
-           ->orderBy('o.id', 'ASC')
-           ->setMaxResults(10)
-           ->getQuery()
-           ->getResult()
-       ;
-   }
 
    /**
     * This method retreive try to retreive targeted OrderProductRef in an targeted order
@@ -56,13 +42,21 @@ class OrderProductRefRepository extends ServiceEntityRepository
             ->getOneOrNullResult();
    }
 
-//    public function findOneBySomeField($value): ?OrderProductRef
-//    {
-//        return $this->createQueryBuilder('o')
-//            ->andWhere('o.exampleField = :val')
-//            ->setParameter('val', $value)
-//            ->getQuery()
-//            ->getOneOrNullResult()
-//        ;
-//    }
+   /**
+    * Undocumented function
+    *
+    * @param integer $orderId
+    * @return mixed
+    */
+    public function findProductWithRelatedInOrder(int $orderId) : mixed {
+        return $this->createQueryBuilder("akaOrderProductRef")
+            ->innerJoin("akaOrderProductRef.item", "akaProductRef")
+            ->innerJoin("akaOrderProductRef.order", "akaOrder")
+            ->innerJoin("akaProductRef.product", "akaProduct")
+            ->addSelect(["akaProductRef", "akaProduct"])
+            ->where("akaOrder.id = :orderId")
+            ->setParameter("orderId", $orderId)
+            ->getQuery()
+            ->getResult();
+    }
 }

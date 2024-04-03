@@ -6,11 +6,11 @@ use App\Entity\Order;
 use App\Entity\OrderProductRef;
 use App\Entity\ProductReference;
 use App\Repository\Trait\RepositoryToolTrait;
-use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+
 use Doctrine\ORM\Query\ResultSetMapping;
-use Doctrine\ORM\Query\ResultSetMappingBuilder;
-use Doctrine\ORM\Tools\Pagination\Paginator;
 use Doctrine\Persistence\ManagerRegistry;
+use Doctrine\ORM\Query\ResultSetMappingBuilder;
+use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 
 /**
  * @extends ServiceEntityRepository<Order>
@@ -31,8 +31,9 @@ class OrderRepository extends ServiceEntityRepository
         parent::__construct($registry, Order::class);
     }
 
+
     /**
-     * Will build 
+     * Will build a sql query which paginate and filter order
      *
      * @param string $userSearchQuery
      * @param array $orderBy
@@ -68,12 +69,12 @@ class OrderRepository extends ServiceEntityRepository
     }
 
     /**
-     * Undocumented function
+     * Will build a sql query which count filtered order
      *
-     * @param null|string $userSearchQuery
+     * @param string $userSearchQuery
      * @return string
      */
-    private function buildPaginateFilteredCountOrdersQuery(null|string $userSearchQuery) : string
+    private function buildPaginateFilteredCountOrdersQuery(string $userSearchQuery) : string
     {
         $sqlOrderCountQueryString = sprintf(
             "SELECT COUNT(DISTINCT %s.id) as countOrder FROM `order` as %s".
@@ -81,7 +82,7 @@ class OrderRepository extends ServiceEntityRepository
             ...array_fill(0, 3, self::orderAlias)
 
         );
-        if(!is_null($userSearchQuery)){
+        if(!empty($userSearchQuery)){
             $sqlOrderCountQueryString.= " WHERE";
             $userSearchQueryTerms = explode(' ', $userSearchQuery);
             foreach ($userSearchQueryTerms as $term) {
@@ -92,11 +93,11 @@ class OrderRepository extends ServiceEntityRepository
     }
 
     /**
-     * Undocumented function
+     * This method will calculate the max number of page for a given query
      *
      * @param string $query
      * @param integer $perPage
-     * @return object
+     * @return object {count : int, maxPage : int} count represent the number of rows for a query , and maxPage return the lastPossible page
      */
     private function calculateOrderMaxPage(string $query, int $perPage) : object {
         $countResultSetMapper = new ResultSetMapping();
@@ -108,16 +109,15 @@ class OrderRepository extends ServiceEntityRepository
     }
 
     /**
-     * Undocumented function
-     *
+     * This method will execute a query and paginate it 
+     * return an array of order
      * @param string $sqlQuery
      * @param integer $perPage
      * @param integer $page
-     * @return void
+     * @return mixed
      */
-    private function executePaginateOrderQuery(string $sqlQuery, int $perPage, int $page){
+    private function executePaginateOrderQuery(string $sqlQuery, int $perPage, int $page) : mixed {
         $paginateSqlQuery = $sqlQuery.sprintf(" LIMIT %d OFFSET %d", $perPage, ($page - 1) * $perPage);
-        // dd($paginateSqlQuery);
         $rsm = new ResultSetMappingBuilder($this->getEntityManager());
         $rsm->addRootEntityFromClassMetadata(Order::class, 'o');
         $rsm->addScalarResult("totalOrderAmount", "totalOrderAmount");
@@ -132,15 +132,15 @@ class OrderRepository extends ServiceEntityRepository
         return $this->getEntityManager()->createNativeQuery($paginateSqlQuery, $rsm)->getResult();
     }
 
-    /**
-     * Undocumented function
-     *
-     * @param integer $page
-     * @param integer $perPage
-     * @param string|null $queryString
-     * @param array $orderBy
-     * @return object
-     */
+   /**
+    * This method return an object that contain paginate orders and data to control pagination
+    *
+    * @param integer $page
+    * @param integer $perPage
+    * @param string $userSearchQuery
+    * @param array $orderBy
+    * @return object {results : mixed, nbResults : int, maxPage: int, page: int}
+    */
     public function paginateFilteredOrders(int $page = 1, int $perPage = 12, string $userSearchQuery = '', array $orderBy = []) : object {
         $orderCountSqlQuery = $this->buildPaginateFilteredCountOrdersQuery($userSearchQuery);
         $orderSqlQuery = $this->buildPaginateFilteredOrdersQuery($userSearchQuery, $orderBy);

@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Controller;
+namespace App\Controller\Api;
 
 use App\Entity\Order;
 use App\Entity\OrderProductRef;
@@ -8,7 +8,6 @@ use App\Entity\ProductReference;
 use App\Service\EnhancedEntityJsonSerializer;
 
 use Doctrine\ORM\EntityManagerInterface;
-use App\Repository\ProductReferenceRepository;
 use App\Controller\Trait\ControllerToolsTrait;
 use Doctrine\Common\Collections\ArrayCollection;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -24,43 +23,16 @@ use Symfony\Component\Uid\Uuid;
 use Symfony\Component\Serializer\Normalizer\AbstractNormalizer;
 
 
-#[Route('api', 'api.')]
+#[Route('api/commandes', 'api.orders.')]
 /**
  * @author Aléki <alexlegras@hotmail.com>
  * @version 1
  * Controller that handle api endpoint for order  routes
  */
-class ApiOrderController extends AbstractController
+class OrderController extends AbstractController
 {
     use ControllerToolsTrait;
 
-    #[Route('/produits/recherche', name: 'query')]
-    /**
-     * API Endpoint: get product refrences by name.
-     *
-     * @param ProductReferenceRepository $productReferenceRepository
-     * @param Request $request
-     * @param EnhancedEnityJsonSerializer $enhancedEnityJsonSerializer
-     * @return Response
-     */
-    public function searchProductReferencesByQueryApi(ProductReferenceRepository $productReferenceRepository, Request $request, EnhancedEntityJsonSerializer $enhancedEnityJsonSerializer): Response
-    {
-        $queryString = $request->get('nom');
-        if (empty($queryString) || is_null($queryString))
-            return new Response(null, 401, ['Content-Type' => 'application/json']);
-        $productReferences = $productReferenceRepository->refByQueryWithRelated($queryString);
-        $enhancedEnityJsonSerializer
-            ->setObjectToSerialize($productReferences)
-            ->setOptions([AbstractNormalizer::CIRCULAR_REFERENCE_HANDLER => fn (object $orderProductRef, string $format, array $context) => $orderProductRef->getId()])
-            ->setAttributes([
-                'price', 'weight', 'weightType', 'slug', 'imageUrl', 'product' => [
-                    'name', 'description', 'slug'
-                ]
-            ]);
-        return new Response($enhancedEnityJsonSerializer->serialize(), headers: [
-            'Content-Type' => 'application/json'
-        ]);
-    }
 
     #[Route('/commandes/{uuidOrder}/ajouter-produit', name: 'add-product-to-basket', methods: ['POST'])]
     /**
