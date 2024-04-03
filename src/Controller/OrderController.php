@@ -80,7 +80,7 @@ class OrderController extends AbstractController
      */
     public function askOrderProductsView(string $uuid, EntityManagerInterface $manager, EnhancedEntityJsonSerializer $enhancedEnityJsonSerializer): Response
     {
-        $order = $manager->getRepository(Order::class)->findByUuid($uuid);
+        $order = $manager->getRepository(Order::class)->findOneBy(['uuid' => $uuid]);
 
         if (is_null($order))
             throw $this->createNotFoundException("No entity found for uuid : $uuid");
@@ -127,7 +127,7 @@ class OrderController extends AbstractController
             return null;
         }
         
-        $orderWithProducts = $manager->getRepository(Order::class)->findByUuidWithRelated($uuidOrder);
+        $orderWithProducts = $manager->getRepository(Order::class)->findOneBy(['uuid' => $uuidOrder]);
         if($orderWithProducts->getItems()->count() < 1){
             // Feedback utilisateur on ne peut pas commander sans produit
             return null;

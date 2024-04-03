@@ -327,10 +327,7 @@ class Order
      *
      * @return int|float
      */
-    public function getTotalPrice() : int|float {
-        return $this->getItems()->reduce(
-            fn(int $accumulator, object $orderItem) => $accumulator + ($orderItem->getItem()->getPrice() * $orderItem->getQuantity()),
-            0
-        );
+    public function getTotalPrice() : int|float|null {
+        return property_exists($this, "totalPrice") ? $this->{'totalPrice'} : null;
     }
 }

@@ -150,7 +150,7 @@ class ApiOrderController extends AbstractController
     {
         if (empty($uuidOrder) || is_null($uuidOrder) || !Uuid::isValid($uuidOrder))
             return  (object)['error' => ['code' => 422, 'msg' =>'UUID absent ou erroné']];
-        $order = $manager->getRepository(Order::class)->findByUuid($uuidOrder);
+        $order = $manager->getRepository(Order::class)->findOneBy(['uuid' => $uuidOrder]);
         $orderItems = new ArrayCollection($manager->getRepository(OrderProductRef::class)->findBy([
             'order' => $order->getId()
         ]));

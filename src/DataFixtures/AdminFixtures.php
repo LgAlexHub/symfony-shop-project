@@ -77,7 +77,7 @@ class AdminFixtures extends Fixture implements FixtureGroupInterface
         );
 
         foreach($admins as $admin) {
-            $newAdmin = (new Admin);
+            $newAdmin = (new Admin());
             $newAdmin->setEmail($admin->email);
             $newAdmin->setPseudonyme($admin->pseudonyme);
             $newAdmin->setPassword($this->hasher->hashPassword($newAdmin, $admin->password));

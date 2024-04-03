@@ -31,19 +31,7 @@ class OrderController extends AbstractController
     public function index(Request $request, OrderRepository $manager, SessionTokenManager $sessionTokenManager): Response
     {
 
-        $orders = $manager->orderPagination();
-        $ordersWithTotalPrices = [];
-        foreach($orders->paginator as $order){
-            $ordersWithTotalPrices[] = [
-                'order' => $order,
-                'totalPrice' => $order->getTotalPrice()
-            ];
-        }
         $renderArray =  [
-            'orders'  => $ordersWithTotalPrices,
-            'totalPage' => $orders->maxPage,
-            'nbResult'  => $orders->nbResult,
-            'page'      => $orders->page,
             'api_token' => $sessionTokenManager->getApiToken()
         ];
 
@@ -66,7 +54,7 @@ class OrderController extends AbstractController
 
     #[Route('/{uuid}/valider', name: 'validate')]
     public function changeIsValidState(EntityManagerInterface $manager, string $uuid) : Response {
-        $order = $manager->getRepository(Order::class)->findByUuid($uuid);
+        $order = $manager->getRepository(Order::class)->findOneBy(['uuid' => $uuid]);
         if (is_null($order))
             return new Response(null, 404);
         $order->setIsDone(!$order->getIsDone());

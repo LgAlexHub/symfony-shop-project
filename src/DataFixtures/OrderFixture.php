@@ -27,7 +27,7 @@ class OrderFixture extends Fixture implements DependentFixtureInterface, Fixture
     public function __construct()
     {
         $this->fakerGenerator = Factory::create();
-        $this->maxCreate = 20;
+        $this->maxCreate = 150  ;
     }
 
     /**
@@ -73,7 +73,12 @@ class OrderFixture extends Fixture implements DependentFixtureInterface, Fixture
      */
     public function load(ObjectManager $manager): void
     {       
+        $startDate = new \DateTimeImmutable('2023-01-01 12:00:00');
+        $endDate = new \DateTimeImmutable('2023-06-20 23:59:00');
+        $events = $manager->getClassMetadata(Order::class)->lifecycleCallbacks;
+        $manager->getClassMetadata(Order::class)->setLifecycleCallbacks(array());
         for ($i=0; $i < $this->maxCreate; $i++) { 
+            $randomDate = new \DateTimeImmutable('@' . mt_rand($startDate->getTimestamp(), $endDate->getTimestamp()));
             $order = (new Order);
             $order
                 ->setUuid(Uuid::v4())
@@ -84,10 +89,14 @@ class OrderFixture extends Fixture implements DependentFixtureInterface, Fixture
                 ->setAdressCityCode($this->fakerGenerator->numberBetween(0, 99999))
                 ->setAdressCity($this->fakerGenerator->city())
                 ->setAdressStreetInfo($this->fakerGenerator->streetName())
-                ->setIsDone($this->fakerGenerator->boolean());
+                ->setIsDone($this->fakerGenerator->boolean())
+                ->setCreatedAt($randomDate)
+                ->setUpdatedAt($randomDate);
             
             $manager->persist($order);
         }
         $manager->flush();
+        $manager->getClassMetadata(Order::class)->setLifecycleCallbacks($events);
+
     }
 }

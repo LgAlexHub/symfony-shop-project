@@ -16,6 +16,11 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 #[Route('/api/admin/commandes', 'api.admin.orders.')]
 class OrderController extends AbstractController
 {
+    #[Route('/debug', name: 'debug')]
+    public function debug(OrderRepository $orderManager){
+        dd($orderManager->paginateFilteredOrders(page: 1, userSearchQuery: "", orderBy: []));
+    }
+
     #[Route('/', name: 'list')]
     public function listOrdersWithPaginationAndFilters(Request $request, SessionTokenManager $sessionTokenManager, EnhancedEntityJsonSerializer $enhancedEntityJsonSerializer, OrderRepository $orderManager){
         //Check if bearer token is in request header
@@ -28,10 +33,31 @@ class OrderController extends AbstractController
         if ($sessionTokenManager->getApiToken() !== $bearerToken){
             return $this->json("Unauthorized", 401);
         }
+
+        //Remove orderBy prefix from url parameters
+        $urlParams = $request->query->all();
+        $ordersBy = array_reduce(array_keys($urlParams) , function ($carry, $urlParamName) use ($urlParams){
+            if (strpos($urlParamName, "orderBy") === 0) {
+                $camelCaseKeyWithUnderscore = preg_replace('/([a-z])([A-Z])/', '$1_$2', substr($urlParamName, strlen("orderBy")));
+                $snake_case_key = strtolower($camelCaseKeyWithUnderscore);
+                
+                $carry[$snake_case_key] = $urlParams[$urlParamName];
+            }
+            return $carry;
+        }, []); 
         $page = $request->get('page') ?? 1;
-        $orders = $orderManager->orderPagination(page: $page);
+        $query = $request->get('query') ?? '';
+        $orders = $orderManager->paginateFilteredOrders(page: $page, userSearchQuery: $query, orderBy: $ordersBy);
+        $orders->results = array_map(
+            function($item){
+                $tmpItem = $item[0];
+                $tmpItem->totalPrice = $item["totalOrderAmount"];
+                return $tmpItem;
+            },
+            $orders->results
+        );
         $enhancedEntityJsonSerializer
-            ->setObjectToSerialize($orders->paginator)
+            ->setObjectToSerialize($orders->results)
             ->setOptions([AbstractNormalizer::CIRCULAR_REFERENCE_HANDLER => fn (object $order, string $format, array $context) => $order->getId()])
             ->setAttributes([
                 'id',

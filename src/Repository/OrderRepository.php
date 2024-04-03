@@ -3,8 +3,12 @@
 namespace App\Repository;
 
 use App\Entity\Order;
+use App\Entity\OrderProductRef;
+use App\Entity\ProductReference;
 use App\Repository\Trait\RepositoryToolTrait;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use Doctrine\ORM\Query\ResultSetMapping;
+use Doctrine\ORM\Query\ResultSetMappingBuilder;
 use Doctrine\ORM\Tools\Pagination\Paginator;
 use Doctrine\Persistence\ManagerRegistry;
 
@@ -19,108 +23,133 @@ use Doctrine\Persistence\ManagerRegistry;
 class OrderRepository extends ServiceEntityRepository
 {
     use RepositoryToolTrait;
-    
+
+    const orderAlias = 'akaOrder';
+
     public function __construct(ManagerRegistry $registry)
     {
         parent::__construct($registry, Order::class);
     }
 
-    public function findByUuid(mixed $value){
-        return $this->findOneBy(['uuid' => $value]);
-    }
+    /**
+     * Will build 
+     *
+     * @param string $userSearchQuery
+     * @param array $orderBy
+     * @return string
+     */
+    private function buildPaginateFilteredOrdersQuery(string $userSearchQuery, array $orderBy) : string 
+    {
+        $sqlOrderQueryString = sprintf(
+            "SELECT %s.*, SUM(akaOrderProductReference.quantity * akaProductReference.price) AS totalOrderAmount FROM `order` AS %s".
+                " INNER JOIN order_product_ref AS akaOrderProductReference ON akaOrderProductReference.order_id = %s.id".
+                " JOIN product_reference AS akaProductReference ON akaProductReference.id = akaOrderProductReference.item_id",
+            ...array_fill(0, 3, self::orderAlias)
+        );
 
-
-    public function findByUuidWithRelated(string $uuid){
-        return $this->createQueryBuilder("o")
-            ->leftJoin('o.items', 'items')
-            ->addSelect("items")
-            ->where("o.uuid = :uuid")
-            ->setParameter("uuid", $uuid, 'uuid')
-            ->getQuery()
-            ->getOneOrNullResult();
-    }
-
-    public function findAllRelated(){
-        return $this->createQueryBuilder("o")
-            ->innerJoin('o.items', 'items')
-            ->addSelect("items")
-            ->getQuery()
-            ->getResult();
-    }
-
-    public function orderPagination(int $page = 1, int $perPage = 12, string $queryString = null, string $orderBy = null, bool $asc = true) {
-        $orderQuery = $this->createQueryBuilder('o')
-            ->innerJoin('o.items', 'orderItems')
-            ->addSelect('orderItems');
-        
-        $orderCountQuery = $this->createQueryBuilder('orders')
-            ->innerJoin('orders.items', 'items')
-            ->addSelect('items')
-            ->select('COUNT(DISTINCT orders.id)')
-            ->getQuery()
-            ->getSingleScalarResult();
-        
-        $maxPage = ceil($orderCountQuery/$perPage);
-
-        if (!is_null($queryString)){
-            $terms = explode(" ", $queryString);
-            // First iteration outside loop to set one Where clause , then unset variable to use the foreach loop as usual
-            $orderQuery
-                ->where("o.clientFirstName LIKE :term_0")
-                ->orWhere("o.clientLastName LIKE :term_0")
-                ->orWhere("o.email LIKE :term_0")
-                ->setParameter("term_0", $terms[0]);
-            unset($terms[0]);
-
-            foreach ($terms as $index => $term) {
-                $orderQuery
-                    ->orWhere("o.clientFirstName LIKE :term_".$index)
-                    ->orWhere("o.clientLastName LIKE :term_".$index)
-                    ->orWhere("o.email LIKE :term_".$index)
-                    ->setParameter("term_".$index, $term);
+        if(!empty($userSearchQuery)){
+            $sqlOrderQueryString.= " WHERE";
+            $userSearchQueryTerms = explode(' ', $userSearchQuery);
+            foreach ($userSearchQueryTerms as $term) {
+                $sqlOrderQueryString.= sprintf(" %s.client_first_name LIKE '%%%s%%' OR %s.client_last_name LIKE '%%%s%%' OR %s.email LIKE '%%%s%%'", self::orderAlias, $term, self::orderAlias, $term, self::orderAlias, $term);
             }
         }
 
-        if (!is_null($orderBy)){
-            $orderQuery->orderBy("o.".$orderBy, $asc ? 'ASC' : 'DESC');
-        }else{
-            $orderQuery->orderBy("o.createdAt", $asc ? 'ASC' : 'DESC');
+        $sqlOrderQueryString.= sprintf(" GROUP BY %s.id", self::orderAlias);
+
+        if (!empty($orderBy)){
+            $sqlOrderQueryString.= " ORDER BY";
+            foreach ($orderBy as $key => $value) {
+                $sqlOrderQueryString.= sprintf(" %s %s,", $key === "total_price" ? "totalOrderAmount" : self::orderAlias.".".$key, $value);
+            }
+            $sqlOrderQueryString = substr($sqlOrderQueryString, 0, -1);
         }
-
-        $orderQuery->setFirstResult(($page - 1) * $perPage)
-            ->setMaxResults($perPage)
-            ->getQuery();
-
-        return (object)[
-            'paginator' => new Paginator($orderQuery),
-            'maxPage'   => (int) $maxPage,
-            'page'      => $page,
-            'nbResult'  => $orderCountQuery
-        ];
+        return $sqlOrderQueryString;
     }
 
-//    /**
-//     * @return Order[] Returns an array of Order objects
-//     */
-//    public function findByExampleField($value): array
-//    {
-//        return $this->createQueryBuilder('o')
-//            ->andWhere('o.exampleField = :val')
-//            ->setParameter('val', $value)
-//            ->orderBy('o.id', 'ASC')
-//            ->setMaxResults(10)
-//            ->getQuery()
-//            ->getResult()
-//        ;
-//    }
+    /**
+     * Undocumented function
+     *
+     * @param null|string $userSearchQuery
+     * @return string
+     */
+    private function buildPaginateFilteredCountOrdersQuery(null|string $userSearchQuery) : string
+    {
+        $sqlOrderCountQueryString = sprintf(
+            "SELECT COUNT(DISTINCT %s.id) as countOrder FROM `order` as %s".
+                " INNER JOIN order_product_ref AS opr ON opr.order_id = %s.id",
+            ...array_fill(0, 3, self::orderAlias)
 
-//    public function findOneBySomeField($value): ?Order
-//    {
-//        return $this->createQueryBuilder('o')
-//            ->andWhere('o.exampleField = :val')
-//            ->setParameter('val', $value)
-//            ->getQuery()
-//            ->getOneOrNullResult()
-//        ;
-//    }
+        );
+        if(!is_null($userSearchQuery)){
+            $sqlOrderCountQueryString.= " WHERE";
+            $userSearchQueryTerms = explode(' ', $userSearchQuery);
+            foreach ($userSearchQueryTerms as $term) {
+                $sqlOrderCountQueryString.= sprintf(" %s.client_first_name LIKE '%%%s%%' OR %s.client_last_name LIKE '%%%s%%' OR %s.email LIKE '%%%s%%'", self::orderAlias, $term, self::orderAlias, $term, self::orderAlias, $term);
+            }
+        }
+        return $sqlOrderCountQueryString;
+    }
+
+    /**
+     * Undocumented function
+     *
+     * @param string $query
+     * @param integer $perPage
+     * @return object
+     */
+    private function calculateOrderMaxPage(string $query, int $perPage) : object {
+        $countResultSetMapper = new ResultSetMapping();
+        $countResultSetMapper->addScalarResult("countOrder", "countOrder");
+        $orderCount = $this->getEntityManager()
+            ->createNativeQuery($query, $countResultSetMapper)
+            ->getSingleScalarResult();
+        return (object)['count' => $orderCount, 'maxPage' => (int) ceil($orderCount / $perPage)];
+    }
+
+    /**
+     * Undocumented function
+     *
+     * @param string $sqlQuery
+     * @param integer $perPage
+     * @param integer $page
+     * @return void
+     */
+    private function executePaginateOrderQuery(string $sqlQuery, int $perPage, int $page){
+        $paginateSqlQuery = $sqlQuery.sprintf(" LIMIT %d OFFSET %d", $perPage, ($page - 1) * $perPage);
+        // dd($paginateSqlQuery);
+        $rsm = new ResultSetMappingBuilder($this->getEntityManager());
+        $rsm->addRootEntityFromClassMetadata(Order::class, 'o');
+        $rsm->addScalarResult("totalOrderAmount", "totalOrderAmount");
+        $rsm->addJoinedEntityFromClassMetadata(OrderProductRef::class, 'opr', 'o', 'items', [
+            'id' => 'order_product_ref_id'
+        ]);
+        $rsm->addJoinedEntityFromClassMetadata(ProductReference::class, 'pr', 'opr', 'item', [
+            'id' => 'product_ref_id',
+            'created_at' => 'product_ref_created_at',
+            'updated_at' => 'product_ref_updated_at'
+        ]);
+        return $this->getEntityManager()->createNativeQuery($paginateSqlQuery, $rsm)->getResult();
+    }
+
+    /**
+     * Undocumented function
+     *
+     * @param integer $page
+     * @param integer $perPage
+     * @param string|null $queryString
+     * @param array $orderBy
+     * @return object
+     */
+    public function paginateFilteredOrders(int $page = 1, int $perPage = 12, string $userSearchQuery = '', array $orderBy = []) : object {
+        $orderCountSqlQuery = $this->buildPaginateFilteredCountOrdersQuery($userSearchQuery);
+        $orderSqlQuery = $this->buildPaginateFilteredOrdersQuery($userSearchQuery, $orderBy);
+        $orderCountAndMaxPage = $this->calculateOrderMaxPage($orderCountSqlQuery, $perPage);
+        return (object)[
+            'results' => $this->executePaginateOrderQuery($orderSqlQuery, $perPage, $page),
+            'nbResult'  => $orderCountAndMaxPage->count,
+            'maxPage'   => $orderCountAndMaxPage->maxPage,
+            'page'      => $page,
+        ];
+    }
 }
