@@ -4,9 +4,11 @@ namespace App\Repository;
 
 use App\Entity\Product;
 use App\Repository\Trait\RepositoryToolTrait;
-use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
-use Doctrine\ORM\Tools\Pagination\Paginator;
+
 use Doctrine\Persistence\ManagerRegistry;
+use Doctrine\ORM\Tools\Pagination\Paginator;
+use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use Doctrine\ORM\QueryBuilder;
 
 /**
  * @extends ServiceEntityRepository<Product>
@@ -20,12 +22,14 @@ class ProductRepository extends ServiceEntityRepository
 {
     use RepositoryToolTrait;
 
+    const alias = 'akaProduct';
+
     public function __construct(ManagerRegistry $registry)
     {
         parent::__construct($registry, Product::class);
     }
 
-    public function productsByQuery(string $query){
+    public function productsByQuery(string $query) : mixed {
         return $this->createQueryBuilder('product')
             ->where('product.name like :query')
             ->orderBy('product.name','ASC')
@@ -34,86 +38,72 @@ class ProductRepository extends ServiceEntityRepository
             ->getResult();
     }
 
-    public function productOrderByNamePaginate(int $page = 1, int $perPage = 12, $category = null, $query = null){
-        $productCountQuery = $this->createQueryBuilder('product')
-            ->innerJoin('product.productReferences', 'prodRef');
-
-        if (!is_null($category)){
-            $productCountQuery->innerJoin('product.category', 'prodCat')
-                ->addSelect('prodCat')
-                ->where('prodCat.label = :cat')
-                ->setParameter("cat", $category);
+    private function buildProductFilterPaginateQuery(string $userSearchQuery) : QueryBuilder {
+        $queryBuilder = $this->createQueryBuilder(self::alias)
+            ->innerJoin(sprintf("%s.productReferences", self::alias), "productReference")
+            ->innerJoin(sprintf("%s.category", self::alias), "productCategory")
+            ->addSelect(['productReference', 'productCategory']);
+        
+        if(!empty($userSearchQuery)){
+            $this->filterByUserSearch($queryBuilder, $userSearchQuery);
         }
 
-        // WARNING : Peut-être un overextend de regarder les slugs des productsRefs quand on peut direct checker le product slug
-        if (!is_null($query)){
-            $productCountQuery
-                ->where('LOWER(prodRef.slug) LIKE :query')
-                ->setParameter('query', '%'.$query.'%');
+        return $queryBuilder;
+    }
+
+    private function buildProductCountQuery(string $userSearchQuery) : QueryBuilder {
+        $queryBuilder = $this->createQueryBuilder(self::alias)
+            ->innerJoin(sprintf("%s.productReferences", self::alias), "productReference")
+            ->select(sprintf("COUNT(DISTINCT %s.id)", self::alias));
+        
+        if(!empty($userSearchQuery)){
+            $this->filterByUserSearch($queryBuilder, $userSearchQuery);
         }
 
-        $productCountQuery = $productCountQuery
-            ->select('count(DISTINCT product.id)')
-            ->getQuery()
+        return $queryBuilder;
+    }
+
+    /**
+     * Note : Pas besoin de return le query builder car en php les objets sont passé en réf
+     * Filters the query based on the user's search terms. It searches for each term in the client's last name 
+     * and email columns.
+     * @param QueryBuilder $queryBuilder
+     * @param string $userSearchQuery
+     * @return void
+     */
+    private function filterByUserSearch(QueryBuilder $queryBuilder, string $userSearchQuery) : void {
+        $userSearchQueryTerms = explode(" ", $userSearchQuery);
+        $queryBuilder->where(sprintf("%s.name LIKE :term_%d", self::alias, 0))
+            ->setParameter(sprintf("term_%d", 0), sprintf("%%%s%%", $userSearchQueryTerms[0]));
+        unset($userSearchQueryTerms[0]);
+        foreach($userSearchQueryTerms as $termKey => $termValue){
+            $queryBuilder->orWhere(sprintf("%s.name LIKE :term_%d", self::alias, $termKey))
+                ->setParameter(sprintf("term_%d", 0), sprintf("%%%s%%", $termValue));
+        }
+    }
+
+    private function calculateOrderMaxPage(QueryBuilder $queryBuilder, int $perPage) : object {
+        $orderCount = $queryBuilder->getQuery()
             ->getSingleScalarResult();
-
-        $maxPage = ceil($productCountQuery/$perPage);
-        // if ($page > $maxPage){
-        //     $page = $maxPage;
-        // }
-        $productQuery = $this->createQueryBuilder('product')
-            ->innerJoin('product.productReferences', 'prodRef');
-           
-        if (!is_null($category)){
-            $productQuery->innerJoin('product.category', 'prodCat')
-                ->addSelect('prodCat')
-                ->where('prodCat.label = :cat')
-                ->setParameter("cat", $category);
-        }
-
-        if (!is_null($query)){
-            $productQuery
-                ->where('LOWER(prodRef.slug) LIKE :query')
-                ->setParameter('query', '%'.$query.'%');
-        }
-
-        $productQuery =  $productQuery->setFirstResult(($page - 1) * $perPage)
-            ->setMaxResults($perPage)
-            ->orderBy('product.name', 'ASC')
-            ->getQuery();
-
-
         return (object)[
-            'productPaginator' => new Paginator($productQuery),
-            'maxPage' => (int)$maxPage,
-            'page' => $page, 
-            'nbResult' => $productCountQuery
+            'count'   => $orderCount,
+            'maxPage' => (int) ceil($orderCount / $perPage)
         ];
     }
 
+    public function paginateFilterProducts(int $page = 1, int $perPage = 12, $category = null, $userSearchQuery = null) : mixed {
+        $productCountQueryBuilder = $this->buildProductCountQuery($userSearchQuery);
+        $productFilterQueryBuilder = $this->buildProductFilterPaginateQuery($userSearchQuery);
+        $productCountAndMaxPage = $this->calculateOrderMaxPage($productCountQueryBuilder, $perPage);
 
-//    /**
-//     * @return Product[] Returns an array of Product objects
-//     */
-//    public function findByExampleField($value): array
-//    {
-//        return $this->createQueryBuilder('p')
-//            ->andWhere('p.exampleField = :val')
-//            ->setParameter('val', $value)
-//            ->orderBy('p.id', 'ASC')
-//            ->setMaxResults(10)
-//            ->getQuery()
-//            ->getResult()
-//        ;
-//    }
+        $productFilterQueryBuilder->setFirstResult($perPage * ($page - 1))
+            ->setMaxResults($perPage);
 
-//    public function findOneBySomeField($value): ?Product
-//    {
-//        return $this->createQueryBuilder('p')
-//            ->andWhere('p.exampleField = :val')
-//            ->setParameter('val', $value)
-//            ->getQuery()
-//            ->getOneOrNullResult()
-//        ;
-//    }
+        return (object)[
+            'results' => (new Paginator($productFilterQueryBuilder)),
+            'nbResult'  => $productCountAndMaxPage->count,
+            'maxPage'   => $productCountAndMaxPage->maxPage,
+            'page'      => $page,
+        ];
+    }
 }

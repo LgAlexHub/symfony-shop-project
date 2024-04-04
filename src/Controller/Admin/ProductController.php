@@ -5,7 +5,7 @@ namespace App\Controller\Admin;
 use App\Controller\Trait\ControllerToolsTrait;
 use App\Entity\Product;
 use App\Form\ProductType;
-
+use App\Service\SessionTokenManager;
 use Doctrine\ORM\EntityManagerInterface;
 
 use Symfony\Component\HttpFoundation\Request;
@@ -35,31 +35,11 @@ class ProductController extends AbstractController
      * @param EntityManagerInterface $manager
      * @return Response containt form view
      */
-    public function index(Request $request, EntityManagerInterface $manager): Response
+    public function index(SessionTokenManager $sessionTokenManager): Response
     {
-        // dd($request->get('query'));
-        $page = $request->get('page') ?? 1;
-        $query = $request->get('activeQuery') ?? null;
-        $newQuery = $request->get('query') ?? null;
-        // dd(['new' => $newQuery, 'old' => $query]);
-        if (!is_null($newQuery))
-            $query = $newQuery;
-        $paginatedProduct = $manager
-            ->getRepository(Product::class)
-            ->productOrderByNamePaginate($page, category : null, query : $query);
-
-        $renderArray =  [
-            'products'  => $paginatedProduct->productPaginator,
-            'totalPage' => $paginatedProduct->maxPage,
-            'nbResult'  => $paginatedProduct->nbResult,
-            'page'      => $paginatedProduct->page,
-        ];
-        
-        if (!is_null($query)){
-            $renderArray['query'] = $query; 
-        }
-
-        return $this->render(self::$templatePath.'/index.html.twig', $renderArray);
+        return $this->render(self::$templatePath.'/index.html.twig', [
+            'api_token' => $sessionTokenManager->getApiToken()
+        ]);
     }
 
     #[Route('/add', name: 'add')]

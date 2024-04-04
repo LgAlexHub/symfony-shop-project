@@ -3,92 +3,12 @@
 {% block title %} - Produits{% endblock %}
 
 {% block body %}
-    <h1 class="text-center my-3 text-4xl font-sans font-light text-slate-800">Mes produits</h1>
-    {% if query is defined %}
-            <p class="font-bold">Terme recherché "{{query}}"</p>
-            <a class="text-orange-600 hover:underline text-center" href="{{path('admin.products.index')}}">
-                <i class="fa-solid fa-xmark"></i>
-                Afficher tout les produits
-            </a>
-            
-    {% endif %}
-    <form action="{{path('admin.products.index')}}">
-        <div class="flex items-center w-full rounded-lg border-4 border-black">
-            <input type="text" name="query" id="" class="w-11/12 rounded-lg" placeholder="Confiture de fraise...">
-            <button type="submit" class="w-1/12 flex justify-center border-l-2 border-black rounded hover:bg-black hover:text-white">
-                <i class="fa-solid fa-magnifying-glass my-1"></i>
-            </button>
-        </div>
-    </form>
-    
-    <div class="container mx-auto mt-3 ml-3">
-        <div class="h-30 flex justify-center my-8">
-            <nav aria-label="Page navigation example">
-                <ul class="list-style-none flex">
-                    {% if page > 1 %}
-                        <li>
-                            <a class="relative hover:bg-black hover:text-white block border-rounded border-2 border-black rounded px-3 py-1.5 text-sm text-black" href="{{path('admin.products.index', {'page': page - 1, 'categorie' : category is defined ? category|url_encode : null, query : query is defined ? query|url_encode : null})}}"><i class="fa-solid fa-arrow-left-long"></i></a>
-                        </li>
-                    {% endif %}
-                    <li aria-current="page">
-                        <p class="relative border-rounded border-2 border-black mr-3 ml-3 block rounded px-3 py-1.5 text-sm text-black">{{page}}</p>
-                    </li>
-                    {% if totalPage > page  %}
-                        <li aria-current="page">
-                            <a class="relative hover:bg-black hover:text-white block border-rounded border-2 border-black rounded px-3 py-1.5 text-sm text-black" href="{{path('admin.products.index', {'page': page + 1, 'categorie' : category is defined ? category|url_encode : null, query : query is defined ? query|url_encode : null})}}">
-                                <i class="fa-solid fa-arrow-right-long"></i>
-                            </a>
-                        </li>
-                    {% endif %}
-                    <li class="relative border-rounded border-2 border-black mr-3 ml-3 block rounded px-3 py-1.5 text-sm text-black">...</li>
-                    <li aria-current="page">
-                        <p class="relative border-rounded border-2 border-gray-500 mr-3 ml-3 block rounded px-3 py-1.5 text-sm text-gray-500 bg-gray-300">{{ totalPage }}</p>
-                    </li>
-                </ul>
-            </nav>
-        </div>
-        <p> Nombre de résultats : <span class="font-bold">{{ nbResult }}</span></p>
-        <table class="table-fixed w-full border-separate border-spacing-2">
-            <thead>
-                <tr>
-                    <td class="bg-slate-600 border border-slate-300 text-white px-2 py-1">
-                        Nom
-                    </td>
-                    <td class="bg-slate-600 text-white border border-slate-300 px-2 py-1">
-                        Catégorie
-                    </td>
-                    <td class="bg-slate-600 text-white border border-slate-300 px-2 py-1">
-                        Prix enregistrés
-                    </td>
-                    <td class="bg-slate-600 border border-slate-300 px-2 py-1">
-
-                    </td>
-                </tr>
-            </thead>
-            <tbody>
-                {% for product in products %}
-                    <tr class="even:bg-white odd:bg-blue-50">
-                        <td class="border border-slate-300 px-2 w-1/6">{{product.name}}</td>
-                        <td class="border border-slate-300 px-2 w-1/6">{{product.category.label}}</td>
-                        <td class="border border-slate-300 text-center text-blue-800 w-2/6 border border-slate-300">
-                            <a href="{{path('admin.products.references.index', {'slug' : product.slug})}}" class="hover:underline">
-                                Prix disponible : <span class="rounded-full px-2 border border-purple-400 bg-purple-400 text-white">
-                                    {{product.productReferences|length}}
-                                </span>
-                            </a>
-                        </td>
-                        <td class="w-1/6 space-x-8 py-3 px-3 bg-white text-center">
-                            <a href="">
-                                <i class="fa-solid fa-magnifying-glass text-blue-700 border border-blue-700 hover:text-white hover:border-transparent hover:bg-blue-700 rounded-md px-3 py-3"></i>
-                            </a>
-                            <a href="{{path('admin.products.edit', {'slug' : product.slug})}}">
-                                <i class="fa-solid fa-pen-to-square border text-slate-800 border-slate-800 hover:text-white hover:border-transparent hover:bg-slate-800 rounded-md px-3 py-3"></i>
-                            </a>
-                            <a href="{{path('admin.products.delete', {'slug' : product.slug})}}" class="w-fit"><i class="fa-solid fa-circle-xmark border text-red-500 border-red-500 hover:text-white hover:border-transparent hover:bg-red-500 rounded-md px-3 py-3"></i></a>                     </div>
-                        </td>
-                    </tr>
-                {% endfor %}
-            </tbody>
-        </table>
-    </div>
+    <h2 class="flex flex-row flex-nowrap items-center my-12">
+        <span class="flex-grow block border-t border-black"></span>
+        <span class="flex-none block mx-4 px-4 py-2.5 text-xl rounded leading-none font-medium bg-blue-200 text-white">
+            Mes produits
+        </span>
+        <span class="flex-grow block border-t border-black"></span>
+    </h2>
+    <div class="my-10 mx-10" {{ vue_component('admin/products/table', {'apiToken' : api_token}) }}></div>
 {% endblock %}
