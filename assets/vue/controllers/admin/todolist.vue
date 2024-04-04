@@ -11,7 +11,7 @@
                     Gérer les commandes du [back-office] :
                     <ul class="[&>*]:ml-10 list-disc">
                         <li class="text-gray-500">Envoyer un mail au client lorsque la commande est marquée comme validée (ajouter un système de vérification pour empêcher le spam de mail).</li>
-                        <li class="text-gray-500">Ajouter des animations de chargement pour le composant Vue admin/order/table lorsqu'il fetch des données en db.</li>
+                        <li class="text-gray-500">Ajouter des animations de chargement pour le composant Vue admin/orders/table lorsqu'il fetch des données en db.</li>
                     </ul>
                 </li>
                 <li class="text-gray-600">
@@ -19,8 +19,9 @@
                     Back-Office :
                     <ul class="[&>*]:ml-10 list-disc">
                         <li class="text-gray-500">Ajouter un endroit dans le BO où on peut ajouter des produits phares.</li>
-                        <li class="text-gray-500 font-bold">Faire une refonte de l'affichage des produits en utilisant un composant Vue (cf : admin/order/table.vue).</li>
                         <li class="text-gray-500">Ajouter la fonctionnalité d'upload d'image pour les productReferences.</li>
+                        <li class="text-gray-500">Ajouter un menu déroulant pour choisir parmis toutes les catégories de produit en bdd, puis afficher uniquement les produits appartenant à cette catégorie /admin/produits</li>
+                        <li class="text-gray-500">Ajouter des animations de chargement pour le composant Vue admin/products/table lorsqu'il fetch des données en db.</li>
                     </ul>
                 </li>
                 <li class="text-gray-600">
@@ -46,6 +47,7 @@
                     <ul class="[&>*]:ml-10 list-disc">
                         <li class="text-green-500">Trouver un moyen d'isoler les composant vue admin et client, pour que l'utilisateur ne charge pas des composants qu'il n'utilisera jamais !</li>
                         <li class="text-green-500">Ajouter une propriété pour savoir si le client a bien payé le site owner.</li>
+                        <li class="text-green-500">Déplacer la constante alias dans order et product repository dans les entités</li>
                     </ul>
                 </div>
             </ul>

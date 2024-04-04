@@ -29,15 +29,30 @@ class ProductRepository extends ServiceEntityRepository
         parent::__construct($registry, Product::class);
     }
 
-    public function productsByQuery(string $query) : mixed {
-        return $this->createQueryBuilder('product')
-            ->where('product.name like :query')
-            ->orderBy('product.name','ASC')
-            ->setParameter('query', "%$query%")
+    /**
+     * Finds products by a search query. It constructs a query to retrieve 
+     * products whose names match the specified search query, ordered alphabetically.
+     *
+     * @param string $query
+     * @return mixed
+     */
+    public function findProductsByQuery(string $query) : mixed {
+        return $this->createQueryBuilder(self::alias)
+            ->where(sprintf("%s.name LIKE :query"))
+            ->orderBy(sprintf("%s.name", self::alias), "ASC")
+            ->setParameter("query", "%$query%")
             ->getQuery()
             ->getResult();
     }
 
+    /**
+     * Builds a query to paginate products with filtering capabilities based on the user's search query. 
+     * It constructs a query builder object with inner joins to fetch associated product
+     * references and categories. Additionally, it adds selections for productReference and productCategory.
+     *
+     * @param string $userSearchQuery
+     * @return QueryBuilder
+     */
     private function buildProductFilterPaginateQuery(string $userSearchQuery) : QueryBuilder {
         $queryBuilder = $this->createQueryBuilder(self::alias)
             ->innerJoin(sprintf("%s.productReferences", self::alias), "productReference")
@@ -51,6 +66,14 @@ class ProductRepository extends ServiceEntityRepository
         return $queryBuilder;
     }
 
+    /**
+     * Builds a query to count products based on the user's search query. 
+     * It constructs a query builder object to count the number of products that match
+     * the given search criteria. The query includes inner joins to fetch associated product references.
+     *
+     * @param string $userSearchQuery
+     * @return QueryBuilder
+     */
     private function buildProductCountQuery(string $userSearchQuery) : QueryBuilder {
         $queryBuilder = $this->createQueryBuilder(self::alias)
             ->innerJoin(sprintf("%s.productReferences", self::alias), "productReference")
@@ -82,7 +105,16 @@ class ProductRepository extends ServiceEntityRepository
         }
     }
 
-    private function calculateOrderMaxPage(QueryBuilder $queryBuilder, int $perPage) : object {
+    /**
+     * Calculates the maximum number of pages for paginating products based on the total count of products and
+     * the specified number of items per page. It executes a query to retrieve the total count of products and
+     * then computes the maximum page count.
+     *
+     * @param QueryBuilder $queryBuilder
+     * @param integer $perPage
+     * @return object
+     */
+    private function calculateProductMaxPage(QueryBuilder $queryBuilder, int $perPage) : object {
         $orderCount = $queryBuilder->getQuery()
             ->getSingleScalarResult();
         return (object)[
@@ -91,10 +123,22 @@ class ProductRepository extends ServiceEntityRepository
         ];
     }
 
+    /**
+     * Paginates and filters products based on the specified parameters.
+     * It constructs a query to count products and another query to retrieve
+     * paginated products with applied filters. Additionally, 
+     * it calculates the maximum number of pages for pagination.
+     *
+     * @param integer $page
+     * @param integer $perPage
+     * @param [type] $category
+     * @param [type] $userSearchQuery
+     * @return mixed
+     */
     public function paginateFilterProducts(int $page = 1, int $perPage = 12, $category = null, $userSearchQuery = null) : mixed {
         $productCountQueryBuilder = $this->buildProductCountQuery($userSearchQuery);
         $productFilterQueryBuilder = $this->buildProductFilterPaginateQuery($userSearchQuery);
-        $productCountAndMaxPage = $this->calculateOrderMaxPage($productCountQueryBuilder, $perPage);
+        $productCountAndMaxPage = $this->calculateProductMaxPage($productCountQueryBuilder, $perPage);
 
         $productFilterQueryBuilder->setFirstResult($perPage * ($page - 1))
             ->setMaxResults($perPage);

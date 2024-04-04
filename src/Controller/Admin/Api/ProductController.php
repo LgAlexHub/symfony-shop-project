@@ -13,10 +13,23 @@ use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Serializer\Normalizer\AbstractNormalizer;
 
 #[Route('/api/admin/produits', 'api.admin.products.')]
+/**
+ * @author Alélki <alexlegras@hotmail.com>
+ * @version 1.0.0
+ */
 class ProductController extends ApiAdminController
 {
     #[Route('/', name: 'list')]
-    public function listOrdersWithPaginationAndFilters(Request $request, SessionTokenManager $sessionTokenManager, EnhancedEntityJsonSerializer $enhancedEntityJsonSerializer, ProductRepository $productManager){
+    /**
+     * This method will render a paginate and filter list of product in json format.
+     *
+     * @param Request $request
+     * @param SessionTokenManager $sessionTokenManager
+     * @param EnhancedEntityJsonSerializer $enhancedEntityJsonSerializer
+     * @param ProductRepository $productManager
+     * @return Response
+     */
+    public function listOrdersWithPaginationAndFilters(Request $request, SessionTokenManager $sessionTokenManager, EnhancedEntityJsonSerializer $enhancedEntityJsonSerializer, ProductRepository $productManager) : Response {
         $this->checkBearerToken($request, $sessionTokenManager);
         $page = $request->get('page') ?? 1;
         $query = $request->get('query') ?? '';

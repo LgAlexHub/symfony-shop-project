@@ -2,12 +2,13 @@
 
 namespace App\Controller\Admin\Api;
 
-use App\Controller\Admin\Api\ApiAdminController;
 use App\Entity\Order;
 use App\Entity\OrderProductRef;
 use App\Repository\OrderRepository;
 use App\Service\SessionTokenManager;
 use App\Service\EnhancedEntityJsonSerializer;
+use App\Controller\Admin\Api\ApiAdminController;
+
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -15,6 +16,11 @@ use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Serializer\Normalizer\AbstractNormalizer;
 
 #[Route('/api/admin/commandes', 'api.admin.orders.')]
+/**
+ * @author Name <alexlegras@hotmail.com>
+ * @version 1.0.0
+ * This controller handle admin api request
+ */
 class OrderController extends ApiAdminController
 {
     #[Route('/debug', name: 'debug', env: 'dev')]
@@ -26,6 +32,15 @@ class OrderController extends ApiAdminController
     }
 
     #[Route('/', name: 'list')]
+    /**
+     * This method retreive a paginate and filter list of product in json format
+     *
+     * @param Request $request
+     * @param SessionTokenManager $sessionTokenManager
+     * @param EnhancedEntityJsonSerializer $enhancedEntityJsonSerializer
+     * @param OrderRepository $orderManager
+     * @return void
+     */
     public function listOrdersWithPaginationAndFilters(Request $request, SessionTokenManager $sessionTokenManager, EnhancedEntityJsonSerializer $enhancedEntityJsonSerializer, OrderRepository $orderManager){
         $this->checkBearerToken($request, $sessionTokenManager);
 
@@ -83,7 +98,16 @@ class OrderController extends ApiAdminController
     }
 
     #[Route('/{id}/validee', name: 'done')]
-    public function updateIsDone(Request $request, SessionTokenManager $sessionTokenManager, int $id, EntityManagerInterface $em){
+    /**
+     * This method will try to set the property isDone of targeted order.
+     * Will return a json response
+     * @param Request $request
+     * @param SessionTokenManager $sessionTokenManager
+     * @param integer $id
+     * @param EntityManagerInterface $em
+     * @return Response
+     */
+    public function updateIsDone(Request $request, SessionTokenManager $sessionTokenManager, int $id, EntityManagerInterface $em) : Response {
         $this->checkBearerToken($request, $sessionTokenManager);
         if (is_null($id))
             return $this->json(['error' => ['msg' => sprintf("Id manquant dans l'url")]], 422);
@@ -101,7 +125,17 @@ class OrderController extends ApiAdminController
 
 
     #[Route('/{id}/produits', name:'products')]
-    public function getOrderProduct(Request $request, SessionTokenManager $sessionTokenManager, int $id, EntityManagerInterface $em, EnhancedEntityJsonSerializer $enhancedEntityJsonSerializer){
+    /**
+     * This method retreive all product from a targeted order.
+     * Note : nothing call this method, but i'll keept it :) 
+     * @param Request $request
+     * @param SessionTokenManager $sessionTokenManager
+     * @param integer $id
+     * @param EntityManagerInterface $em
+     * @param EnhancedEntityJsonSerializer $enhancedEntityJsonSerializer
+     * @return Response
+     */
+    public function getOrderProduct(Request $request, SessionTokenManager $sessionTokenManager, int $id, EntityManagerInterface $em, EnhancedEntityJsonSerializer $enhancedEntityJsonSerializer) : Response {
         $this->checkBearerToken($request, $sessionTokenManager);
         if (is_null($id))
         return $this->json(['error' => ['msg' => sprintf("Id manquant dans l'url")]], 422);
