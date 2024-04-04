@@ -5,11 +5,10 @@ namespace App\Repository;
 use App\Entity\Order;
 use App\Repository\Trait\RepositoryToolTrait;
 
-use Doctrine\Persistence\ManagerRegistry;
-use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\ORM\QueryBuilder;
+use Doctrine\Persistence\ManagerRegistry;
 use Doctrine\ORM\Tools\Pagination\Paginator;
-use Doctrine\ORM\Query\Expr;
+use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 
 
 /**
@@ -24,7 +23,7 @@ class OrderRepository extends ServiceEntityRepository
 {
     use RepositoryToolTrait;
 
-    const orderAlias = 'akaOrder';
+    const alias = 'akaOrder';
 
     public function __construct(ManagerRegistry $registry)
     {
@@ -42,12 +41,12 @@ class OrderRepository extends ServiceEntityRepository
      * @return QueryBuilder
      */
     private function buildOrderFilterPaginateQueryWithTotalAmount(string $userSearchQuery, array $orderBy) : QueryBuilder {
-        $queryBuilder = $this->createQueryBuilder(self::orderAlias)
-            ->select(self::orderAlias)
-            ->innerJoin(sprintf("%s.items", self::orderAlias), "opr")
+        $queryBuilder = $this->createQueryBuilder(self::alias)
+            ->select(self::alias)
+            ->innerJoin(sprintf("%s.items", self::alias), "opr")
             ->innerJoin("opr.item", "pr")
             ->addSelect('SUM(opr.quantity * pr.price) as totalOrderAmount')
-            ->groupBy(sprintf("%s.id", self::orderAlias));
+            ->groupBy(sprintf("%s.id", self::alias));
             
         if(!empty($userSearchQuery)){
            $this->filterByUserSearch($queryBuilder, $userSearchQuery);
@@ -59,10 +58,15 @@ class OrderRepository extends ServiceEntityRepository
         return $queryBuilder;
     }
 
-
-    private function buildOrderCountQuery(string $userSearchQuery){
-        $queryBuilder = $this->createQueryBuilder(self::orderAlias)
-            ->select(sprintf('COUNT(DISTINCT %s.id)', self::orderAlias));
+    /**
+     * Build a count query for order pagination
+     *
+     * @param string $userSearchQuery
+     * @return QueryBuilder
+     */
+    private function buildOrderCountQuery(string $userSearchQuery) : QueryBuilder {
+        $queryBuilder = $this->createQueryBuilder(self::alias)
+            ->select(sprintf('COUNT(DISTINCT %s.id)', self::alias));
         if (!empty($userSearchQuery)){
             $queryBuilder = $this->filterByUserSearch($queryBuilder, $userSearchQuery);   
         }
@@ -83,7 +87,7 @@ class OrderRepository extends ServiceEntityRepository
                 $queryBuilder->addOrderBy("totalOrderAmount", $orderValue);
                 continue;
             }
-            $queryBuilder->addOrderBy(sprintf("%s.%s", self::orderAlias, $columnName), $orderValue);
+            $queryBuilder->addOrderBy(sprintf("%s.%s", self::alias, $columnName), $orderValue);
         }
     }
 
@@ -97,13 +101,13 @@ class OrderRepository extends ServiceEntityRepository
      */
     private function filterByUserSearch(QueryBuilder $queryBuilder, string $userSearchQuery) : void {
         $userSearchQueryTerms = explode(" ", $userSearchQuery);
-        $queryBuilder->where(sprintf("%s.clientLastName LIKE :term_%d", self::orderAlias, 0))
-            ->orWhere(sprintf("%s.email LIKE :term_%d", self::orderAlias, 0))
+        $queryBuilder->where(sprintf("%s.clientLastName LIKE :term_%d", self::alias, 0))
+            ->orWhere(sprintf("%s.email LIKE :term_%d", self::alias, 0))
             ->setParameter(sprintf("term_%d", 0), sprintf("%%%s%%", $userSearchQueryTerms[0]));
         unset($userSearchQueryTerms[0]);
         foreach($userSearchQueryTerms as $termKey => $termValue){
-            $queryBuilder->orWhere(sprintf("%s.clientLastName LIKE :term_%d", self::orderAlias, $termKey))
-                ->orWhere(sprintf("%s.email LIKE :term_%d", self::orderAlias, $termKey))
+            $queryBuilder->orWhere(sprintf("%s.clientLastName LIKE :term_%d", self::alias, $termKey))
+                ->orWhere(sprintf("%s.email LIKE :term_%d", self::alias, $termKey))
                 ->setParameter(sprintf("term_%d", 0), sprintf("%%%s%%", $termValue));
         }
     }
