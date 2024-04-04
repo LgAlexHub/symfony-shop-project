@@ -19,20 +19,10 @@ class OrderController extends AbstractController
 {
     #[Route('/debug', name: 'debug', env: 'dev')]
     public function debug(EntityManagerInterface $em, EnhancedEntityJsonSerializer $enhancedEntityJsonSerializer){
-        $repo = $em->getRepository(OrderProductRef::class);
-        $orderProductRefs = $repo->findProductWithRelatedInOrder(443);
-        $enhancedEntityJsonSerializer
-        ->setObjectToSerialize($orderProductRefs)
-        ->setOptions([AbstractNormalizer::CIRCULAR_REFERENCE_HANDLER => fn (object $opr, string $format, array $context) => $opr->getId()])
-        ->setAttributes([
-            'quantity',
-            'item' => [
-                'price', 'weight', 'weightType', 'slug', 'imageUrl', 'product' => [
-                    'name', 'description', 'slug'
-                ]
-            ]
-        ]);
-        dd($enhancedEntityJsonSerializer->serialize());
+        $repo = $em->getRepository(Order::class);
+        $test = $repo->main();
+        
+        dd($test);
     }
 
     private function checkBearerToken(Request $request, SessionTokenManager $sessionTokenManager){
@@ -56,10 +46,7 @@ class OrderController extends AbstractController
         $urlParams = $request->query->all();
         $ordersBy = array_reduce(array_keys($urlParams) , function ($carry, $urlParamName) use ($urlParams){
             if (strpos($urlParamName, "orderBy") === 0) {
-                $camelCaseKeyWithUnderscore = preg_replace('/([a-z])([A-Z])/', '$1_$2', substr($urlParamName, strlen("orderBy")));
-                $snake_case_key = strtolower($camelCaseKeyWithUnderscore);
-                
-                $carry[$snake_case_key] = $urlParams[$urlParamName];
+                $carry[substr($urlParamName, strlen("orderBy"))] = $urlParams[$urlParamName];
             }
             return $carry;
         }, []); 
@@ -72,7 +59,7 @@ class OrderController extends AbstractController
                 $tmpItem->totalPrice = $item["totalOrderAmount"];
                 return $tmpItem;
             },
-            $orders->results
+            iterator_to_array($orders->results)
         );
 
         $enhancedEntityJsonSerializer
