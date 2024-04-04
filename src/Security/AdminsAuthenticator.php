@@ -71,7 +71,7 @@ class AdminsAuthenticator extends AbstractLoginFormAuthenticator
             return new RedirectResponse($targetPath);
         }
         // For example:
-        return new RedirectResponse($this->urlGenerator->generate('admin.products.index'));
+        return new RedirectResponse($this->urlGenerator->generate('admin.orders.index'));
         // throw new \Exception('TODO: provide a valid redirect inside '.__FILE__);
     }
 
