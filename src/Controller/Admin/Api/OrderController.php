@@ -2,6 +2,7 @@
 
 namespace App\Controller\Admin\Api;
 
+use App\Controller\Admin\Api\ApiAdminController;
 use App\Entity\Order;
 use App\Entity\OrderProductRef;
 use App\Repository\OrderRepository;
@@ -12,10 +13,9 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Serializer\Normalizer\AbstractNormalizer;
-use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
 #[Route('/api/admin/commandes', 'api.admin.orders.')]
-class OrderController extends AbstractController
+class OrderController extends ApiAdminController
 {
     #[Route('/debug', name: 'debug', env: 'dev')]
     public function debug(EntityManagerInterface $em, EnhancedEntityJsonSerializer $enhancedEntityJsonSerializer){
@@ -23,19 +23,6 @@ class OrderController extends AbstractController
         $test = $repo->main();
         
         dd($test);
-    }
-
-    private function checkBearerToken(Request $request, SessionTokenManager $sessionTokenManager){
-        //Check if bearer token is in request header
-        $bearerToken = $request->headers->get('authorization');
-        if (is_null($bearerToken)){
-            return $this->json("Unauthorized", 401);
-        }
-        //Check if bearer token is same as the one in the session
-        $bearerToken = explode(" ", $bearerToken)[1];
-        if ($sessionTokenManager->getApiToken() !== $bearerToken){
-            return $this->json("Unauthorized", 401);
-        }
     }
 
     #[Route('/', name: 'list')]
