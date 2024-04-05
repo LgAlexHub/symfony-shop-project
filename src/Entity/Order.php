@@ -61,6 +61,9 @@ class Order
     #[ORM\Column(type: Types::BOOLEAN, nullable: false, options: ['default' => false])]
     private bool $isDone;
 
+    #[ORM\Column(name: 'mailed_at', type: Types::DATETIME_IMMUTABLE, updatable: true, nullable:true)]
+    private ?\DateTimeInterface $mailedAt;
+
     public function __construct()
     {
         $this->items = new ArrayCollection();
@@ -329,5 +332,25 @@ class Order
      */
     public function getTotalPrice() : int|float|null {
         return property_exists($this, "totalPrice") ? $this->{'totalPrice'} : null;
+    }
+
+    /**
+     * Get the value of mailedAt
+     */ 
+    public function getMailedAt() : ?\DateTimeImmutable
+    {
+        return $this->mailedAt;
+    }
+
+    /**
+     * Set the value of mailedAt
+     *
+     * @return  self
+     */ 
+    public function setMailedAt(?\DateTimeImmutable $mailedAt)
+    {
+        $this->mailedAt = $mailedAt;
+
+        return $this;
     }
 }

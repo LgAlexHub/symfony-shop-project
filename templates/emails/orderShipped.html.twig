@@ -1,0 +1,86 @@
+{% apply inline_css %}
+    <!DOCTYPE html>
+    <html lang="fr">
+        <head>
+            <meta charset="UTF-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            <title>Commande Expédiée</title>
+            <style>
+                .container {
+                    margin: 0;
+                    padding: 0;
+                    font-family: sans-serif;
+                    background-color: #f3f4f6;
+                    color: #374151;
+                }
+                .content {
+                    padding: 20px;
+                }
+                .heading {
+                    font-size: 24px;
+                    font-weight: bold;
+                    margin-bottom: 20px;
+                }
+                .paragraph {
+                    font-size: 16px;
+                    margin-bottom: 20px;
+                }
+                .signature {
+                    font-size: 16px;
+                    margin-bottom: 20px;
+                    font-weight: bold;
+                }
+                .order-summary {
+                    margin-bottom: 20px;
+                    border-collapse: collapse;
+                    width: 100%;
+                }
+                .order-summary th,
+                .order-summary td {
+                    border: 1px solid #ccc;
+                    padding: 8px;
+                    text-align: left;
+                }
+                .order-summary th {
+                    background-color: #f0f0f0;
+                }
+            </style>
+        </head>
+        <body class="container">
+            <table role="presentation" cellspacing="0" cellpadding="0" width="100%" style="border-collapse: collapse;">
+                <tr>
+                    <td class="content">
+                        <h1 class="heading">Votre commande a été expédiée !</h1>
+                        <p class="paragraph">Bonjour {{ order.clientFirstName }} {{ order.clientLastName }},</p>
+                        <p class="paragraph">Nous sommes heureux de vous informer que votre commande portant le numéro <strong>{{ order.uuid }}</strong> a été expédiée avec succès.</p>
+                        <table class="order-summary">
+                            <thead>
+                                <tr>
+                                    <th>Produit</th>
+                                    <th>Quantité</th>
+                                    <th>Poids</th>
+                                    <th>Prix unitaire</th>
+                                    <th>Total</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for opr in order.items %}
+                                <tr>
+                                    <td>{{ opr.item.product.name }}</td>
+                                    <td>{{ opr.quantity }}</td>
+                                    <td>{{ opr.item.weight }} {{ opr.item.weightType }}</td>
+                                    <td>{{ (opr.item.price / 100)|number_format(2) }} €</td>
+                                    <td>{{ (opr.quantity * opr.item.price / 100)|number_format(2) }} €</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                        {# <p class="total">Total de la commande: {{ orderTotal }} €</p> #}
+                        <p class="paragraph">Si vous avez des questions ou des préoccupations, n'hésitez pas à nous contacter.</p>
+                        <p class="signature">Cordialement,<br>Gout'mé cha</p>
+                    </td>
+                </tr>
+            </table>
+        </body>
+    </html>
+{% endapply %}

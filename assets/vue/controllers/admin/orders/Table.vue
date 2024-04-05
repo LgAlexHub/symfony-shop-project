@@ -58,22 +58,23 @@
             <template v-for="(order, index) in orders" :key="order.serializeUuid">
                 <tr :class="{ '[&>*]:py-2': true, 'bg-gray-100' : index % 2 == 0 }">
                     <td>
-                        <p :class="{ 'text-center font-semibold': true }">
+                        <p class="text-center font-semibold">
                             {{ order.clientFirstName }}
                         </p>
                     </td>
                     <td>
-                        <p :class="{ 'text-center font-semibold': true }">
+                        <p class="text-center font-semibold">
+                            <i @mouseover="showTooltip($event, order.mailedAt)" @mouseleave="hideTooltip()" v-if="order.mailedAt !== null" class="text-blue-600 fa-regular fa-envelope"></i>
                             {{ order.email }}
                         </p>
                     </td>
                     <td>
-                        <p :class="{ 'text-center font-semibold': true }">
+                        <p class="text-center font-semibold">
                             {{ (order.totalPrice / 100).toFixed(2).replace('.', ',') }} €
                         </p>
                     </td>
                     <td>
-                        <p :class="{ 'text-center font-semibold' : true, 'text-green-500' : order.isDone, 'text-red-500' : !order.isDone }">
+                        <p class="text-center font-semibold" :class="{'text-green-500' : order.isDone, 'text-red-500' : !order.isDone }">
                             {{ order.isDone ? 'Terminée' : 'En cours' }}
                         </p>
                     </td>
@@ -90,6 +91,9 @@
             </template>
         </tbody>
     </table>
+    <div v-show="show" :style="tooltipStyle" class="absolute bg-gray-800 text-white text-sm rounded px-2 py-1 whitespace-nowrap">
+      Mail envoyé le : {{ currentTooltip }}
+    </div>
 </template>
 
 <script>
@@ -140,7 +144,14 @@ export default {
             queryInput: "",
             queryDebounceTimeout : null,
             orderByDebounceTimeout : null,
+            
 
+            show : false,
+            currentTooltip: null,
+            tooltipStyle: {
+                top: '0',
+                left: '0',
+            },
         }
     }, 
     computed : {
@@ -220,7 +231,20 @@ export default {
                 this.resultCount = res.data.nbResult;
                 this.orders = res.data.orders
             });
-        }
+        },
+        showTooltip(event, date) {
+            this.show = true;
+            this.currentTooltip =  new Date((typeof date !== "object" ? date : date.timestamp) * 1000).toLocaleString('fr-FR', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' });
+            // Récupérer la position de l'élément déclencheur
+            const rect = event.target.getBoundingClientRect();
+            // Calculer la position du tooltip
+            this.tooltipStyle.top = `${rect.bottom}px`;
+            this.tooltipStyle.left = `${rect.left}px`;
+        },
+        hideTooltip() {
+            this.show = false;
+            this.currentTooltip = null;
+        },
     },
     mounted(){
         this.fetchPaginatedOrder();

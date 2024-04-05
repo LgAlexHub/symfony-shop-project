@@ -10,10 +10,15 @@ use App\Service\EnhancedEntityJsonSerializer;
 use App\Controller\Admin\Api\ApiAdminController;
 
 use Doctrine\ORM\EntityManagerInterface;
+use Symfony\Bridge\Twig\Mime\TemplatedEmail;
+use Symfony\Component\Mime\Email;
+use Symfony\Component\Mailer\MailerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Serializer\Normalizer\AbstractNormalizer;
+use Symfony\Component\Mailer\Exception\TransportExceptionInterface;
+use Symfony\Component\Mailer\Transport\TransportInterface;
 
 #[Route('/api/admin/commandes', 'api.admin.orders.')]
 /**
@@ -76,6 +81,7 @@ class OrderController extends ApiAdminController
                 'comment',
                 'isValid',
                 'isDone',
+                'mailedAt',
                 'totalPrice',
                 'createdAt',
                 'items' => [
@@ -160,5 +166,52 @@ class OrderController extends ApiAdminController
         return new Response($enhancedEntityJsonSerializer->serialize(), headers: [
             'Content-Type' => 'application/json'
         ]);
+    }
+
+    #[Route('/{id}/mailer', name: 'send.mail')]
+    /**
+     * 
+     *
+     * @param Request $request
+     * @param integer $id
+     * @param SessionTokenManager $sessionTokenManager
+     * @param EntityManagerInterface $em
+     * @return Response
+     */
+    public function tryToMail(Request $request, int $id, SessionTokenManager $sessionTokenManager, EntityManagerInterface $em, TransportInterface $mailer) : Response {
+        $this->checkBearerToken($request, $sessionTokenManager);
+        if (is_null($id))
+            return $this->json(['error' => ['msg' => sprintf("Id manquant dans l'url")]], 422);
+
+        $targetedOrder = $em->getRepository(Order::class)->findOneBy(['id' => $id]);
+
+        if (is_null($targetedOrder))
+            return  $this->json(['error' => ['msg' => sprintf("Commande avec l'id %d inexistant", $id)]], 404);
+
+        if ($targetedOrder->getIsDone() && is_null($targetedOrder->getMailedAt())){
+            $email = (new TemplatedEmail());
+            $email->to($targetedOrder->getEmail())
+                ->subject("Gout'mé cha - Votre commande est expédiée")
+                ->htmlTemplate('emails/orderShipped.html.twig')
+                ->context([
+                   'order' => $targetedOrder
+                ]);
+            try{
+                $mailer->send($email);
+            }catch(TransportExceptionInterface $e){
+                var_dump($e);
+                die;
+            }
+            $targetedOrder->setMailedAt(new \DateTimeImmutable());
+            $em->persist($targetedOrder);
+            $em->flush();
+            return $this->json($targetedOrder->getMailedAt()->getTimestamp());
+        }
+
+        if($targetedOrder->getIsDone())
+            return $this->json("Mail déjà envoyé", 422);
+
+        return $this->json("La commande n'est pas validée", 422);
+        
     }
 }

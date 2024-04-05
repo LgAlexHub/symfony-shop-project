@@ -91,7 +91,7 @@ class EnhancedEntityJsonSerializer {
      * @return string json string of entity(.ies)
      */
     public function serialize() : string {
-        $finalOptions = array(AbstractNormalizer::ATTRIBUTES => $this->getAttributes());
+        $finalOptions = !is_null($this->getAttributes()) ? array(AbstractNormalizer::ATTRIBUTES => $this->getAttributes()) : [];
         if (is_null($this->getObjectToSerialize()))
             throw new Exception("objectToSerialize must be not null to start serializing", "-1");
         if (is_array($this->getOptions()) && !empty($this->getOptions())){

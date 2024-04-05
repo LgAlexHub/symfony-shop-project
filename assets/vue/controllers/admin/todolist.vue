@@ -38,6 +38,7 @@
                 <li class="text-blue-600">
                     <i class="fas fa-arrow-up mr-2 text-blue-400"></i> Amélioration à faire plus tard :
                     <ul class="[&>*]:ml-10 list-disc">
+                        <li class="text-blue-500">Configurer symfony sur le bon fuseau horaire</li>
                         <li class="text-blue-500">Ajouter une page récap de commande , possibilité de générer un pdf.</li>
                         <li class="text-blue-500">Ajouter une propriété couleur à ProductCategory.</li>
                     </ul>
@@ -48,6 +49,7 @@
                         <li class="text-green-500">Trouver un moyen d'isoler les composant vue admin et client, pour que l'utilisateur ne charge pas des composants qu'il n'utilisera jamais !</li>
                         <li class="text-green-500">Ajouter une propriété pour savoir si le client a bien payé le site owner.</li>
                         <li class="text-green-500">Déplacer la constante alias dans order et product repository dans les entités</li>
+                        <li class="text-green-500">Gérer les temps d'attentes après une requête axios dans les composant vue.js (ajouter une anim de chargement + desac boutton)</li>
                     </ul>
                 </div>
             </ul>
