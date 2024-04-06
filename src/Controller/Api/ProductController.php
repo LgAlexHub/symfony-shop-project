@@ -13,7 +13,7 @@ use Symfony\Component\Serializer\Normalizer\AbstractNormalizer;
 #[Route('api/produits', 'api.products.')]
 class ProductController extends AbstractController
 {
-    #[Route('/produits/recherche', name: 'query')]
+    #[Route('/recherche', name: 'query')]
     /**
      * API Endpoint: get product refrences by name.
      *

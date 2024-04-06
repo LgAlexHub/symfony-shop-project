@@ -10,5 +10,5 @@
         </span>
         <span class="flex-grow block border-t border-black"></span>
     </h2>
-    <div class="my-10 mx-10" {{ vue_component('admin/products/table', {'apiToken' : api_token}) }}></div>
+    <div class="my-10 mx-10" {{ vue_component('admin/products/table', {'apiToken' : api_token, 'categories' : jsonCategories}) }}></div>
 {% endblock %}

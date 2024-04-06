@@ -53,11 +53,16 @@ class ProductRepository extends ServiceEntityRepository
      * @param string $userSearchQuery
      * @return QueryBuilder
      */
-    private function buildProductFilterPaginateQuery(string $userSearchQuery) : QueryBuilder {
+    private function buildProductFilterPaginateQuery(string $userSearchQuery, null|int $category) : QueryBuilder {
         $queryBuilder = $this->createQueryBuilder(self::alias)
             ->innerJoin(sprintf("%s.productReferences", self::alias), "productReference")
             ->innerJoin(sprintf("%s.category", self::alias), "productCategory")
             ->addSelect(['productReference', 'productCategory']);
+
+        if(!is_null($category)){
+            $queryBuilder->where("productCategory.id = :catId")
+                ->setParameter("catId", $category);
+        }
         
         if(!empty($userSearchQuery)){
             $this->filterByUserSearch($queryBuilder, $userSearchQuery);
@@ -74,10 +79,16 @@ class ProductRepository extends ServiceEntityRepository
      * @param string $userSearchQuery
      * @return QueryBuilder
      */
-    private function buildProductCountQuery(string $userSearchQuery) : QueryBuilder {
+    private function buildProductCountQuery(string $userSearchQuery, null|int $category) : QueryBuilder {
         $queryBuilder = $this->createQueryBuilder(self::alias)
-            ->innerJoin(sprintf("%s.productReferences", self::alias), "productReference")
-            ->select(sprintf("COUNT(DISTINCT %s.id)", self::alias));
+            ->select(sprintf("COUNT(DISTINCT %s.id)", self::alias))
+            ->innerJoin(sprintf("%s.productReferences", self::alias), "productReference");
+
+        if(!is_null($category)){
+            $queryBuilder->innerJoin(sprintf("%s.category", self::alias), "productCategory")
+                ->where("productCategory.id = :catId")
+                ->setParameter("catId", $category);
+        }
         
         if(!empty($userSearchQuery)){
             $this->filterByUserSearch($queryBuilder, $userSearchQuery);
@@ -135,9 +146,9 @@ class ProductRepository extends ServiceEntityRepository
      * @param [type] $userSearchQuery
      * @return mixed
      */
-    public function paginateFilterProducts(int $page = 1, int $perPage = 12, $category = null, $userSearchQuery = null) : mixed {
-        $productCountQueryBuilder = $this->buildProductCountQuery($userSearchQuery);
-        $productFilterQueryBuilder = $this->buildProductFilterPaginateQuery($userSearchQuery);
+    public function paginateFilterProducts(int $page = 1, int $perPage = 12, int|null $category = null, $userSearchQuery = null) : mixed {
+        $productCountQueryBuilder = $this->buildProductCountQuery($userSearchQuery, $category);
+        $productFilterQueryBuilder = $this->buildProductFilterPaginateQuery($userSearchQuery, $category);
         $productCountAndMaxPage = $this->calculateProductMaxPage($productCountQueryBuilder, $perPage);
 
         $productFilterQueryBuilder->setFirstResult($perPage * ($page - 1))

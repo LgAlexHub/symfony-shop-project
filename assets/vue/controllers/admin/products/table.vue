@@ -5,8 +5,11 @@
         <button type="submit" class="absolute right-0 top-0 mt-4 mr-4">
             <i class="fa-solid fa-magnifying-glass"></i>
         </button>
-
     </div>
+    <select @input="debouncedProductInputHandler" v-model="selectedCategory" class="block w-full px-4 py-2 my-5 border border-gray-300 rounded-md focus:outline-none focus:border-blue-500">
+        <option :value="null">Aucune catégorie</option>
+        <option v-for="cat in productCategories" :key="cat.id" :value="cat.id">{{ cat.label }}</option>
+    </select>
     <nav class="my-12">
         <ul class="flex justify-center">
             <li v-if="page > 1">
@@ -94,6 +97,10 @@ export default {
         apiToken : {
             required : true,
             type : String
+        },
+        categories : {
+            required : true, 
+            type : String
         }
     },
     data(){
@@ -122,9 +129,11 @@ export default {
                 },
             },
             products : [],
+            productCategories : [],
             queryInput: "",
             queryDebounceTimeout : null,
             orderByDebounceTimeout : null,
+            selectedCategory : null,
         }
     }, 
     computed : {
@@ -188,6 +197,10 @@ export default {
             if (this.queryInput !== ""){
                 paramString+="&query="+this.queryInput;
             }
+
+            if (this.selectedCategory !== null){
+                paramString+="&cat="+this.selectedCategory;
+            }
             
             if(this.columnsToUrl.length !== 0){
                 paramString+=this.columnsToUrl;
@@ -208,6 +221,7 @@ export default {
     },
     mounted(){
         this.fetchPaginatedProduct();
+        this.productCategories = JSON.parse(this.categories);
     }
 }
 </script>

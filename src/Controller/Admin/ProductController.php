@@ -5,6 +5,8 @@ namespace App\Controller\Admin;
 use App\Controller\Trait\ControllerToolsTrait;
 use App\Entity\Product;
 use App\Form\ProductType;
+use App\Repository\ProductCategoryRepository;
+use App\Service\EnhancedEntityJsonSerializer;
 use App\Service\SessionTokenManager;
 use Doctrine\ORM\EntityManagerInterface;
 
@@ -12,6 +14,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\Serializer\Normalizer\AbstractNormalizer;
 
 #[Route('/admin/products', 'admin.products.')]
 /**
@@ -35,10 +38,16 @@ class ProductController extends AbstractController
      * @param EntityManagerInterface $manager
      * @return Response containt form view
      */
-    public function index(SessionTokenManager $sessionTokenManager): Response
+    public function index(SessionTokenManager $sessionTokenManager, ProductCategoryRepository $productCategoryRepository, EnhancedEntityJsonSerializer $enhancedEntityJsonSerializer): Response
     {
+        $enhancedEntityJsonSerializer->setObjectToSerialize($productCategoryRepository->findAll())
+            ->setOptions([AbstractNormalizer::CIRCULAR_REFERENCE_HANDLER => fn (object $category, string $format, array $context) => $category->getId()])
+            ->setAttributes([
+                'id', 'label'
+            ]);
         return $this->render(self::$templatePath.'/index.html.twig', [
-            'api_token' => $sessionTokenManager->getApiToken()
+            'api_token'       => $sessionTokenManager->getApiToken(),
+            'jsonCategories'  => $enhancedEntityJsonSerializer->serialize()
         ]);
     }
 

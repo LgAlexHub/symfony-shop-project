@@ -10,9 +10,9 @@
                     <i class="fas fa-hourglass-start mr-2 text-gray-400"></i>
                     Back-Office :
                     <ul class="[&>*]:ml-10 list-disc">
+                        <li class="text-gray-500">Raccorder les actions dans admin/products/index.</li>
                         <li class="text-gray-500">Ajouter un endroit dans le BO où on peut ajouter des produits phares.</li>
                         <li class="text-gray-500">Ajouter la fonctionnalité d'upload d'image pour les productReferences.</li>
-                        <li class="text-gray-500">Ajouter un menu déroulant pour choisir parmis toutes les catégories de produit en bdd, puis afficher uniquement les produits appartenant à cette catégorie /admin/produits</li>
                     </ul>
                 </li>
                 <li class="text-gray-600">

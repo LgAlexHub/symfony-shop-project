@@ -29,12 +29,13 @@ class ProductController extends ApiAdminController
      * @param ProductRepository $productManager
      * @return Response
      */
-    public function listOrdersWithPaginationAndFilters(Request $request, SessionTokenManager $sessionTokenManager, EnhancedEntityJsonSerializer $enhancedEntityJsonSerializer, ProductRepository $productManager) : Response {
+    public function listProductsWithPaginationAndFilters(Request $request, SessionTokenManager $sessionTokenManager, EnhancedEntityJsonSerializer $enhancedEntityJsonSerializer, ProductRepository $productManager) : Response {
         $this->checkBearerToken($request, $sessionTokenManager);
         $page = $request->get('page') ?? 1;
         $query = $request->get('query') ?? '';
-        $products = $productManager->paginateFilterProducts(page: $page, userSearchQuery: $query);
-     
+        $cat = $request->get('cat') ?? null;
+        $products = $productManager->paginateFilterProducts(page: $page, userSearchQuery: $query, category: $cat);
+        
         $enhancedEntityJsonSerializer
             ->setObjectToSerialize($products->results)
             ->setOptions([AbstractNormalizer::CIRCULAR_REFERENCE_HANDLER => fn (object $product, string $format, array $context) => $product->getId()])
