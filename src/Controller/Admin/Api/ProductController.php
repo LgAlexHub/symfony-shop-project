@@ -3,12 +3,15 @@
 namespace App\Controller\Admin\Api;
 
 use App\Controller\Admin\Api\ApiAdminController;
+use App\Entity\Product;
+use App\Form\ProductType;
 use App\Repository\ProductRepository;
 use App\Service\EnhancedEntityJsonSerializer;
 use App\Service\SessionTokenManager;
-
+use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Serializer\Normalizer\AbstractNormalizer;
 
@@ -30,7 +33,10 @@ class ProductController extends ApiAdminController
      * @return Response
      */
     public function listProductsWithPaginationAndFilters(Request $request, SessionTokenManager $sessionTokenManager, EnhancedEntityJsonSerializer $enhancedEntityJsonSerializer, ProductRepository $productManager) : Response {
-        $this->checkBearerToken($request, $sessionTokenManager);
+        $authCheck = $this->checkBearerToken($request, $sessionTokenManager);
+        if(!is_null($authCheck)){
+            return $authCheck;
+        }
         $page = $request->get('page') ?? 1;
         $query = $request->get('query') ?? '';
         $cat = $request->get('cat') ?? null;
@@ -42,14 +48,17 @@ class ProductController extends ApiAdminController
             ->setAttributes([
                'id',
                'name',
-               'category' => ['label'],
+               'category' => ['label', 'id'],
                'createdAt',
+               'updatedAt',
+               'description',
                'productReferences' => [
-                    'price',
+                    'id',
+                    'formatedPrice',
                     'weight',
-                    'weighType',
+                    'weightType',
                     'imageUrl',
-                    'slug'
+                    'slug',
                ]
             ]);
         return new Response(
@@ -61,4 +70,54 @@ class ProductController extends ApiAdminController
             headers: [ 'Content-Type' => 'application/json']
         );
     }
+
+    #[Route('/{id}', name: 'edit', methods:['GET', 'PATCH'])]
+    public function edit(Request $request, SessionTokenManager $sessionTokenManager, EntityManagerInterface $em, EnhancedEntityJsonSerializer $enhancedEntityJsonSerializer, int $id){
+        // $authCheck = $this->checkBearerToken($request, $sessionTokenManager);
+        // if(!is_null($authCheck)){
+        //     return $authCheck;
+        // }
+
+        if (is_null($id))
+            return $this->json(['error' => ['msg' => sprintf("Id manquant dans l'url")]], 422);
+
+        $targetedProduct = $em->getRepository(Product::class)->findOneBy(['id' => $id]);
+
+        if (is_null($targetedProduct))
+            return  $this->json(['error' => ['msg' => sprintf("Produit avec l'id %d inexistant", $id)]], 404);
+        
+        $productForm = $this->createForm(ProductType::class, options: ['csrf_protection' => false]);
+        $productForm->submit(json_decode($request->getContent(), true));
+        if($productForm->isValid()){
+            $editedProduct = $productForm->getData();
+            $targetedProduct
+                ->setName($editedProduct->getName())
+                ->setDescription($editedProduct->getDescription());
+            $em->persist($targetedProduct);
+            $em->flush();
+            $em->detach($targetedProduct);
+            $enhancedEntityJsonSerializer->setObjectToSerialize($targetedProduct)
+                ->setAttributes([
+                    'id',
+                    'name',
+                    'category' => ['label', 'id'],
+                    'createdAt',
+                    'updatedAt',
+                    'description',
+                    'productReferences' => [
+                        'id',
+                        'formatedPrice',
+                        'weight',
+                        'weightType',
+                        'imageUrl',
+                        'slug',
+                    ]
+                ]);
+            return $this->apiJson($enhancedEntityJsonSerializer->serialize());
+        }
+        dd($productForm->getErrors(true));
+        //TODO : ajouter un vrai feeback
+        return  $this->json(['error' => ['msg' => 'Formulaire invalide !']], 422);
+    }
 }
+    

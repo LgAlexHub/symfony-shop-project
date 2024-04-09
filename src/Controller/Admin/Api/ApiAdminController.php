@@ -5,6 +5,7 @@ namespace App\Controller\Admin\Api;
 use App\Service\SessionTokenManager;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 
 abstract class ApiAdminController extends AbstractController{
 
@@ -19,5 +20,12 @@ abstract class ApiAdminController extends AbstractController{
         if ($sessionTokenManager->getApiToken() !== $bearerToken){
             return $this->json("Unauthorized", 401);
         }
+        return null;
+    }
+
+    protected function apiJson(string $json, int $status=200) : Response {
+        return new Response($json, status: $status, headers: [
+            'Content-Type' => 'application/json'
+        ]); 
     }
 }

@@ -1,4 +1,11 @@
 <template>
+    <!-- TODO : passer les props catégories -->
+    <popup 
+        v-if="selectedProduct !== null"
+        :product="selectedProduct"
+        :api-token="apiToken"
+        @close-popup="selectedProduct = null"
+    ></popup>
     <div class="pt-2 relative mx-auto text-gray-600">
         <input v-model="queryInput" @input="debouncedProductInputHandler" class="border-2 border-gray-300 bg-white w-full h-10 px-5 pr-16 rounded-lg text-sm focus:border-black"
           type="search" name="search" placeholder="Recherche par nom">
@@ -27,9 +34,6 @@
                     </button>
                 </li>
             </template>
-            <!-- <li>
-                <button class="mx-1 flex h-9 w-9 items-center justify-center rounded-full border border-blue-gray-100 bg-blue-300 p-0 text-sm text-blue-gray-500 transition duration-150 ease-in-out hover:bg-gray-300">{{ page }}</button>
-            </li> -->
             <li v-if="page + 1 <= maxPage">
                 <button @click="goToPage(page + 1)" class="mx-1 flex h-9 w-9 items-center justify-center rounded-full border border-blue-gray-100 bg-transparent p-0 text-sm text-blue-gray-500 transition duration-150 ease-in-out hover:bg-gray-300" href="#" aria-label="Next">
                     <i class="fa-solid fa-chevron-right"></i>
@@ -78,10 +82,10 @@
                         {{ new Date(product.createdAt.timestamp * 1000).toLocaleString('fr-FR', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' }) }}
                     </td>
                     <td>
-                        <!-- <button class="w-10/12 bg-blue-200 hover:bg-blue-300 text-white text-center rounded-md px-2 py-1 w-100 mx-5" @click="selectedOrder = order">
+                        <button class="w-10/12 bg-blue-200 hover:bg-blue-300 text-white text-center rounded-md px-2 py-1 w-100 mx-5" @click="selectedProduct = product">
                             <i class="fa-solid fa-magnifying-glass">
                             </i>
-                        </button>     -->
+                        </button>    
                     </td>
                 </tr>
             </template>
@@ -91,6 +95,7 @@
 
 <script>
 import axios from 'axios';
+import popup from "./popup.vue";
 
 export default {
     props : {
@@ -102,6 +107,9 @@ export default {
             required : true, 
             type : String
         }
+    },
+    components : {
+        'popup' : popup
     },
     data(){
         return {
@@ -134,6 +142,7 @@ export default {
             queryDebounceTimeout : null,
             orderByDebounceTimeout : null,
             selectedCategory : null,
+            selectedProduct : null
         }
     }, 
     computed : {

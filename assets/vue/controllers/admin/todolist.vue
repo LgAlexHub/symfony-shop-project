@@ -10,9 +10,23 @@
                     <i class="fas fa-hourglass-start mr-2 text-gray-400"></i>
                     Back-Office :
                     <ul class="[&>*]:ml-10 list-disc">
-                        <li class="text-gray-500">Raccorder les actions dans admin/products/index.</li>
-                        <li class="text-gray-500">Ajouter un endroit dans le BO où on peut ajouter des produits phares.</li>
-                        <li class="text-gray-500">Ajouter la fonctionnalité d'upload d'image pour les productReferences.</li>
+                        <li class="text-gray-500 font-bold">
+                            Raccorder les actions dans admin/products/index. [REFONT] => Dynamisation des outils de gestions des produits dans le BO
+                            <ul class="list-decimal	[&>*]:ml-10">
+                                <li class="text-gray-500">
+                                    Ajouter un endroit dans le BO où on peut ajouter des produits phares.
+                                </li>
+                                <li class="text-gray-500">
+                                    Faire une modal pour modifier un produit [EXTEND] => Modifier cette même modal pour ajouter/modifier/supprimer une référence de produit?
+                                </li>
+                                <li class="text-gray-500">
+                                    Ajouter la fonctionnalité d'upload d'image pour les productReferences.
+                                </li>
+                                <li class="text-gray-500">
+                                    Ajouter de la validation sur les composants vue js
+                                </li>
+                            </ul>
+                        </li>
                     </ul>
                 </li>
                 <li class="text-gray-600">
@@ -26,17 +40,15 @@
                         <li class="text-gray-500">Implémenter vue-store pour la prise de commande (à voir).</li>
                     </ul>
                 </li>
-                <li class="text-blue-600">
-                    <i class="fas fa-arrow-up mr-2 text-blue-400"></i> Amélioration à faire plus tard :
-                    <ul class="[&>*]:ml-10 list-disc">
-                        <li class="text-blue-500">Configurer symfony sur le bon fuseau horaire</li>
-                        <li class="text-blue-500">Ajouter une page récap de commande , possibilité de générer un pdf.</li>
-                        <li class="text-blue-500">Ajouter une propriété couleur à ProductCategory.</li>
-                    </ul>
-                </li>
                 <div class="text-green-600">
-                    <i class="fas fa-arrow-up mr-2 text-green-400"></i> Idée à planifier :
+                    <i class="fas fa-arrow-up mr-2 text-green-400"></i> À planifier :
                     <ul class="[&>*]:ml-10 list-disc">
+
+                        <li class="text-green-500">Enlever les slugs au product reference</li>
+                        <li class="text-green-500">Ajouter un event listenner qui ecoutera toutes les requetes sur les controller admin api et qui vérifira si l'utilisateur possède un bearer token</li>
+                        <li class="text-green-500">Configurer symfony sur le bon fuseau horaire</li>
+                        <li class="text-green-500">Ajouter une page récap de commande , possibilité de générer un pdf.</li>
+                        <li class="text-green-500">Ajouter une propriété couleur à ProductCategory.</li>
                         <li class="text-green-500">Trouver un moyen d'isoler les composant vue admin et client, pour que l'utilisateur ne charge pas des composants qu'il n'utilisera jamais !</li>
                         <li class="text-green-500">Ajouter une propriété pour savoir si le client a bien payé le site owner.</li>
                         <li class="text-green-500">Déplacer la constante alias dans order et product repository dans les entités</li>

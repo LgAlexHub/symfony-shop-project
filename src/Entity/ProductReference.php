@@ -61,6 +61,10 @@ class ProductReference
         return $this->price;
     }
 
+    public function getFormatedPrice(): ?float {
+        return $this->getPrice()/100;
+    }
+
     /**
      * Price setter
      *

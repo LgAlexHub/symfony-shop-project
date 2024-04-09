@@ -19,6 +19,7 @@ class EnhancedEntityJsonSerializer {
 
     public function __construct()
     {
+        $this->options = [];
         $this->serializer = new Serializer(
             array(new ObjectNormalizer()),
             array('json' => new JsonEncoder())
