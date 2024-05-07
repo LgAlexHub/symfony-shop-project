@@ -24,6 +24,12 @@
                     class="w-full px-4 py-2 rounded-md border border-gray-300 focus:outline-none focus:border-blue-500 focus:ring-blue-500">
             </div>
             <div class="mb-4">
+                <label for="productCategory" class="block text-sm font-semibold mb-1">Catégorie :</label>
+                <select id="productCategory" v-model="selectedCategory" class="block w-full px-4 py-2 my-5 border border-gray-300 rounded-md focus:outline-none focus:border-blue-500">
+                    <option v-for="cat in categories" :key="cat.id" :value="cat.id">{{ cat.label }}</option>
+                </select>
+            </div>
+            <div class="mb-4">
                 <label for="productDescription" class="block text-sm font-semibold mb-1">Description :</label>
                 <textarea id="productDescription" v-model="currentProduct.description"
                     class="w-full px-4 py-2 rounded-md border border-gray-300 focus:outline-none focus:border-blue-500 focus:ring-blue-500 resize-none"></textarea>
@@ -47,6 +53,10 @@ export default {
             required: true,
             type: Object
         },
+        categories : {
+            required: true,
+            type: Array
+        },
         apiToken: {
             required: true,
             type: String
@@ -56,11 +66,12 @@ export default {
     data() {
         return {
             currentProduct: null,
+            selectedCategory : null,
         }
     },
     computed : {
         isProductDifferent(){
-            return this.currentProduct.description !== this.product.description || this.currentProduct.name !== this.product.name && this.currentProduct.name !== "";
+            return (this.currentProduct.description !== this.product.description || this.currentProduct.name !== this.product.name || this.selectedCategory !== this.product.category.id) && this.currentProduct.name !== "";
         }
     },
     methods: {
@@ -77,13 +88,16 @@ export default {
         handleEditProduct() {
             axios.patch(`/api/admin/produits/${this.currentProduct.id}`, {
                 name : this.currentProduct.name,
-                description : this.currentProduct.description
+                description : this.currentProduct.description,
+                category : this.selectedCategory
             }, {
                 headers: {
                     "Authorization": `Bearer ${this.apiToken}`
                 }
             })
                 .then((resolve) => {
+                    this.currentProduct = resolve.data;
+                    this.selectedCategory = this.currentProduct.category.id;
                     this.$emit('onProductSaved', resolve.data)
                     //TODO : Ajouter un toast feedback
                 })
@@ -93,6 +107,7 @@ export default {
     },
     beforeMount() {
         this.currentProduct = Object.assign({}, this.product);
+        this.selectedCategory = this.currentProduct.category.id
     }
 }
 </script>

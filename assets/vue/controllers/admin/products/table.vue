@@ -4,7 +4,10 @@
         v-if="selectedProduct !== null"
         :product="selectedProduct"
         :api-token="apiToken"
+        :categories="productCategories"
         @close-popup="selectedProduct = null"
+        @on-product-reference-delete="handleProductReferenceDelete"
+        @on-product-save="handleProductSave"
     ></popup>
     <div class="pt-2 relative mx-auto text-gray-600">
         <input v-model="queryInput" @input="debouncedProductInputHandler" class="border-2 border-gray-300 bg-white w-full h-10 px-5 pr-16 rounded-lg text-sm focus:border-black"
@@ -226,6 +229,18 @@ export default {
                 this.resultCount = res.data.nbResult;
                 this.products = res.data.products
             });
+        },
+        handleProductReferenceDelete(payload){
+            let index = this.products.findIndex((product) => product.id === this.selectedProduct.id);
+            if (index !== -1){
+                this.products[index].productReferences = payload;
+            }
+        },
+        handleProductSave(payload){
+            let index = this.products.findIndex((product) => product.id === this.selectedProduct.id);
+            if(index !== -1){
+                this.products[index] = payload;
+            }
         }
     },
     mounted(){

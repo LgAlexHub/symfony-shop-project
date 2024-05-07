@@ -28,10 +28,10 @@
                             <a href="">
                                 <i class="fa-solid fa-magnifying-glass text-blue-700 border border-blue-700 hover:text-white hover:border-transparent hover:bg-blue-700 rounded-md px-3 py-3"></i>
                             </a>
-                            <a href="{{path('admin.categories.edit', {'id' : category.id})}}" class="w-fit">
+                            <a href="{{path('admin.categories.edit', {'slug' : category.slug})}}" class="w-fit">
                                 <i class="fa-solid fa-pen-to-square border text-slate-800 border-slate-800 hover:text-white hover:border-transparent hover:bg-slate-800 rounded-md px-3 py-3"></i>
                             </a>
-                            <a href="{{path('admin.categories.delete', {'id' : category.id})}}" class="w-fit">
+                            <a href="{{path('admin.categories.delete', {'slug' : category.slug})}}" class="w-fit">
                                 <i class="fa-solid fa-circle-xmark border text-red-500 border-red-500 hover:text-white hover:border-transparent hover:bg-red-500 rounded-md px-3 py-3"></i>
                             </a>  
                         </td>

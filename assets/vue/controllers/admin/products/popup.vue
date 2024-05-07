@@ -24,12 +24,15 @@
                 <editProductTab
                     v-if="activeTab === 'Produit'" 
                     :product="currentProduct" 
+                    :categories="categories"
                     :api-token="apiToken"
+                    @on-product-saved="handleProductSave"
                 ></editProductTab>
                 <prodRefTable
                     v-else
                     :product-references="product.productReferences"
                     :api-token="apiToken"
+                    @on-product-reference-deleted="handleProductReferenceDelete"
                 ></prodRefTable>
             </div>
         </div>
@@ -47,12 +50,16 @@ export default {
             required: true,
             type: Object
         },
+        categories : {
+            required: true,
+            type: Array
+        },
         apiToken: {
             required: true,
             type: String
         }
     },
-    emits: ['closePopup'],
+    emits: ['closePopup', 'onProductReferenceDelete', 'onProductSave'],
     components: {
         'editProductTab' : editProduct,
         'prodRefTable'   : productReferenceTable,
@@ -96,6 +103,14 @@ export default {
                     })
                     .catch((error) => console.error(error));
             }
+        },
+        handleProductReferenceDelete(payload){
+            this.currentProduct.productReferences = payload;
+            this.$emit('onProductReferenceDelete', payload);
+        },
+        handleProductSave(payload){
+            this.currentProduct = payload;
+            this.$emit('onProductSave', payload);
         }
     },
     beforeMount() {

@@ -114,7 +114,7 @@ class ProductController extends AbstractController
      * @throws NotFoundHttpException If the targeted product is not found.
      */
     public function edit(Request $request, string $slug, EntityManagerInterface $entityManager) : Response {
-        $product = $entityManager->getRepository(Product::class)->findBySlug($slug);
+        $product = $entityManager->getRepository(Product::class)->findOneBy(["slug" => $slug]);
         $this->checkEntityExistence($product,"slug" ,$slug);
         $productForm = $this->createForm(ProductType::class, $product);
         if ($this->handleAndCheckForm($request, $productForm)){

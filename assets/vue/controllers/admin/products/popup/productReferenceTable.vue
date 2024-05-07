@@ -27,10 +27,10 @@
                             <i class="fa-solid fa-edit"></i>
                             Modifier
                         </button>
-                        <button @click="selected('delete', productReference)" class="font-light text-white border-2 border-red-500 rounded bg-red-500 hover:bg-red-700">
+                        <!-- <button @click="selected('delete', productReference)" class="font-light text-white border-2 border-red-500 rounded bg-red-500 hover:bg-red-700">
                             <i class="fa-solid fa-trash"></i>
                             Supprimer
-                        </button>
+                        </button> -->
                     </div>
                 </td>
             </tr>
@@ -40,13 +40,21 @@
         v-if="selectedProductReference !== null && selectedActionType === 'edit'"
         :product-ref="selectedProductReference"
         :api-token="apiToken"
-        @on-form-canceled="selectedProductReference = null; selectedActionType = null"
+        @on-form-canceled="reset"
         @on-product-reference-saved="handleProductReferenceSave"
     ></productRefForm>
+    <productDeleteForm
+        v-if="selectedProductReference !== null && selectedActionType === 'delete'"
+        :product-ref="selectedProductReference"
+        :api-token="apiToken"
+        @on-delete-canceled="reset"
+        @on-product-reference-deleted="handleReferenceDelete"
+    ></productDeleteForm>
 </template>
 
 <script>
 import editProductReference from './editProductReference.vue';
+import deleteProductReference from './deleteProductReference.vue';
 export default {
     name: "popupProductRefTable",
     props: {
@@ -61,7 +69,9 @@ export default {
     },
     components : {
         'productRefForm' : editProductReference,
+        'productDeleteForm' : deleteProductReference,
     },
+    emits : ['onProductReferenceDeleted'],
     data() {
         return {
             currentProductReferences: null,
@@ -73,6 +83,10 @@ export default {
         selected(action , ref){
             this.selectedProductReference = ref;
             this.selectedActionType = action;
+        },
+        reset(){
+            this.selectedProductReference = null;
+            this.selectedActionType = null;
         },
         timesptampToEuTimzezoneString(timestamp) {
             return new Date(timestamp * 1000)
@@ -92,6 +106,14 @@ export default {
                 this.currentProductReferences[index] = payload;
             }
         },
+        handleReferenceDelete(payload) {
+            let index = this.currentProductReferences.findIndex((ref) => ref.id === payload.id);
+            if (index !== -1) {
+                this.currentProductReferences = this.currentProductReferences.splice(index, 1);
+                this.reset();
+                this.$emit('onProductReferenceDeleted', this.currentProductReferences);
+            }
+        }
     },
     beforeMount() {
         this.currentProductReferences = [...this.productReferences];

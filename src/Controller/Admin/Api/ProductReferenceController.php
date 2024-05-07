@@ -72,4 +72,30 @@ class ProductReferenceController extends ApiAdminController
             'error' => ['msg' => sprintf("Erreur de formulaire")]
         ]);
     }
+
+    #[Route('/{id}', name: 'delete', methods:['DELETE'])]
+    public function delete(Request $request, SessionTokenManager $sessionTokenManager, EntityManagerInterface $em, int $id){
+        $authCheck = $this->checkBearerToken($request, $sessionTokenManager);
+        if(!is_null($authCheck)){
+            return $authCheck;
+        }
+
+        if (is_null($id))
+            return $this->json(['error' => ['msg' => sprintf("Id manquant dans l'url")]], 422);
+
+        $targetedProductReference = $em->getRepository(ProductReference::class)->findOneBy(['id' => $id]);
+
+        if (is_null($targetedProductReference))
+            return  $this->json(['error' => ['msg' => sprintf("Référence avec l'id %d inexistant", $id)]], 404);
+
+        try {
+            $em->remove($targetedProductReference);
+            $em->flush();
+        } catch (\Throwable $th) {
+            // dd($th->getMessage()); //TODO ecrire les erreur en français
+            return $this->json(['error' => ['msg' => 'Une erreur est survenue pendant la suppression dans la base de données']], 500);
+        }
+
+        return $this->json('OK');
+    }
 }

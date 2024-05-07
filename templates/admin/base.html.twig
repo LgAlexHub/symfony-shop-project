@@ -18,58 +18,58 @@
 	<body class="font-sans">
 		<div class="grid grid-cols-10 h-screen">
 			<div class="col-span-1">
-				<div class="min-h-0 w-full h-full flex-1 flex overflow-hidden">
-					<nav aria-label="Sidebar" class="block bg-gray-800 w-full overflow-y-auto">
-						{% if is_granted('IS_AUTHENTICATED_FULLY') %}
-							<p class="block mb-2 md:text-center text-sm px-2 mt-4 rounded text-white [&>span]:underline [&>span]:font-bold">
+				<div class="flex h-full flex-col flex-shrink-0 p-3 bg-gray-900 text-white">		
+					<a href="{{path('home')}}" class="flex text-xl hover:bg-[#593444] text-center bg-[#804C62] rounded py-1">
+						<h1 class="mx-3">Gout'mé cha</h1>
+						<img src="/icon.png" alt="">
+					</a>
+					{% if is_granted('IS_AUTHENTICATED_FULLY') %}
+							<p class="mb-2 md:text-center text-sm mt-4 rounded text-white [&>span]:underline [&>span]:font-bold">
 								Connecté.e :
 								<span>{{app.user.pseudonyme}}</span>
 							</p>
-							<hr class="mx-12 my-1">
-							<p class="block mb-2 text-center text-sm  rounded text-white [&>span]:underline [&>span]:font-bold">
-								{{app.user.email}}
-							</p>
-							<hr>
-							<a href="{{path('logout')}}" class="w-full block text-center text-white hover:bg-gray-700">
+								<a href="{{path('logout')}}" class="w-full text-center text-white hover:bg-gray-700">
 								Déconnexion
 							</a>
-							<hr>
-						{% endif %}
-						<div class="relative flex flex-shrink-0 space-y-2 flex-col p-3">
-							<a href="{{path('admin.products.index')}}" class="text-gray-400 text-center hover:text-red-700">
-								<i class="fa fa-shopping-cart"></i>
-								Produits
-							</a>
-							<a href="{{path('admin.products.add')}}" class="mx-5 border rounded-full text-center text-sm px-1 py-1 hover:border-transparent hover:bg-lime-800 border-lime-200 bg-lime-400 text-white">
-								<i class="fa fa-plus"></i>
-								Ajouter
-							</a>
-							<hr>
-							<a href="{{path('admin.categories.index')}}" class="text-gray-400 text-center hover:text-red-700">
-								<i class="fa-solid fa-list"></i>
-								Catégories
-							</a>
-							<a href="{{path('admin.categories.add')}}" class="mx-5 border rounded-full text-center text-sm px-1 py-1 hover:border-transparent hover:bg-lime-800 border-lime-200 bg-lime-400 text-white">
-								<i class="fa fa-plus"></i>
-								Ajouter
-							</a>
-							<hr>
-							<a href="{{path('admin.orders.index')}}" class="text-gray-400 text-center hover:text-red-700">
-								<i class="fa-solid fa-box"></i>
+							<hr class="my-5">
+					{% endif %}
+					<ul class="flex flex-col space-y-2">
+						<li>
+							<a href="{{path('admin.orders.index')}}" class="flex items-center px-4 py-2 text-white hover:bg-gray-800 rounded-md {{app.request.attributes.get('_route') == 'admin.orders.index' ? 'bg-gray-800' : ''}}">
+								<i class="fa-solid fa-truck-fast mr-2"></i>
 								Commandes
 							</a>
-							<hr>
-							<a href="{{path('home')}}" class="text-gray-400 text-center hover:text-red-700">
-								<i class="fa fa-info"></i>
-								Affichage client
+						</li>
+						<li>
+							<a href="{{path('admin.products.index')}}" class="flex items-center px-4 py-2 text-white hover:bg-gray-800 rounded-md {{app.request.attributes.get('_route') == 'admin.products.index' ? 'bg-gray-800' : ''}}">
+								<i class="fa fa-shopping-cart mr-2"></i>
+								Produits
 							</a>
-						</div>
-					</nav>
+						</li>
+						<li class="ml-3">
+							<a href="{{path('admin.products.add')}}" class="flex items-center text-sm px-2 py-1 text-white hover:bg-gray-800 rounded-md">
+								<i class="fa fa-plus mr-2"></i>
+								Ajouter un produit
+							</a>
+						</li>
+						<li>
+							<a href="{{path('admin.categories.index')}}" class="flex items-center px-4 py-2 text-white hover:bg-gray-800 rounded-md {{app.request.attributes.get('_route') == 'admin.categories.index' ? 'bg-gray-800' : ''}}">
+								<i class="fa fa-list mr-2"></i>
+								Catégories
+							</a>
+						</li>
+						<li class="ml-3">
+							<a href="{{path('admin.categories.add')}}" class="flex items-center text-sm text-sm px-2 py-1 text-white hover:bg-gray-800 rounded-md">
+								<i class="fa fa-plus mr-2"></i>
+								Ajouter une catégorie
+							</a>
+						</li>
+					</ul>
 				</div>
 			</div>
 			<div class="col-span-9">
 				<div class="w-full px-3">
-					<div  {{ vue_component('admin/todolist') }}></div>
+					<div {{ vue_component('admin/todolist') }}></div>
 					{% block body %}{% endblock %}
 				</div>
 			</div>

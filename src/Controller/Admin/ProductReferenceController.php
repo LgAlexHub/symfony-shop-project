@@ -92,7 +92,7 @@ class ProductReferenceController extends AbstractController
      */
     public function edit(Request $request, EntityManagerInterface $manager, string $refSlug)
     {
-        $ref = $manager->getRepository(ProductReference::class)->findBySlug($refSlug)[0];
+        $ref = $manager->getRepository(ProductReference::class)->findBySlug($refSlug);
         $this->checkEntityExistence($ref, "slug", $refSlug);
         $productRefForm = $this->createForm(ProductReferenceType::class, $ref);
         if ($this->handleAndCheckForm($request, $productRefForm)) {
