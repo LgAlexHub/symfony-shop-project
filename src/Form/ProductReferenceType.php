@@ -49,7 +49,7 @@ class ProductReferenceType extends AbstractType
                     new NotBlank()
                 ]
             ])
-            ->add('imageFile', VichImageType::class)
+            // ->add('imageFile', VichImageType::class)
             ->add('submit', Type\SubmitType::class, [
                 'label' => 'Ajouter'
             ])

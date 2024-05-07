@@ -4,12 +4,13 @@ namespace App\Controller;
 
 use App\Entity\Product;
 use App\Entity\ProductCategory;
+use App\Service\EnhancedEntityJsonSerializer;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
-
+use Symfony\Component\Serializer\Normalizer\AbstractNormalizer;
 
 /**
  * @author Aléki <alexlegras@hotmail.com>
@@ -42,21 +43,12 @@ class HomeController extends AbstractController
      * Render view with all product from DB
      *
      * @param EntityManagerInterface $manager
-     * @return void
+     * @return Response
      */
     #[Route('/nos-produits', name:'home.products')]
-    public function products(Request $request, EntityManagerInterface $manager){
-        $page = $request->get('page') ?? 1;
-        $category = $request->get('categorie') !== null ? urldecode($request->get('categorie')) :  null;
-        $paginatedProduct = $manager->getRepository(Product::class)->productOrderByNamePaginate($page, category : $category);
-        $productCategories = $manager->getRepository(ProductCategory::class)->findCategoryWithProduct();
-        return $this->render('home/products.html.twig', [
-            'selectedCategory' => $category,
-            'categories' => $productCategories,
-            'totalPage' => $paginatedProduct->maxPage,
-            'page' => $paginatedProduct->page,
-            'products' => $paginatedProduct->productPaginator
-        ]);
+    public function products(Request $request, EntityManagerInterface $manager, EnhancedEntityJsonSerializer $enhancedEntityJsonSerializer) : Response{
+        
+        return $this->render('home/products.html.twig');
         // dd($product, ($page - 1) * $perPage);    
     }
 
