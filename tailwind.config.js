@@ -16,6 +16,11 @@ module.exports = {
       },
     },
   },
+  safelist: [
+    {
+      pattern: /bg-purple-+/, 
+    },
+  ],
   plugins: [],
 }
 
