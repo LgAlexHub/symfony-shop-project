@@ -33,11 +33,8 @@
                     <i class="fas fa-hourglass-start mr-2 text-gray-400"></i>
                     Faire une refonte complète du système de prise de commande [côté client] :
                     <ul class="[&>*]:ml-10 list-disc">
-                        <li class="text-gray-500">Composant Vue dynamique.</li>
                         <li class="text-gray-500">Page responsive.</li>
                         <li class="text-gray-500">Beau design.</li>
-                        <li class="text-gray-500">Montrer les étapes pour passer une commande.</li>
-                        <li class="text-gray-500">Implémenter vue-store pour la prise de commande (à voir).</li>
                     </ul>
                 </li>
                 <div class="text-green-600">
