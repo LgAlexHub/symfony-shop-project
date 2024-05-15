@@ -1,0 +1,91 @@
+{% apply inline_css %}
+   {# templates/emails/order_shipped.html.twig #}
+{# templates/emails/order_shipped.html.twig #}
+
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Commande Expédiée</title>
+    <style>
+        .container {
+            margin: 0;
+            padding: 0;
+            font-family: sans-serif;
+            background-color: #f5f5f5; /* Couleur de fond légère */
+            color: #333333; /* Couleur de texte principale */
+        }
+        .content {
+            padding: 20px;
+        }
+        .heading {
+            font-size: 24px;
+            font-weight: bold;
+            margin-bottom: 20px;
+            color: #804C62; /* Couleur principale accentuée */
+        }
+        .paragraph {
+            font-size: 16px;
+            margin-bottom: 20px;
+        }
+        .signature {
+            font-size: 18px;
+            margin-top: 40px; /* Marge supérieure augmentée pour la signature */
+            font-weight: bold;
+            color: #804C62; /* Couleur principale accentuée */
+            text-align: center; /* Centrage de la signature */
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        th, td {
+            padding: 8px;
+            border-bottom: 1px solid #dddddd; /* Ligne de séparation gris clair */
+            text-align: left;
+        }
+        th {
+            background-color: #804C62; /* Couleur principale accentuée */
+            color: #ffffff; /* Texte en blanc */
+        }
+        tr:nth-child(even) {
+            background-color: #f2f2f2; /* Couleur de fond gris clair pour les lignes paires */
+        }
+    </style>
+</head>
+<body class="container">
+    <table role="presentation" cellspacing="0" cellpadding="0" width="100%">
+        <tr>
+            <td class="content">
+                <img src="https://goutmecha.fr/src/img/po.jpg" alt="Logo" width="200" style="display: block; margin: 0 auto;"> <!-- Largeur définie à 200 pixels -->
+                <h1 class="heading">Votre commande a bien été prise en compte</h1>
+                <p class="paragraph">Bonjour {{ order.clientFirstName }} {{ order.clientLastName }},</p>
+                <p class="paragraph">Nous vous informons que votre commande portant le numéro <strong>{{ order.uuid }}</strong>  a été envoyée à la propriétaire de Gout'mé cha.</p>
+                <p class="paragraph">Veuillez noter que la propriétaire se réserve le droit de refuser la commande. Les modalités de paiement seront discutées si la commande est acceptée.</p>
+                <p class="paragraph">Récapitulatif de la commande :</p>
+                <table>
+                    <tr>
+                        <th>Nom de l'article</th>
+                        <th>Quantité</th>
+                        <th>Poids</th>
+                    </tr>
+                    {% for opr in order.items %}
+                    <tr>
+                        <td>{{ opr.item.product.name }}</td>
+                        <td>{{ opr.quantity }}</td>
+                        <td>
+                            {{ opr.item.weight }} {{ opr.item.weightType }}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </table>
+                <p class="paragraph">Si vous avez des questions ou des préoccupations, n'hésitez pas à nous contacter.</p>
+                <p class="signature">Cordialement,<br>Gout'mé cha</p>
+            </td>
+        </tr>
+    </table>
+</body>
+</html>
+
+{% endapply %}

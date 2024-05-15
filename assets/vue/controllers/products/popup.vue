@@ -40,10 +40,7 @@
             </div>
             <div class="h-30 flex flex-col justify-center items-center">
                 <p class="text-lg font-bold mb-2">Total du panier: {{ totalCartPrice.toFixed(2) }} €</p>
-                <form class="my-3" action="" method="POST">
-                    <input type="hidden" name="basketItems" :value="JSON.stringify(basket)">
-                    <button v-if="basket.length > 0" class="bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded focus:outline-none focus:ring-2 focus:ring-green-400" type="submit">Commander</button>
-                </form>
+               
             </div>
 
         </div>

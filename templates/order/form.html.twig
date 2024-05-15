@@ -3,32 +3,31 @@
 {% block title %} - Commander{% endblock %}
 
 {% block body %}
-    <h1 class="text-center text-2xl my-10">Demande commande</h1>
-    <p class="block text-center w-2/4 mb-4 text-slate-500 font-bold">
-        * Champs Requis
-    </p>
-    <div class="flex h-fit justify-center">
-        {{ form_start(form, {attr: {'class' : 'space-y-9 w-2/4'}})}}
-            {# force twig to not generate item input from form because we use a custom one to pass json string into hidden input  #}
+    <div class="my-5">
+        <h1 class="text-center text-2xl my-10 text-[#80504C] font-bold">Demande de commande</h1>
+        <p class="block text-center mb-4 text-slate-500 font-bold">
+            * Champs Requis
+        </p>
+        <div class="lg:w-2/4 w-3/4 mx-auto">
+            {{ form_start(form, {attr: {'class' : 'w-full'}})}}
             {% do form.items.setRendered %}
             {{ form_errors(form)}}
-            {{form_row(form.clientFirstName, {label : '*Prénom :', attr : {'class' : 'w-full border rounded-sm border-slate-700 ml-3 px-2 px-3', 'placeholder' : 'Jonathan...'}})}}
-            {{form_row(form.clientLastName, {label : '*Nom :', attr : {'class' : 'w-full border rounded-sm border-slate-700 ml-3 px-2 px-3', 'placeholder' : 'Françoise...'}})}}
-            {{form_row(form.email, {label : '*Email :', attr : {'class' : 'w-full border rounded-sm border-slate-700 ml-3 px-2 px-3', 'placeholder' : 'jonathan.francoise@gmail.com...'}})}}
-            {{form_row(form.comment, {label : 'Commentaire :', attr : {'class' : 'h-1/4 w-full border rounded-sm border-slate-700 ml-3 px-2 px-3'}})}}
-            <hr>
-            <h1 class="text-2xl text-center">Adresse</h1>
-            {{form_row(form.adressCity, {label : '*Ville :', attr : {'class' : 'h-1/4 w-full border rounded-sm border-slate-700 ml-3 px-2 px-3', 'placeholder' : 'Paris'}})}}
-            {{form_row(form.adressCityCode, {label : '*Code postal :', attr : {'class' : 'w-full border rounded-sm border-slate-700 ml-3 px-2 px-3', 'placeholder' : '75000', 'maxlength' : 5}})}}
-            {{form_row(form.adressStreetInfo, {label : '*Adresse :', attr : {'class' : 'w-full border rounded-sm border-slate-700 ml-3 px-2 px-3', 'placeholder' : '73 rue des paquerettes, immeubles des tulipes, apt 2'}})}}
-
-            {% if  preSelectedOrderItemJson is defined and preSelectedOrderItemJson is not null and preSelectedOrderItemJson is not empty %}
-                <input type="hidden" name="order[items]" value="{{preSelectedOrderItemJson}}">
-            {% endif %}
-            <div class="flex justify-center">
-                {{ form_widget(form.submit, {label : 'Choisir ses produits', attr : {'class' : 'w-1/2  border border-blue-400 rounded-md bg-sky-400 px-2 py-1 text-white hover:bg-blue-800 hover:border-transparent'}})}}
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-12">
+                {{form_row(form.clientFirstName, {label_attr : {'class': 'text-[#80504C] font-semibold'}, label : '*Prénom :', attr : {'class' : 'w-full border rounded-xl border-grey-200 px-3 py-2 placeholder-slate-500', 'placeholder' : 'Jonathan'}})}}
+                {{form_row(form.clientLastName, {label_attr : {'class': 'text-[#80504C] font-semibold'}, label : '*Nom :', attr : {'class' : 'w-full border rounded-xl border-grey-200 px-3 py-2 placeholder-slate-500', 'placeholder' : 'Françoise'}})}}
+                {{form_row(form.email, {label_attr : {'class': 'text-[#80504C] font-semibold'}, label : '*Email :', attr : {'class' : 'w-full border rounded-xl border-grey-200 px-3 py-2 placeholder-slate-500', 'placeholder' : 'jonathan.francoise@gmail.com'}})}}
+                {{form_row(form.comment, {label_attr : {'class': 'text-[#80504C] font-semibold'}, label : 'Commentaire :', attr : {'class' : 'w-full border rounded-xl border-grey-200 px-3 py-2 placeholder-slate-500', 'placeholder' : 'Votre commentaire...'}})}}
+                {{form_row(form.adressCity, {label_attr : {'class': 'text-[#80504C] font-semibold'}, label : '*Ville :', attr : {'class' : 'w-full border rounded-xl border-grey-200 px-3 py-2 placeholder-slate-500', 'placeholder' : 'Paris'}})}}
+                {{form_row(form.adressCityCode, {label_attr : {'class': 'text-[#80504C] font-semibold'}, label : '*Code postal :', attr : {'class' : 'w-full border rounded-xl border-grey-200 px-3 py-2 placeholder-slate-500', 'placeholder' : '75000', 'maxlength' : 5}})}}
+                {{form_row(form.adressStreetInfo, {label_attr : {'class': 'text-[#80504C] font-semibold'}, label : '*Adresse :', attr : {'class' : 'w-full border rounded-xl border-grey-200 px-3 py-2 placeholder-slate-500', 'placeholder' : '73 rue des paquerettes, immeubles des tulipes, apt 2'}})}}
             </div>
-            {# <div {{ vue_component('products/formOrderProduct', { 'linkItem': productRefJson }) }}></div>    #}
-        {{ form_end(form)}}
+            <div class="flex justify-center my-6">
+                {% if  basketItems is defined and basketItems is not null and basketItems is not empty %}
+                    <input type="hidden" name="basket" value="{{basketItems}}">
+                {% endif %}
+                {{ form_widget(form.submit, {label : 'Envoyer une demande de commande', attr : {'class' : 'w-full border border-[#4C7C80] rounded-md bg-[#4C7C80] px-4 py-2 text-white hover:bg-lime-800 hover:border-transparent'}})}}
+            </div>
+            {{ form_end(form)}}
+        </div>
     </div>
 {% endblock %}

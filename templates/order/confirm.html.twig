@@ -1,0 +1,15 @@
+{% extends 'base.html.twig' %}
+
+{% block title %} - Confirmation de la commande{% endblock %}
+
+{% block body %}
+    <div class="my-5 flex justify-center">
+        <div class="bg-[#4C7C80] text-white rounded-md p-8 w-3/5">
+            <p class="text-lg mb-6">Votre commande a été enregistrée avec succès !</p>
+            <p class="text-lg mb-6">Un email de récapitulatif a été envoyé à <strong>{{ order.getEmail() }}</strong>.</p>
+            <p class="text-lg mb-6">Votre numéro de commande est : <strong>{{ order.getUuid() }}</strong>.</p>
+            <p class="text-lg mb-6">Nous vous remercions pour votre commande.</p>
+            <a class="text-center text-sky-200 hover:underline" href="/"> <i class="fa-solid fa-arrow-left mr-3"></i>Retour à la page d'accueil</a>
+        </div>
+    </div>
+{% endblock %}
