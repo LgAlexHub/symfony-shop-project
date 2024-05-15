@@ -54,7 +54,7 @@
                 </template>
             </tr>
         </thead>
-        <tbody class="divide-y divide-gray-200">
+        <tbody class="divide-y divide-gray-200" v-if="!isLoading">
             <template v-for="(order, index) in orders" :key="order.serializeUuid">
                 <tr :class="{ '[&>*]:py-2': true, 'bg-gray-100' : index % 2 == 0 }">
                     <td>
@@ -90,6 +90,7 @@
                 </tr>
             </template>
         </tbody>
+        <loadingSpinner v-else></loadingSpinner>
     </table>
     <div v-show="show" :style="tooltipStyle" class="absolute bg-gray-800 text-white text-sm rounded px-2 py-1 whitespace-nowrap">
       Mail envoyé le : {{ currentTooltip }}
@@ -99,6 +100,7 @@
 <script>
 import axios from 'axios';
 import popup from "./popup.vue";
+import Spinner from "../../components/Spinner.vue";
 
 export default {
     props : {
@@ -108,13 +110,15 @@ export default {
         }
     },
     components : {
-        'popup' : popup
+        'popup' : popup,
+        'loadingSpinner' : Spinner
     },
     data(){
         return {
             page : 1,
             maxPage : null,
             resultCount : null,
+            isLoading : false,
             columns : {
                 clientLastName : {
                     label : 'Nom client',
@@ -210,6 +214,7 @@ export default {
 
         },
         fetchPaginatedOrder(){
+            this.isLoading = true;
             let paramString = "?page="+this.page;
 
             if (this.queryInput !== ""){
@@ -229,7 +234,8 @@ export default {
                 this.page = res.data.page;
                 this.maxPage = res.data.totalPage;
                 this.resultCount = res.data.nbResult;
-                this.orders = res.data.orders
+                this.orders = res.data.orders;
+                this.isLoading = false;
             });
         },
         showTooltip(event, date) {

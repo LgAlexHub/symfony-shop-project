@@ -44,7 +44,7 @@
             </li>
         </ul>
     </nav>
-    <table class="table-auto divide-y divide-gray-200 w-full">
+    <table class="table-auto w-full">
         <thead class="">
             <tr class="[&>*]:text-center [&>*]:font-semibold text-gray-700 bg-blue-100 [&>*]:py-4">
                 <template v-for="(column, index) in columnsKeys">
@@ -63,7 +63,7 @@
                 </template>
             </tr>
         </thead>
-        <tbody class="divide-y divide-gray-200">
+        <tbody class="divide-y divide-gray-200" v-if="!isLoading">
             <template v-for="(product, index) in products" :key="product.id">
                 <tr :class="{ '[&>*]:py-2': true, 'bg-gray-100' : index % 2 == 0 }">
                     <td>
@@ -93,12 +93,14 @@
                 </tr>
             </template>
         </tbody>
+        <loadingSpinner v-else></loadingSpinner>
     </table>
 </template>
 
 <script>
 import axios from 'axios';
 import popup from "./popup.vue";
+import Spinner from "../../components/Spinner.vue";
 
 export default {
     props : {
@@ -112,13 +114,15 @@ export default {
         }
     },
     components : {
-        'popup' : popup
+        'popup' : popup,
+        'loadingSpinner' : Spinner
     },
     data(){
         return {
             page : 1,
             maxPage : null,
             resultCount : null,
+            isLoading : false,
             columns : {
                 name : {
                     label : 'Nom du produit',
@@ -204,6 +208,7 @@ export default {
 
         },
         fetchPaginatedProduct(){
+            this.isLoading = true;
             let paramString = "?page="+this.page;
 
             if (this.queryInput !== ""){
@@ -227,7 +232,8 @@ export default {
                 this.page = res.data.page;
                 this.maxPage = res.data.totalPage;
                 this.resultCount = res.data.nbResult;
-                this.products = res.data.products
+                this.products = res.data.products;
+                this.isLoading = false;
             });
         },
         handleProductReferenceDelete(payload){
