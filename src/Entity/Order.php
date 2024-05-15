@@ -66,6 +66,8 @@ class Order
 
     public function __construct()
     {
+        $this->isDone = false;
+        $this->uuid = Uuid::v4();
         $this->items = new ArrayCollection();
     }
 
