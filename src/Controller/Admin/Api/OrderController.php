@@ -11,8 +11,6 @@ use App\Controller\Admin\Api\ApiAdminController;
 
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bridge\Twig\Mime\TemplatedEmail;
-use Symfony\Component\Mime\Email;
-use Symfony\Component\Mailer\MailerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
@@ -190,6 +188,7 @@ class OrderController extends ApiAdminController
 
         if ($targetedOrder->getIsDone() && is_null($targetedOrder->getMailedAt())){
             $email = (new TemplatedEmail());
+            //TODO : changé le template
             $email->to($targetedOrder->getEmail())
                 ->subject("Gout'mé cha - Votre commande est expédiée")
                 ->htmlTemplate('emails/orderShipped.html.twig')
@@ -199,8 +198,7 @@ class OrderController extends ApiAdminController
             try{
                 $mailer->send($email);
             }catch(TransportExceptionInterface $e){
-                var_dump($e);
-                die;
+                die($e);
             }
             $targetedOrder->setMailedAt(new \DateTimeImmutable());
             $em->persist($targetedOrder);
