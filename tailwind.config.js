@@ -20,6 +20,9 @@ module.exports = {
     {
       pattern: /bg-purple-+/, 
     },
+    {
+      pattern: /from-purple-+/, 
+    },
   ],
   plugins: [],
 }
