@@ -9,6 +9,13 @@ use Symfony\Component\HttpFoundation\Response;
 
 abstract class ApiAdminController extends AbstractController{
 
+    /**
+     * This method check if our user have the bearer token to gain access to api
+     *
+     * @param Request $request
+     * @param SessionTokenManager $sessionTokenManager
+     * @return void
+     */
     protected function checkBearerToken(Request $request, SessionTokenManager $sessionTokenManager){
         //Check if bearer token is in request header
         $bearerToken = $request->headers->get('authorization');
@@ -23,6 +30,13 @@ abstract class ApiAdminController extends AbstractController{
         return null;
     }
 
+    /**
+     * Not necessary but save some time 
+     *
+     * @param string $json
+     * @param integer $status
+     * @return Response
+     */
     protected function apiJson(string $json, int $status=200) : Response {
         return new Response($json, status: $status, headers: [
             'Content-Type' => 'application/json'

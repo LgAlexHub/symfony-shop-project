@@ -78,6 +78,8 @@ class ProductController extends AbstractController
      * Attempts to delete a product by its slug.
      *
      * Note:
+     * - Do not work because product are bind to ref that are bind to orders
+     * - Need to create soft delete
      * - Redirects to the "admin.products.home" route if the deletion is successful.
      * - TODO: Add a 404 exception if the slug is not found.
      *
@@ -97,38 +99,5 @@ class ProductController extends AbstractController
         $manager->remove($product);
         $manager->flush();
         return $this->redirectToRoute("admin.products.index");
-    }
-
-    #[Route('/{slug}/edit', name : 'edit')]
-    /**
-     * Displays and processes the edit form for a specified product.
-     *
-     * This route retrieves and renders the edit form for a specific product identified by its slug.
-     *
-     * @param Request                $request
-     * @param string                 $slug               The slug of the targeted product.
-     * @param EntityManagerInterface $entityManager   The entity manager used to retrieve and persist data.
-     *
-     * @return Response Either the rendered form view or a redirection.
-     *
-     * @throws NotFoundHttpException If the targeted product is not found.
-     */
-    public function edit(Request $request, string $slug, EntityManagerInterface $entityManager) : Response {
-        $product = $entityManager->getRepository(Product::class)->findOneBy(["slug" => $slug]);
-        $this->checkEntityExistence($product,"slug" ,$slug);
-        $productForm = $this->createForm(ProductType::class, $product);
-        if ($this->handleAndCheckForm($request, $productForm)){
-            $updatedProduct = $productForm->getData();
-            $product
-                ->setDescription($updatedProduct->getDescription())
-                ->setName($updatedProduct->getName())
-                ->setCategory($updatedProduct->getCategory());
-            $entityManager->persist($product);
-            $entityManager->flush();
-            return $this->redirectToRoute(self::$homeRoute);
-        }
-        return $this->renderWithNavigation($product, self::$templatePath.'/form.html.twig', [
-            'form' => $productForm
-        ]);
     }
 }

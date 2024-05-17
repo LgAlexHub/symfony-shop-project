@@ -2,17 +2,16 @@
 
 namespace App\Controller\Admin\Api;
 
-use App\Controller\Admin\Api\ApiAdminController;
 use App\Entity\Product;
-use App\Entity\ProductCategory;
 use App\Form\ProductType;
 use App\Repository\ProductRepository;
-use App\Service\EnhancedEntityJsonSerializer;
 use App\Service\SessionTokenManager;
+use App\Service\EnhancedEntityJsonSerializer;
+use App\Controller\Admin\Api\ApiAdminController;
+
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Serializer\Normalizer\AbstractNormalizer;
 
@@ -115,7 +114,6 @@ class ProductController extends ApiAdminController
                 ]);
             return $this->apiJson($enhancedEntityJsonSerializer->serialize());
         }
-        // dd($productForm->getErrors(true));
         //TODO : ajouter un vrai feeback
         return  $this->json(['error' => ['msg' => 'Formulaire invalide !']], 422);
     }

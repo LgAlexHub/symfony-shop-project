@@ -10,13 +10,10 @@ use App\Service\EnhancedEntityJsonSerializer;
 use App\Controller\Admin\Api\ApiAdminController;
 
 use Doctrine\ORM\EntityManagerInterface;
-use Symfony\Bridge\Twig\Mime\TemplatedEmail;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Serializer\Normalizer\AbstractNormalizer;
-use Symfony\Component\Mailer\Exception\TransportExceptionInterface;
-use Symfony\Component\Mailer\Transport\TransportInterface;
 
 #[Route('/api/admin/commandes', 'api.admin.orders.')]
 /**
@@ -47,8 +44,9 @@ class OrderController extends ApiAdminController
     public function listOrdersWithPaginationAndFilters(Request $request, SessionTokenManager $sessionTokenManager, EnhancedEntityJsonSerializer $enhancedEntityJsonSerializer, OrderRepository $orderManager){
         $this->checkBearerToken($request, $sessionTokenManager);
 
-        //Remove orderBy prefix from url parameters
+
         $urlParams = $request->query->all();
+        //Create orderBy array without preffix
         $ordersBy = array_reduce(array_keys($urlParams) , function ($carry, $urlParamName) use ($urlParams){
             if (strpos($urlParamName, "orderBy") === 0) {
                 $carry[substr($urlParamName, strlen("orderBy"))] = $urlParams[$urlParamName];
@@ -111,7 +109,12 @@ class OrderController extends ApiAdminController
      * @return Response
      */
     public function updateIsDone(Request $request, SessionTokenManager $sessionTokenManager, int $id, EntityManagerInterface $em) : Response {
-        $this->checkBearerToken($request, $sessionTokenManager);
+        $auth = $this->checkBearerToken($request, $sessionTokenManager);
+        // Retrun json api error 401 if auth not valid
+        if(!is_null($auth)){
+            return $auth;
+        }
+
         if (is_null($id))
             return $this->json(['error' => ['msg' => sprintf("Id manquant dans l'url")]], 422);
 
@@ -139,9 +142,14 @@ class OrderController extends ApiAdminController
      * @return Response
      */
     public function getOrderProduct(Request $request, SessionTokenManager $sessionTokenManager, int $id, EntityManagerInterface $em, EnhancedEntityJsonSerializer $enhancedEntityJsonSerializer) : Response {
-        $this->checkBearerToken($request, $sessionTokenManager);
+        $auth = $this->checkBearerToken($request, $sessionTokenManager);
+        // Retrun json api error 401 if auth not valid
+        if(!is_null($auth)){
+            return $auth;
+        }
+
         if (is_null($id))
-        return $this->json(['error' => ['msg' => sprintf("Id manquant dans l'url")]], 422);
+            return $this->json(['error' => ['msg' => sprintf("Id manquant dans l'url")]], 422);
 
         $targetedOrder = $em->getRepository(Order::class)->findOneBy(['id' => $id]);
 

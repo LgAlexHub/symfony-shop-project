@@ -2,48 +2,21 @@
 
 namespace App\Controller\Api;
 
-use App\Entity\ProductCategory;
-use App\Repository\ProductCategoryRepository;
-use App\Repository\ProductReferenceRepository;
 use App\Repository\ProductRepository;
 use App\Service\EnhancedEntityJsonSerializer;
-use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use App\Repository\ProductCategoryRepository;
+use App\Repository\ProductReferenceRepository;
+
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Serializer\Normalizer\AbstractNormalizer;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
 #[Route('api/produits', 'api.products.')]
 class ProductController extends AbstractController
 {
-    #[Route('/recherche', name: 'query')]
-    /**
-     * API Endpoint: get product refrences by name.
-     *
-     * @param ProductReferenceRepository $productReferenceRepository
-     * @param Request $request
-     * @param EnhancedEnityJsonSerializer $enhancedEnityJsonSerializer
-     * @return Response
-     */
-    public function searchProductReferencesByQuery(ProductReferenceRepository $productReferenceRepository, Request $request, EnhancedEntityJsonSerializer $enhancedEnityJsonSerializer): Response
-    {
-        $queryString = $request->get('nom');
-        if (empty($queryString) || is_null($queryString))
-            return new Response(null, 401, ['Content-Type' => 'application/json']);
-        $productReferences = $productReferenceRepository->refByQueryWithRelated($queryString);
-        $enhancedEnityJsonSerializer
-            ->setObjectToSerialize($productReferences)
-            ->setOptions([AbstractNormalizer::CIRCULAR_REFERENCE_HANDLER => fn (object $orderProductRef, string $format, array $context) => $orderProductRef->getId()])
-            ->setAttributes([
-                'price', 'weight', 'weightType', 'slug', 'imageUrl', 'product' => [
-                    'name', 'description', 'slug'
-                ]
-            ]);
-        return new Response($enhancedEnityJsonSerializer->serialize(), headers: [
-            'Content-Type' => 'application/json'
-        ]);
-    }
-
+  
     #[Route('/', name: 'list')]
     /**
      * This method will render a paginate and filter list of product in json format.
@@ -90,6 +63,13 @@ class ProductController extends AbstractController
     }
 
     #[Route('/categories', name: 'categories.list')]
+    /**
+     * Will retreive every category with active product and render it into json response
+     *
+     * @param EnhancedEntityJsonSerializer $enhancedEntityJsonSerializer
+     * @param ProductCategoryRepository $manager
+     * @return void
+     */
     public function categoriesList(EnhancedEntityJsonSerializer $enhancedEntityJsonSerializer, ProductCategoryRepository $manager){
         $enhancedEntityJsonSerializer
             ->setObjectToSerialize($manager->findCategoryWithProduct())

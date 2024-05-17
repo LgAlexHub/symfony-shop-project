@@ -2,13 +2,13 @@
 
 namespace App\Controller\Admin\Api;
 
-use App\Controller\Trait\ControllerToolsTrait;
 use App\Entity\ProductReference;
 use App\Form\ProductReferenceType;
-use App\Service\EnhancedEntityJsonSerializer;
 use App\Service\SessionTokenManager;
+use App\Service\EnhancedEntityJsonSerializer;
+use App\Controller\Trait\ControllerToolsTrait;
+
 use Doctrine\ORM\EntityManagerInterface;
-use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
@@ -19,6 +19,16 @@ class ProductReferenceController extends ApiAdminController
     use ControllerToolsTrait;
 
     #[Route('/{id}', name: 'edit', methods:['PATCH'])]
+    /**
+     * This method will try to edit a product reference with content of request
+     *
+     * @param Request $request
+     * @param SessionTokenManager $sessionTokenManager
+     * @param EntityManagerInterface $em
+     * @param EnhancedEntityJsonSerializer $enhancedEntityJsonSerializer
+     * @param integer $id
+     * @return Response
+     */
     public function edit(Request $request, SessionTokenManager $sessionTokenManager, EntityManagerInterface $em, EnhancedEntityJsonSerializer $enhancedEntityJsonSerializer, int $id): Response
     {
         $authCheck = $this->checkBearerToken($request, $sessionTokenManager);
@@ -51,7 +61,7 @@ class ProductReferenceController extends ApiAdminController
         if($productReferenceForm->isValid()){
             $editedProductReference = $productReferenceForm->getData();
             $targetedProductReference->setPrice($editedProductReference->getPrice())
-                        ->setWeight($editedProductReference->getWeight())
+                ->setWeight($editedProductReference->getWeight())
                 ->setWeightType($editedProductReference->getWeightType());
             $em->persist($targetedProductReference);
             $em->flush();
@@ -74,6 +84,16 @@ class ProductReferenceController extends ApiAdminController
     }
 
     #[Route('/{id}', name: 'delete', methods:['DELETE'])]
+    /**
+     * This method cannot work currently because every ref are bind to orders 
+     * TODO : Use a soft delete
+     *
+     * @param Request $request
+     * @param SessionTokenManager $sessionTokenManager
+     * @param EntityManagerInterface $em
+     * @param integer $id
+     * @return void
+     */
     public function delete(Request $request, SessionTokenManager $sessionTokenManager, EntityManagerInterface $em, int $id){
         $authCheck = $this->checkBearerToken($request, $sessionTokenManager);
         if(!is_null($authCheck)){

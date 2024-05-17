@@ -71,6 +71,8 @@ class ProductCategoryController extends AbstractController
     /**  
      * Try to delete a  product category in database, will throw exception if it's incorrect
      * and will redirect to product categories home route if it's successfully deleted.
+     * NOTE : Might not work because cat are bind to product that are bind to ref that are bind to orders
+     * TODO : Use soft delete
      * @param EntityManagerInterface $manager
      * @param string $slug
      * @throws createNotFoundException
