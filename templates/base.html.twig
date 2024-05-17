@@ -14,7 +14,7 @@
         {% endblock %}
     </head>
     <body class="font-sans">
-        <nav class="flex items-center justify-between flex-wrap p-6 text-white bg-[#804C62]">
+        <nav class="flex items-center justify-between flex-wrap p-6 text-white bg-[#804C62] shadow-xl">
             <div class="flex items-center lg:w-fit sm:justify-center md:w-full flex-shrink-0 mr-6">
                 <a href="{{path('home')}}">
                     <img src="/logo.png" alt="Icône du site, fraise avec nom du site" width="70" class="mr-2">
@@ -22,7 +22,7 @@
             </div>
             <div class="w-full block flex-grow lg:flex lg:items-center lg:w-auto">
                 <div class="text-sm lg:flex-grow">
-                    <a href="{{path('home.products')}}" class="block lg:w-fit md:w-full md:text-center mt-4 lg:inline-block lg:mt-0 hover:bg-white px-4 py-2 rounded text-white border rounded border-white hover:border-transparent hover:text-[#804C62] mr-4">
+                    <a href="{{path('home.products')}}" class="block lg:w-fit md:w-full md:text-center md:text-xl hover:underline mt-4 lg:inline-block lg:mt-0  px-4 py-2 rounded text-white mr-4">
                         Nos produits
                     </a>
                      {% if is_granted('IS_AUTHENTICATED_FULLY') %}

@@ -1,77 +1,162 @@
 {% extends 'base.html.twig' %}
 
-{% block title %} - Accueil{% endblock %}
+{% block title %}
+	- Accueil
+{% endblock %}
 
 {% block body %}
-    <div class="lg:h-full sm:mb-10">
-        <div class="bg-hero bg-no-repeat flex items-center justify-center bg-right-bottom bg-cover py-10">
-            <h1 class="text-6xl text-center font-extralight text-white">Bienvenue sur {{app_name}}</h1>
-        </div>
-        <div class="lg:container sm:px-3 sm:h-3/4">
-            {% if products|length == 3 %}
-                <h1 class="text-center text-4xl font-semibold my-5 text-[#804C62]">Nos produits phare :</h1>
-                <div class="flex items-center justify-center mt-3">
-                    <div class="grid grid-cols-3 gap-4 place-items-center">
-                        {% for product in products %}
-                            <div class="rounded sm:my-3 relative lg:w-80 sm:w-60">
-                                <img src="{{product.productReferences[0].getImageUrl}}" class="z-1 rounded" alt="">
-                                <div class="absolute bg-red-100 bottom-0 z-3 lg:w-80 sm:w-60 rounded-t-lg rounded-b">
-                                    <p class="text-center my-1 font-sans font-semibold text-slate-600">{{product.name}}</p>
-                                    <div class="flex justify-center [&>*]:mx-1">
-                                        {% for ref in product.productReferences %}
-                                            <span class="rounded-xl bg-red-300 text-white font-semibold px-1 py-1 text-sm">
-                                                {{ref.weight}} {{ref.weightType}}
-                                            </span>
-                                        {% endfor %}
-                                    </div>
-                                    <a href="{{product.viewPageUrl}}" class="block text-center bg-red-200 rounded w-full z-3 mt-5 hover:bg-red-600 hover:text-white hover:font-bold">
-                                        Voir produit
-                                    </a>
-                                </div>
-                            </div>
-                        {% endfor %}
-                    </div>
-                </div>
-            {% endif %}
-        </div>
-        <hr>
-        <div class="container sm:h-full">
-            <h1 class="text-center text-4xl font-semibold my-5 text-[#804C62]">Qui suis-je ?</h1>
-            <div class="lg:columns-2 sm:columns-1 gap-4 lg:flex my-5 mb-3 h-1/2">
-                <img src="/jelly_5184x3456.jpeg" alt="Photo de confiture en préparation" class="rounded lg:w-1/2 sm:w-full">
-                <div class="self-stretch grid grid-rows-4 place-content-between gap-4">
-                    <div>
-                        <h4 class="text-orange-900 font-medium">Comment sont faites mes confitures ?</h4>
-                        <p class="text-md text-orange-700 font-semibold">
-                            <i class="fa-solid fa-apple-whole fa-lg mr-3 text-red-600"></i>
-                            Ces confitures maisons sont faites avec des fruits de saison. Je porte une attention particulière à la sélection des fruits pour vous offrir une confiture de qualité.
-                        </p>
-                    </div>
-                    <div>
-                        <h4 class="text-orange-900 font-medium">
-                            Que fait-on des pots après avoir vider le pot ?
-                        </h4>
-                        <p class="text-md text-orange-700 font-semibold">
-                            <i class="fa-solid fa-earth-europe fa-lg mr-3 text-lime-400"></i>
-                            Pour préserver l'environnement, je consigne mes pots pour éviter les déchets et gaspiller les pots en verre en vous permettant de me les rapporter.
-                        </p>
-                    </div>
-                    <div>
-                        <h4 class="text-orange-900 font-medium">
-                        Comment je suis arrivée ici ?
-                        </h4>
-                        <p class="text-md text-orange-700 font-semibold">
-                            <i class="fa-regular fa-heart mr-3 text-amber-600"></i>
-                            J'ai toujours aimé la cuisine, c'est pourquoi j'ai décidé de lancer mon activité professionelle en vendant mes confitures, gelées et autres produits que vous pouvez découvrir ici.
-                        </p>
-                    </div>
-                    <div class="flex items-center justify-center">
-                        <a href="{{path('home.products')}}" class="text-center border rounded-md px-3 py-2 bg-[#804C62] text-white hover:bg-white hover:border-[#804C62] hover:border-2 hover:text-[#804C62]" href="route produit">
-                            Découvrir les produits !
-                        </a> 
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
+	<div class="sm:mb-10">
+		<div class="bg-hero bg-no-repeat bg-right-bottom bg-cover flex items-center justify-center py-10 shadow-md">
+			<h1 class="text-6xl text-center font-extralight text-white">Bienvenue sur{{app_name}}</h1>
+		</div>
+		<div class="mt-5 h-fit">
+			<h2 class="text-4xl text-[#4C7C80] text-center my-10">Comment acheter de bonnes confitures ?</h2>
+			<div class="grid grid-cols-3 lg:grid-cols-5 lg:gap-10 gap-4 sm:px-5">
+				<div class="lg:col-start-2 rounded border-2 border-orange-900 bg-[#80504C]/5 px-4 py-2 break-words">
+					<h4 class="sm:h-20 sm:text-center ml-3 text-orange-900 text-2xl">
+						<span class="text-[#804C62] text-2xl mr-2">1.</span>Choisissez vos produits
+					</h4>
+					<div class="h-64">
+						<p class="px-1 text-[#4C7C80] mt-2 text-lg font-medium leading-relaxed">
+							Vous pouvez choisir vos produits et faire une demande de commande ici:
+						</p>
+						<div class="text-center mt-4">
+							<a href="{{path('home.products')}}" class="border rounded-md px-3 py-2 bg-[#804C62] text-white hover:bg-white hover:border-[#804C62] hover:border-2 hover:text-[#804C62]" href="route produit">
+								Découvrir les produits !
+							</a>
+						</div>
+					</div>
+					<img src="/click-demo.png" alt="">
+				</div>
+				<div class="rounded border-2 border-orange-900 bg-[#80504C]/10 px-4 py-2">
+					<h4 class="sm:h-20 sm:text-center ml-3 text-orange-900 text-2xl">
+						<span class="text-[#804C62] text-2xl mr-2">2.</span>On se retrouve
+					</h4>
+					<div class="h-64">
+						<p class="px-1 text-[#4C7C80] mt-2 text-lg font-medium leading-relaxed">
+							Après avoir passé votre commande nous fixons un point de rendez-vous où vous pouvez venir la récupérer.
+														Ou alors passer par d'autres intermédiaires en fonction de la distance et ainsi éviter trop de frais pour tout le monde.
+						</p>
+					</div>
+					<img src="/handshake-demo.png" alt="">
+				</div>
+				<div class="rounded border-2 border-orange-900 bg-[#80504C]/20 px-4 py-2">
+					<h4 class="sm:h-20 sm:text-center ml-3 text-orange-900 text-2xl">
+						<span class="text-[#804C62] text-2xl mr-2">3.</span>On se régale
+					</h4>
+					<div class="h-64">
+						<p class="px-1 text-[#4C7C80] mt-2 text-lg font-medium leading-relaxed">
+							Bonne dégustation, n'hésiter pas à me faire des retours !
+						</p>
+					</div>
+					<img src="/smiley-demo.png" alt="">
+				</div>
+			</div>
+		</div>
+		<hr class="my-5 mx-20">
+		<h2 class="text-4xl text-[#4C7C80] text-center my-10">Nos valeurs</h2>
+		<div class="px-10 leading-relaxed">
+			<h3 class="text-3xl text-[#804C62] my-3">
+				⦿ On suit les saisons !</h3>
+			<p class="px-10 sm:text-xl">
+				Toutes les confitures et gelées sont faites avec des fruits de saisons. Fraises, abricots, pêches et prunes l'été. Des pommes, des mûres à la fin de l'été et à l'arrivée de l'automne.
+								Des agrumes et de l'ananas l'hiver puisque ceux-ci viennent des pays chauds à cette période de l'année. Même chose pour les compotes et les jus de pommes qui arrivent en automne-hiver.
+								 L'avantage des confitures et gelées c'est qu'elles peuvent être consommées à n'importe quel moment de l'année et se conserver longtemps (mais ça vaut aussi pour les autres produits que je propose :) ). 
+								Tous les fruits sont selectionnés et choisis à maturité pour le goût. Bien entendu vous pouvez retrouver toute l'année confitures de lait et sauces au caramel.
+			</p>
+		</div>
+		<div class="mt-10 px-6 lg:px-20">
+			<h3 class="text-3xl text-[#804C62] my-5 font-bold text-center">
+				⦿ On fait ça bien !
+			</h3>
+			<div class="grid grid-cols-1 lg:grid-cols-6 gap-6 items-center">
+				<div class="lg:col-span-2 flex justify-center">
+					<img src="/jelly_5184x3456.jpeg" class="rounded-lg shadow-lg max-w-full h-auto" alt="Photo de confiture en préparation">
+				</div>
+				<div class="lg:col-span-4 text-justify">
+					<p class="text-lg lg:text-xl leading-relaxed text-gray-700">
+						Les confitures sont faites dans des bassines en cuivre, tout est fait à la main pour la meilleure qualité possible. Rien n'est ajouté dans aucun des produits, ni colorant ni gélifiant. 
+						Ce serait dommage de modifier le goût des fruits. De même pour la confiture de lait, qui est très belle comme elle est.
+						Je réalise mes produits dans le respect de la tradition familiale et sans conservateurs.
+					</p>
+				</div>
+			</div>
+		</div>	
+		<div class="mt-10 px-10">
+			<h3 class="text-3xl text-[#804C62] my-3">
+				⦿ On pense au tri !</h3>
+			<p class="px-10 sm:text-xl">
+				Pour préserver l'environnement tous les pots, les bocaux et les bouteilles ne sont plus consignés mais vous avez toujours la possibilité de me les ramener. 
+								De cette manière on limite la production de verre. De plus je propose des sacs à 20 centimes pour vous faciliter la tâche. Il vous suffit de me le préciser. 
+								L'idéal serait d'amener votre propre sac afin de limiter les déchets. Vous avez tous les moyens pour me contacter dans l'onglet "contact".
+			</p>
+		</div>
+		<hr class="my-10 mx-10">
+		<h2 class="text-4xl text-[#4C7C80] text-center my-10">Suivez-nous</h2>
+		<div class="mt-10 px-10">
+			<p class="px-10 sm:text-xl">
+				Retrouvez-moi sur les réseaux sociaux. Vous pouvez suivre l'actualité que je poste sur ma page facebook et sur mon compte instagram. Différents évènements pourront apparaître (portes ouvertes etc...).
+								Je vous informerai des nouveautés.
+			</p>
+			<div class="flex justify-center my-5">
+				<a href="https://www.facebook.com/Gout-m%C3%A9-cha-104158378103823">
+					<img src="/facebook-logo.png" class="w-10 sm:w-20 mr-4 sm:mr-8" alt="">
+				</a>
+				<a href="https://www.instagram.com/goutmecha/">
+					<img src="/insta-logo.png" class="w-10 sm:w-20" alt="">
+				</a>
+			</div>
+		</div>
+		{# <div class="mt-5">
+									<div class="grid lg:grid-cols-4 md:gap-4 grid-cols-2 my-5 py-4 px-4 mx-2 rounded-2xl">
+										<div class="bg-white rounded px-10 sm:pt-5">
+											<h4 class="text-orange-900 text-orange-900 font-medium my-3">Comment sont faites mes confitures ?</h4>
+											<p class="text-md text-[#4C7C80] font-semibold">
+												<i class="fa-solid fa-apple-whole fa-lg mr-3 text-red-600"></i>
+												Ces confitures maisons sont faites avec des fruits de saison. Je porte une attention particulière à la sélection des fruits pour vous offrir une confiture de qualité.
+											</p>
+											<h4 class="text-orange-900 font-semibold my-3">
+												Que fait-on des pots après avoir vider le pot ?
+											</h4>
+											<p class="text-md text-[#4C7C80] font-semibold">
+												<i class="fa-solid fa-earth-europe fa-lg mr-3 text-lime-400"></i>
+												Pour préserver l'environnement, je consigne mes pots pour éviter les déchets et gaspiller les pots en verre en vous permettant de me les rapporter.
+											</p>
+										</div>
+										<img src="/jelly_5184x3456.jpeg" alt="Photo de confiture en préparation" class="rounded">
+										<img src="/jars.jpeg" alt="Photo de confiture en préparation" class="rounded h-full object-contain">
+										<div class="bg-white rounded px-10 sm:pt-5">
+											<h4 class="text-orange-900 font-semibold my-3">
+												Comment je suis arrivée ici ?
+											</h4>
+											<p class="text-md text-[#4C7C80] font-semibold mb-10">
+												<i class="fa-regular fa-heart mr-3 text-amber-600"></i>
+												J'ai toujours aimé la cuisine, c'est pourquoi j'ai décidé de lancer mon activité professionelle en vendant mes confitures, gelées et autres produits que vous pouvez découvrir ici.
+											</p>
+											<div class="text-center">
+												<a href="{{path('home.products')}}" class="border rounded-md px-3 py-2 bg-[#804C62] text-white hover:bg-white hover:border-[#804C62] hover:border-2 hover:text-[#804C62]" href="route produit">
+													Découvrir les produits !
+												</a>
+											</div>
+										</div>
+						
+									</div>
+								</div> #}
+		{# <div class="grid lg:grid-cols-2 md:gap-4 sm:grid-cols-1 my-5 py-4 px-4 mx-2 rounded-2xl">
+											<div class="text-center mx-4">
+												<h2 class="font-bold text-xl my-4">Nos catégories</h2>
+												<ul class="columns-3 space-y-2">
+													{% for category in categories %}
+														<li class="border-2 rounded-xl px-2 py-1 hover:bg-gray-100 hover:border-transparent">
+															{{ category.getLabel()}}
+														</li>
+													{% endfor %}
+												</ul>
+											</div>
+											<div>
+												<h2 class="font-bold text-xl my-4 text-center">Nos recommandations</h2>
+								
+											</div>
+										</div> #}
+	</div>
 {% endblock %}
