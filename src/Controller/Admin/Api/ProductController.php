@@ -145,7 +145,7 @@ class ProductController extends ApiAdminController
         if (is_null($targetedProduct))
             return  $this->json(['error' => ['msg' => sprintf("Produit avec l'id %d inexistant", $id)]], 404);
        
-        $targetedProduct->setIsFavorite(!$targetedProduct->getIsFavorite());
+        $targetedProduct->setIsFavorite(!$targetedProduct->getIsdFavorite());
         $em->persist($targetedProduct);
         $em->flush();
         return $this->json("Ok", status: 200);
