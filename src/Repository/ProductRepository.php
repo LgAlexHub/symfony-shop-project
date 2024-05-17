@@ -53,15 +53,20 @@ class ProductRepository extends ServiceEntityRepository
      * @param string $userSearchQuery
      * @return QueryBuilder
      */
-    private function buildProductFilterPaginateQuery(string $userSearchQuery, null|int $category) : QueryBuilder {
+    private function buildProductFilterPaginateQuery(string $userSearchQuery, null|string|int $category) : QueryBuilder {
         $queryBuilder = $this->createQueryBuilder(self::alias)
             ->innerJoin(sprintf("%s.productReferences", self::alias), "productReference")
             ->innerJoin(sprintf("%s.category", self::alias), "productCategory")
             ->addSelect(['productReference', 'productCategory']);
 
         if(!is_null($category)){
-            $queryBuilder->where("productCategory.id = :catId")
-                ->setParameter("catId", $category);
+            if ($category === "favorite"){
+                $queryBuilder->where(sprintf("%s.isFavorite = :favoriteState", self::alias))
+                    ->setParameter("favoriteState", true);
+            }else{
+                $queryBuilder->where("productCategory.id = :catId")
+                    ->setParameter("catId", $category);
+            }
         }
         
         if(!empty($userSearchQuery)){
@@ -79,7 +84,7 @@ class ProductRepository extends ServiceEntityRepository
      * @param string $userSearchQuery
      * @return QueryBuilder
      */
-    private function buildProductCountQuery(string $userSearchQuery, null|int $category) : QueryBuilder {
+    private function buildProductCountQuery(string $userSearchQuery, null|string|int $category) : QueryBuilder {
         $queryBuilder = $this->createQueryBuilder(self::alias)
             ->select(sprintf("COUNT(DISTINCT %s.id)", self::alias))
             ->innerJoin(sprintf("%s.productReferences", self::alias), "productReference");
@@ -146,7 +151,7 @@ class ProductRepository extends ServiceEntityRepository
      * @param [type] $userSearchQuery
      * @return mixed
      */
-    public function paginateFilterProducts(int $page = 1, int $perPage = 12, int|null $category = null, $userSearchQuery = null) : mixed {
+    public function paginateFilterProducts(int $page = 1, int $perPage = 12, int|string|null $category = null, $userSearchQuery = null) : mixed {
         $productCountQueryBuilder = $this->buildProductCountQuery($userSearchQuery, $category);
         $productFilterQueryBuilder = $this->buildProductFilterPaginateQuery($userSearchQuery, $category);
         $productCountAndMaxPage = $this->calculateProductMaxPage($productCountQueryBuilder, $perPage);

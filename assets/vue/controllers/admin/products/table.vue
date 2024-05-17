@@ -18,6 +18,7 @@
     </div>
     <select @input="debouncedProductInputHandler" v-model="selectedCategory" class="block w-full px-4 py-2 my-5 border border-gray-300 rounded-md focus:outline-none focus:border-blue-500">
         <option :value="null">Aucune catégorie</option>
+        <option value="favorite">Nos recommandations</option>
         <option v-for="cat in productCategories" :key="cat.id" :value="cat.id">{{ cat.label }}</option>
     </select>
     <nav class="my-12">
@@ -84,11 +85,17 @@
                     <td class="text-center">
                         {{ new Date(product.createdAt.timestamp * 1000).toLocaleString('fr-FR', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' }) }}
                     </td>
-                    <td>
-                        <button class="w-10/12 bg-blue-200 hover:bg-blue-300 text-white text-center rounded-md px-2 py-1 w-100 mx-5" @click="selectedProduct = product">
+                    <td class="flex">
+                        <button class="flex-1 bg-blue-200 hover:bg-blue-300 text-white text-center rounded-md px-2 py-1 mx-5" @click="selectedProduct = product">
                             <i class="fa-solid fa-magnifying-glass">
                             </i>
-                        </button>    
+                        </button>
+                        <button @click="updateIsFavoriteState(product.id)" class="flex-1 bg-yellow-400 hover:bg-yellow-500 text-white text-center rounded-md px-2 py-1 mx-5">
+                            <i class="fa-heart fa-solid" :class="{
+                                'text-red-700' : product.isFavorite
+                            }">
+                            </i>
+                        </button>
                     </td>
                 </tr>
             </template>
@@ -236,16 +243,16 @@ export default {
                 this.isLoading = false;
             });
         },
-        fetchOrderInfos(){
-            axios.get(`/api/admin/commandes/info`, {
-                headers : {
-                    "Authorization" : `Bearer ${this.apiToken}`
-                }
-            })
-            .then((res) => {
+        // fetchOrderInfos(){
+        //     axios.get(`/api/admin/commandes/info`, {
+        //         headers : {
+        //             "Authorization" : `Bearer ${this.apiToken}`
+        //         }
+        //     })
+        //     .then((res) => {
                     
-            });
-        },
+        //     });
+        // },
         handleProductReferenceDelete(payload){
             let index = this.products.findIndex((product) => product.id === this.selectedProduct.id);
             if (index !== -1){
@@ -257,7 +264,21 @@ export default {
             if(index !== -1){
                 this.products[index] = payload;
             }
-        }
+        },
+        updateIsFavoriteState(productId){
+            let index = this.products.findIndex((product) => product.id === productId);
+            if (index === -1){
+                //TODO : Rajouter un feedback
+                return ;
+            }
+            axios.get(`/api/admin/produits/${productId}/favoris`,{
+                headers : {
+                    "Authorization" : `Bearer ${this.apiToken}`
+                }
+            })
+            .then((_) =>  this.products[index].isFavorite = ! this.products[index].isFavorite )
+            .catch((err) => console.error(err));
+        },
     },
     mounted(){
         this.fetchPaginatedProduct();

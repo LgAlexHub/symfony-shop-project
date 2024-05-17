@@ -27,9 +27,17 @@
             <div class="lg:col-span-2 col-span-3 px-5">
                 <h4 class="text-2xl my-4 rounded bg-[#804C62] text-center text-white py-2">Catégories</h4>
                 <ul class="text-md space-y-3 text-center space-y-5">
+                    <li>
+                        <a @click="selectCategory('favorite')" :class="{
+                            'font-bold text-white rounded-2xl bg-[#804C62]/70 mx-2': selectedCategory === 'favorite',
+                            'hover:underline': selectedCategory !== 'favorite'
+                        }" class="block transition text-[#80504C] duration-300 ease-in-out lg:text-md text-xl">
+                            Nos recommandations
+                        </a>
+                    </li>
                     <li v-for="category in categories" :key="'category_' + category.label">
                         <a @click="selectCategory(category.id)" :class="{
-                            'font-bold text-[#804C62]': selectedCategory === category.id,
+                            'font-bold text-white rounded-2xl bg-[#804C62]/70 mx-2': selectedCategory === category.id,
                             'hover:underline': selectedCategory !== category.id,
                         }" class="block transition duration-300 ease-in-out lg:text-md text-xl">
                             {{ category.label }}
@@ -37,7 +45,7 @@
                     </li>
                     <li>
                         <a @click="selectCategory(null)" :class="{
-                            'font-bold text-[#804C62]': selectedCategory === null,
+                            'font-bold text-white rounded-2xl bg-[#804C62]/70 mx-2': selectedCategory === null,
                             'hover:underline': selectedCategory !== null
                         }" class="block transition duration-300 ease-in-out lg:text-md text-xl">
                             Tous
@@ -200,7 +208,7 @@ export default {
         fetchProductCategories() {
             axios.get(`/api/produits/categories`, {})
                 .then((res) => {
-                    this.categories = res.data;
+                    this.categories.push(...res.data);
                 });
         },
     },

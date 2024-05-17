@@ -46,12 +46,14 @@ class ProductController extends ApiAdminController
             ->setObjectToSerialize($products->results)
             ->setOptions([AbstractNormalizer::CIRCULAR_REFERENCE_HANDLER => fn (object $product, string $format, array $context) => $product->getId()])
             ->setAttributes([
-               'name',
-               'category' => ['label', 'id'],
-               'createdAt',
-               'updatedAt',
-               'description',
-               'productReferences' => [
+                'id',
+                'name',
+                'category' => ['label', 'id'],
+                'createdAt',
+                'updatedAt',
+                'description',
+                'isFavorite',
+                'productReferences' => [
                     'formatedPrice',
                     'weight',
                     'weightType',
@@ -116,6 +118,37 @@ class ProductController extends ApiAdminController
         }
         //TODO : ajouter un vrai feeback
         return  $this->json(['error' => ['msg' => 'Formulaire invalide !']], 422);
+    }
+
+    #[Route('/{id}/favoris', name: 'favorite')]
+    /**
+     * This method will try to set the property isFavorite of targeted product.
+     * Will return a json response
+     * @param Request $request
+     * @param SessionTokenManager $sessionTokenManager
+     * @param integer $id
+     * @param EntityManagerInterface $em
+     * @return Response
+     */
+    public function updateIsDone(Request $request, SessionTokenManager $sessionTokenManager, int $id, EntityManagerInterface $em) : Response {
+        $auth = $this->checkBearerToken($request, $sessionTokenManager);
+        // Retrun json api error 401 if auth not valid
+        if(!is_null($auth)){
+            return $auth;
+        }
+
+        if (is_null($id))
+            return $this->json(['error' => ['msg' => sprintf("Id manquant dans l'url")]], 422);
+
+        $targetedProduct = $em->getRepository(Product::class)->findOneBy(['id' => $id]);
+
+        if (is_null($targetedProduct))
+            return  $this->json(['error' => ['msg' => sprintf("Produit avec l'id %d inexistant", $id)]], 404);
+       
+        $targetedProduct->setIsFavorite(!$targetedProduct->getIsFavorite());
+        $em->persist($targetedProduct);
+        $em->flush();
+        return $this->json("Ok", status: 200);
     }
 }
     
