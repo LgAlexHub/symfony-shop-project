@@ -48,7 +48,7 @@
             </div>
             <div class="lg:col-span-9 col-span-8">
                 <div v-if="!isLoading" class="grid grid-cols-2 lg:grid-cols-4 gap-10">
-                    <div v-for="product in paginator.products" :key="'product_' + product.slug"
+                    <div v-for="(product, index) in paginator.products" :key="'product_' + index"
                         class="max-w-sm rounded hover:border-4 hover:border-[#804C7C] overflow-hidden shadow-lg transition ease-in-out delay-150 hover:-translate-y-1 hover:scale-105 duration-300">
                         <img v-if="product.productReferences.length > 0"
                             :src="'/products/' + product.productReferences[0].slug + '.jpg'" class="w-full" alt="">

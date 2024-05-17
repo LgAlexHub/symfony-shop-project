@@ -45,22 +45,6 @@ class OrderType extends AbstractType
                     new NotBlank()
                 ]
             ])
-            ->add('adressCity', Type\TextType::class, [
-                'constraints' => [
-                    new NotBlank()
-                ]
-            ])
-            ->add('adressCityCode', Type\TextType::class, [
-                'constraints' => [
-                    new NotBlank(),
-                    new Length(5)
-                ]
-            ])
-            ->add('adressStreetInfo', Type\TextareaType::class, [
-                'constraints' => [
-                    new NotBlank()
-                ]
-            ])
             // utiliser pour faire passer l'item qui a déclenché la commande
             ->add('items', Type\HiddenType::class, ['mapped' => false])
             ->add('comment', Type\TextareaType::class)

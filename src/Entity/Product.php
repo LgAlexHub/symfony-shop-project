@@ -24,7 +24,6 @@ use Doctrine\Common\Collections\ArrayCollection;
 class Product
 {
     use HelperTrait\TimestampableWithIdTrait;
-    use HelperTrait\SluggableTrait;
 
     #[ORM\Column(length: 255, nullable:false, type: Types::STRING)]
     private ?string $name = null;
@@ -155,15 +154,6 @@ class Product
         $this->description = $description;
 
         return $this;
-    }
-
-    /**
-     * Generate url view page of a product using slug
-     *
-     * @return string
-     */
-    public function getViewPageUrl() : string {
-        return "/produits/{$this->slug}";
     }
 
     /**

@@ -11,7 +11,6 @@
                     Back-Office :
                     <ul class="[&>*]:ml-10 list-disc">
                         <li class="text-gray-500">
-                            Raccorder les actions dans admin/products/index. [REFONT] => Dynamisation des outils de gestions des produits dans le BO
                             <ul class="list-decimal	[&>*]:ml-10">
                                 <li class="text-gray-500">
                                     Ajouter un endroit dans le BO où on peut ajouter des produits phares.

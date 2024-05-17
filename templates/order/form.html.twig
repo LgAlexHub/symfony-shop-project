@@ -17,9 +17,6 @@
                 {{form_row(form.clientLastName, {label_attr : {'class': 'text-[#80504C] font-semibold'}, label : '*Nom :', attr : {'class' : 'w-full border rounded-xl border-grey-200 px-3 py-2 placeholder-slate-500', 'placeholder' : 'Françoise'}})}}
                 {{form_row(form.email, {label_attr : {'class': 'text-[#80504C] font-semibold'}, label : '*Email :', attr : {'class' : 'w-full border rounded-xl border-grey-200 px-3 py-2 placeholder-slate-500', 'placeholder' : 'jonathan.francoise@gmail.com'}})}}
                 {{form_row(form.comment, {label_attr : {'class': 'text-[#80504C] font-semibold'}, label : 'Commentaire :', attr : {'class' : 'w-full border rounded-xl border-grey-200 px-3 py-2 placeholder-slate-500', 'placeholder' : 'Votre commentaire...'}})}}
-                {{form_row(form.adressCity, {label_attr : {'class': 'text-[#80504C] font-semibold'}, label : '*Ville :', attr : {'class' : 'w-full border rounded-xl border-grey-200 px-3 py-2 placeholder-slate-500', 'placeholder' : 'Paris'}})}}
-                {{form_row(form.adressCityCode, {label_attr : {'class': 'text-[#80504C] font-semibold'}, label : '*Code postal :', attr : {'class' : 'w-full border rounded-xl border-grey-200 px-3 py-2 placeholder-slate-500', 'placeholder' : '75000', 'maxlength' : 5}})}}
-                {{form_row(form.adressStreetInfo, {label_attr : {'class': 'text-[#80504C] font-semibold'}, label : '*Adresse :', attr : {'class' : 'w-full border rounded-xl border-grey-200 px-3 py-2 placeholder-slate-500', 'placeholder' : '73 rue des paquerettes, immeubles des tulipes, apt 2'}})}}
             </div>
             <div class="flex justify-center my-6">
                 {% if  basketItems is defined and basketItems is not null and basketItems is not empty %}
