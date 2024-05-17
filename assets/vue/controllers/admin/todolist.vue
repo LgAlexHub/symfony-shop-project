@@ -35,7 +35,6 @@
                         <li class="text-green-500">Enlever les slugs au product reference</li>
                         <li class="text-green-500">Ajouter un event listenner qui ecoutera toutes les requetes sur les controller admin api et qui vérifira si l'utilisateur possède un bearer token</li>
                         <li class="text-green-500">Configurer symfony sur le bon fuseau horaire</li>
-                        <li class="text-green-500">Ajouter une page récap de commande , possibilité de générer un pdf.</li>
                         <li class="text-green-500">Ajouter une propriété couleur à ProductCategory.</li>
                         <li class="text-green-500">Trouver un moyen d'isoler les composant vue admin et client, pour que l'utilisateur ne charge pas des composants qu'il n'utilisera jamais !</li>
                         <li class="text-green-500">Ajouter une propriété pour savoir si le client a bien payé le site owner.</li>

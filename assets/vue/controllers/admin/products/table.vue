@@ -9,7 +9,7 @@
         @on-product-reference-delete="handleProductReferenceDelete"
         @on-product-save="handleProductSave"
     ></popup>
-    <div class="pt-2 relative mx-auto text-gray-600">
+    <div class="pt-2 relative mx-auto text-gray-600" >
         <input v-model="queryInput" @input="debouncedProductInputHandler" class="border-2 border-gray-300 bg-white w-full h-10 px-5 pr-16 rounded-lg text-sm focus:border-black"
           type="search" name="search" placeholder="Recherche par nom">
         <button type="submit" class="absolute right-0 top-0 mt-4 mr-4">
@@ -234,6 +234,16 @@ export default {
                 this.resultCount = res.data.nbResult;
                 this.products = res.data.products;
                 this.isLoading = false;
+            });
+        },
+        fetchOrderInfos(){
+            axios.get(`/api/admin/commandes/info`, {
+                headers : {
+                    "Authorization" : `Bearer ${this.apiToken}`
+                }
+            })
+            .then((res) => {
+                    
             });
         },
         handleProductReferenceDelete(payload){
