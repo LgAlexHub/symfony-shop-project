@@ -75,11 +75,15 @@ class OrderController extends AbstractController
      */
     public function confirmOrder(Request $request, String $uuid, TransportInterface $mailer, EntityManagerInterface $manager) : Response {
         $order = $manager->getRepository(Order::class)->findOneBy(['uuid' => $uuid]);
+        $totalPrice = $order->getItems()->reduce(fn(float $total, $opr) => $total+= ($opr->getItem()->getPrice() * $opr->getQuantity()), 0.0) / 100;
         $email = new TemplatedEmail;
         $email->to($order->getEmail());
         $email->subject("Gout'mé cha - Votre commande a été transmise");
         $email->htmlTemplate("emails/orderConfirmed.html.twig");
-        $email->context(['order' => $order]);
+        $email->context([
+            'order' => $order,
+            'total' => $totalPrice
+        ]);
         try {
             $mailer->send($email);
         } catch (TransportExceptionInterface $th) {

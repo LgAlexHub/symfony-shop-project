@@ -52,6 +52,9 @@
         tr:nth-child(even) {
             background-color: #f2f2f2; /* Couleur de fond gris clair pour les lignes paires */
         }
+        tr .price{
+            text-align: center;
+        }
     </style>
 </head>
 <body class="container">
@@ -69,6 +72,8 @@
                         <th>Nom de l'article</th>
                         <th>Quantité</th>
                         <th>Poids</th>
+                        <th class="price">Prix à l'unité</th>
+                        <th class="price">Prix</th>
                     </tr>
                     {% for opr in order.items %}
                     <tr>
@@ -77,8 +82,17 @@
                         <td>
                             {{ opr.item.weight }} {{ opr.item.weightType }}
                         </td>
+                        <td class="price">{{ opr.item.formatedPrice|number_format(2, '.', ',') }} €</td>
+                        <td class="price"> {{(opr.item.formatedPrice * opr.quantity)|number_format(2, '.', ',')}} €</td>
                     </tr>
                     {% endfor %}
+                    <tr>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td class="price">Total :</td>
+                        <td class="price">{{ total|number_format(2, '.', ',') }} €</td>
+                    </tr>
                 </table>
                 <p class="paragraph">Si vous avez des questions ou des préoccupations, n'hésitez pas à nous contacter.</p>
                 <p class="signature">Cordialement,<br>Gout'mé cha</p>
