@@ -79,7 +79,6 @@ class OrderController extends ApiAdminController
                 'comment',
                 'isValid',
                 'isDone',
-                'mailedAt',
                 'totalPrice',
                 'createdAt',
                 'items' => [
@@ -166,50 +165,14 @@ class OrderController extends ApiAdminController
         ]);
     }
 
-    #[Route('/{id}/mailer', name: 'send.mail')]
+    #[Route('/infos', name: 'infos')]
     /**
-     * 
+     * Will return a json response with count of order group by their state
      *
-     * @param Request $request
-     * @param integer $id
-     * @param SessionTokenManager $sessionTokenManager
-     * @param EntityManagerInterface $em
+     * @param EntityManagerInterface $manager
      * @return Response
      */
-    public function tryToMail(Request $request, int $id, SessionTokenManager $sessionTokenManager, EntityManagerInterface $em, TransportInterface $mailer) : Response {
-        $this->checkBearerToken($request, $sessionTokenManager);
-        if (is_null($id))
-            return $this->json(['error' => ['msg' => sprintf("Id manquant dans l'url")]], 422);
-
-        $targetedOrder = $em->getRepository(Order::class)->findOneBy(['id' => $id]);
-
-        if (is_null($targetedOrder))
-            return  $this->json(['error' => ['msg' => sprintf("Commande avec l'id %d inexistant", $id)]], 404);
-
-        if ($targetedOrder->getIsDone() && is_null($targetedOrder->getMailedAt())){
-            $email = (new TemplatedEmail());
-            //TODO : changé le template
-            $email->to($targetedOrder->getEmail())
-                ->subject("Gout'mé cha - Votre commande est expédiée")
-                ->htmlTemplate('emails/orderShipped.html.twig')
-                ->context([
-                   'order' => $targetedOrder
-                ]);
-            try{
-                $mailer->send($email);
-            }catch(TransportExceptionInterface $e){
-                die($e);
-            }
-            $targetedOrder->setMailedAt(new \DateTimeImmutable());
-            $em->persist($targetedOrder);
-            $em->flush();
-            return $this->json($targetedOrder->getMailedAt()->getTimestamp());
-        }
-
-        if($targetedOrder->getIsDone())
-            return $this->json("Mail déjà envoyé", 422);
-
-        return $this->json("La commande n'est pas validée", 422);
-        
+    public function infos(EntityManagerInterface $manager) : Response {
+        return $this->json($manager->getRepository(Order::class)->countByState());
     }
 }

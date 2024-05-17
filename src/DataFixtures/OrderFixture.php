@@ -86,9 +86,6 @@ class OrderFixture extends Fixture implements DependentFixtureInterface, Fixture
                 ->setClientLastName($this->fakerGenerator->lastName())
                 ->setEmail($this->fakerGenerator->email())
                 ->setComment($this->fakerGenerator->boolean() ? $this->fakerGenerator->realText() : null)
-                ->setAdressCityCode($this->fakerGenerator->numberBetween(0, 99999))
-                ->setAdressCity($this->fakerGenerator->city())
-                ->setAdressStreetInfo($this->fakerGenerator->streetName())
                 ->setIsDone($this->fakerGenerator->boolean())
                 ->setCreatedAt($randomDate)
                 ->setUpdatedAt($randomDate);

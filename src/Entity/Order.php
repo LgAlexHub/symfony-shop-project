@@ -49,20 +49,9 @@ class Order
     #[ORM\GeneratedValue]
     private Uuid $uuid;
 
-    #[ORM\Column(type: Types::STRING, nullable: false)]
-    private ?string $adressCity = null;
-    
-    #[ORM\Column(type: Types::STRING, length: 6, nullable: false)]
-    private ?string $adressCityCode = null;
-    
-    #[ORM\Column(type: Types::TEXT, nullable: false)]
-    private ?string $adressStreetInfo;
-
     #[ORM\Column(type: Types::BOOLEAN, nullable: false, options: ['default' => false])]
     private bool $isDone;
 
-    #[ORM\Column(name: 'mailed_at', type: Types::DATETIME_IMMUTABLE, updatable: true, nullable:true)]
-    private ?\DateTimeInterface $mailedAt;
 
     public function __construct()
     {
@@ -247,67 +236,6 @@ class Order
     }
 
     /**
-     * Get the value of adressCityCode
-     */ 
-    public function getAdressCityCode()
-    {
-        return $this->adressCityCode;
-    }
-
-    /**
-     * Set the value of adressCityCode
-     *
-     * @return  self
-     */ 
-    public function setAdressCityCode($adressCityCode)
-    {
-        $this->adressCityCode = $adressCityCode;
-
-        return $this;
-    }
-
-    /**
-     * Get the value of adressCity
-     */ 
-    public function getAdressCity()
-    {
-        return $this->adressCity;
-    }
-
-    /**
-     * Set the value of adressCity
-     *
-     * @return  self
-     */ 
-    public function setAdressCity($adressCity)
-    {
-        $this->adressCity = $adressCity;
-
-        return $this;
-    }
-
-    /**
-     * Get the value of adressStreetInfo
-     */ 
-    public function getAdressStreetInfo()
-    {
-        return $this->adressStreetInfo;
-    }
-
-    /**
-     * Set the value of adressStreetInfo
-     *
-     * @return  self
-     */ 
-    public function setAdressStreetInfo($adressStreetInfo)
-    {
-        $this->adressStreetInfo = $adressStreetInfo;
-
-        return $this;
-    }
-
-
-    /**
      * Get the value of isDone
      */ 
     public function getIsDone()
@@ -336,23 +264,4 @@ class Order
         return property_exists($this, "totalPrice") ? $this->{'totalPrice'} : null;
     }
 
-    /**
-     * Get the value of mailedAt
-     */ 
-    public function getMailedAt() : ?\DateTimeImmutable
-    {
-        return $this->mailedAt;
-    }
-
-    /**
-     * Set the value of mailedAt
-     *
-     * @return  self
-     */ 
-    public function setMailedAt(?\DateTimeImmutable $mailedAt)
-    {
-        $this->mailedAt = $mailedAt;
-
-        return $this;
-    }
 }

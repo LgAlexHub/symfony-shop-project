@@ -64,7 +64,6 @@
                     </td>
                     <td>
                         <p class="text-center font-semibold">
-                            <i @mouseover="showTooltip($event, order.mailedAt)" @mouseleave="hideTooltip()" v-if="order.mailedAt !== null" class="text-blue-600 fa-regular fa-envelope"></i>
                             {{ order.email }}
                         </p>
                     </td>
@@ -148,14 +147,6 @@ export default {
             queryInput: "",
             queryDebounceTimeout : null,
             orderByDebounceTimeout : null,
-            
-
-            show : false,
-            currentTooltip: null,
-            tooltipStyle: {
-                top: '0',
-                left: '0',
-            },
         }
     }, 
     computed : {
@@ -237,19 +228,6 @@ export default {
                 this.orders = res.data.orders;
                 this.isLoading = false;
             });
-        },
-        showTooltip(event, date) {
-            this.show = true;
-            this.currentTooltip =  new Date((typeof date !== "object" ? date : date.timestamp) * 1000).toLocaleString('fr-FR', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' });
-            // Récupérer la position de l'élément déclencheur
-            const rect = event.target.getBoundingClientRect();
-            // Calculer la position du tooltip
-            this.tooltipStyle.top = `${rect.bottom}px`;
-            this.tooltipStyle.left = `${rect.left}px`;
-        },
-        hideTooltip() {
-            this.show = false;
-            this.currentTooltip = null;
         },
     },
     mounted(){

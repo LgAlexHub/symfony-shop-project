@@ -145,4 +145,17 @@ class OrderRepository extends ServiceEntityRepository
             'page'      => $page,
         ];
     }
+
+    /**
+     * This method will count and group by order by their state done or undone 
+     *
+     * @return array
+     */
+    public function countByState() : array{
+        $queryBuilder = $this->createQueryBuilder(self::alias)
+            ->select(sprintf('COUNT(DISTINCT %s.id), %s.isDone', self::alias, self::alias))
+            ->groupBy(sprintf('%s.isDone', self::alias));
+        
+        return $queryBuilder->getQuery()->getScalarResult();
+    }
 }

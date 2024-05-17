@@ -46,7 +46,7 @@
                     </tr>
                 </tbody>
             </table>
-            <div class="grid grid-cols-3 gap-4">
+            <div class="grid grid-cols-2 gap-4">
                 <button @click="$emit('closePopup')" class="mt-4 px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600">Fermer</button>
                 <button 
                     @click="updateIsDoneState" 
@@ -58,23 +58,6 @@
                 >
                     {{ editingOrder.isDone ? 'Marquer comme à faire' : 'Marquer comme faite' }}
                 </button>
-                <button 
-                    :disabled="!editingOrder.isDone || editingOrder.mailedAt !== null"
-                    @click="askForMail"
-                    :class="{'bg-orange-500 hover:bg-orange-600' : editingOrder.isDone && editingOrder.mailedAt === null, 'bg-orange-900' : !editingOrder.isDone || editingOrder.mailedAt !== null}" 
-                    class="mt-4 px-4 py-2 text-white rounded-md"
-                >
-                    <template v-if="editingOrder.isDone && editingOrder.mailedAt === null">
-                        Envoyer le mail informant de l'expédition
-                    </template>
-                    <template v-else-if="!editingOrder.isDone">
-                        La commande n'est pas validée
-                    </template>
-                    <template v-else="editingOrder.mailedAt !== null">
-                        Le mail pour cette commande a déjà été envoyée le : {{  new Date((typeof editingOrder.mailedAt !== "object" ? editingOrder.mailedAt : editingOrder.mailedAt.timestamp) * 1000 ).toLocaleString('fr-FR', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' }) }}
-                    </template>
-                </button>
-
             </div>
 
         </div>
@@ -112,15 +95,6 @@ export default {
             .then((_) => this.editingOrder.isDone = !   this.editingOrder.isDone)
             .catch((err) => console.error(err));
         },
-        askForMail(){
-            axios.get(`/api/admin/commandes/${this.editingOrder.id}/mailer`,{
-                headers : {
-                    "Authorization" : `Bearer ${this.apiToken}`
-                }
-            })
-            .then((res) => this.editingOrder.mailedAt = res.data)
-            .catch((err) => console.error(err));
-        }
     },
     mounted() {
         this.editingOrder = this.order;
