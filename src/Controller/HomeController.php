@@ -27,16 +27,7 @@ class HomeController extends AbstractController
      */
     public function index(EntityManagerInterface $manager): Response
     {
-        $favoriteProducts = $manager->getRepository(Product::class)
-            ->createQueryBuilder("product")
-            ->innerJoin("product.productReferences", "prodRef")
-            ->where("product.isFavorite = 1")
-            ->setMaxResults(4)
-            ->getQuery()
-            ->getResult();
-        return $this->render('home/index.html.twig', [
-            'products' => $favoriteProducts
-        ]);
+        return $this->render('home/index.html.twig');
     }
 
     /**
