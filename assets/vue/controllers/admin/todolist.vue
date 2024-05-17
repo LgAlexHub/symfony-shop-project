@@ -13,9 +13,6 @@
                         <li class="text-gray-500">
                             <ul class="list-decimal	[&>*]:ml-10">
                                 <li class="text-gray-500">
-                                    Ajouter un endroit dans le BO où on peut ajouter des produits phares.
-                                </li>
-                                <li class="text-gray-500">
                                     Ajouter la fonctionnalité d'upload d'image pour les productReferences.
                                 </li>
                                 <li class="text-gray-500">
