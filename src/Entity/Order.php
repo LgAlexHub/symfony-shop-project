@@ -52,6 +52,9 @@ class Order
     #[ORM\Column(type: Types::BOOLEAN, nullable: false, options: ['default' => false])]
     private bool $isDone;
 
+    #[ORM\Column(type: Types::BOOLEAN, nullable: false, options: ['default' => false])]
+    private bool $consentData;
+
 
     public function __construct()
     {
@@ -264,4 +267,24 @@ class Order
         return property_exists($this, "totalPrice") ? $this->{'totalPrice'} : null;
     }
 
+
+    /**
+     * Get the value of consentData
+     */ 
+    public function getConsentData()
+    {
+        return $this->consentData;
+    }
+
+    /**
+     * Set the value of consentData
+     *
+     * @return  self
+     */ 
+    public function setConsentData($consentData)
+    {
+        $this->consentData = $consentData;
+
+        return $this;
+    }
 }

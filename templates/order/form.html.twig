@@ -1,30 +1,48 @@
 {% extends 'base.html.twig' %}
 
-{% block title %} - Commander{% endblock %}
+{% block title %}
+	- Commander
+{% endblock %}
 
 {% block body %}
-    <div class="my-5">
-        <h1 class="text-center text-2xl my-10 text-[#80504C] font-bold">Demande de commande</h1>
-        <p class="block text-center mb-4 text-slate-500 font-bold">
-            * Champs Requis
-        </p>
-        <div class="lg:w-2/4 w-3/4 mx-auto">
-            {{ form_start(form, {attr: {'class' : 'w-full'}})}}
-            {% do form.items.setRendered %}
-            {{ form_errors(form)}}
-            <div class="grid grid-cols-1 lg:grid-cols-2 gap-12">
-                {{form_row(form.clientFirstName, {label_attr : {'class': 'text-[#80504C] font-semibold'}, label : '*Prénom :', attr : {'class' : 'w-full border rounded-xl border-grey-200 px-3 py-2 placeholder-slate-500', 'placeholder' : 'Jonathan'}})}}
-                {{form_row(form.clientLastName, {label_attr : {'class': 'text-[#80504C] font-semibold'}, label : '*Nom :', attr : {'class' : 'w-full border rounded-xl border-grey-200 px-3 py-2 placeholder-slate-500', 'placeholder' : 'Françoise'}})}}
-                {{form_row(form.email, {label_attr : {'class': 'text-[#80504C] font-semibold'}, label : '*Email :', attr : {'class' : 'w-full border rounded-xl border-grey-200 px-3 py-2 placeholder-slate-500', 'placeholder' : 'jonathan.francoise@gmail.com'}})}}
-                {{form_row(form.comment, {label_attr : {'class': 'text-[#80504C] font-semibold'}, label : 'Commentaire :', attr : {'class' : 'w-full border rounded-xl border-grey-200 px-3 py-2 placeholder-slate-500', 'placeholder' : 'Votre commentaire...'}})}}
-            </div>
-            <div class="flex justify-center my-6">
-                {% if  basketItems is defined and basketItems is not null and basketItems is not empty %}
-                    <input type="hidden" name="basket" value="{{basketItems}}">
-                {% endif %}
-                {{ form_widget(form.submit, {label : 'Envoyer une demande de commande', attr : {'class' : 'w-full border border-[#4C7C80] rounded-md bg-[#4C7C80] px-4 py-2 text-white hover:bg-lime-800 hover:border-transparent'}})}}
-            </div>
-            {{ form_end(form)}}
-        </div>
-    </div>
+	<style>
+		li {
+			color : red;
+			font-weight : bold;
+		}
+	</style>
+	<div class="my-5 sm:h-screen">
+		<h1 class="text-center text-2xl my-10 text-[#80504C] font-bold">Demande de commande</h1>
+		<p class="block text-center mb-4 text-slate-500 font-bold">
+			* Champs Requis
+		</p>
+
+		{{ form_start(form, {attr: {'class' : 'w-full'}})}}
+			<div class="lg:w-2/4 w-3/4 mx-auto">
+				{% do form.items.setRendered %}
+				<div class="grid grid-cols-1 lg:grid-cols-2 gap-12">
+					{{form_row(form.clientFirstName, {label_attr : {'class': 'text-[#80504C] font-semibold'}, label : '*Prénom :', attr : {'class' : 'w-full border rounded-xl border-grey-200 px-3 py-2 placeholder-slate-500', 'placeholder' : 'Jonathan'}})}}
+					{{form_row(form.clientLastName, {label_attr : {'class': 'text-[#80504C] font-semibold'}, label : '*Nom :', attr : {'class' : 'w-full border rounded-xl border-grey-200 px-3 py-2 placeholder-slate-500', 'placeholder' : 'Françoise'}})}}
+					{{form_row(form.email, {label_attr : {'class': 'text-[#80504C] font-semibold'}, label : '*Email :', attr : {'class' : 'w-full border rounded-xl border-grey-200 px-3 py-2 placeholder-slate-500', 'placeholder' : 'jonathan.francoise@gmail.com'}})}}
+					{{form_row(form.comment, {label_attr : {'class': 'text-[#80504C] font-semibold'}, label : 'Commentaire :', attr : {'class' : 'w-full border rounded-xl border-grey-200 px-3 py-2 placeholder-slate-500', 'placeholder' : 'Votre commentaire...'}})}}
+				</div>
+				<div class="flex justify-center my-6">
+					{% if  basketItems is defined and basketItems is not null and basketItems is not empty %}
+						<input type="hidden" name="basket" value="{{basketItems}}">
+					{% endif %}
+				</div>
+				<div style="">
+					{{form_row(form.consentData, {label_attr : {'class': 'text-[#80504C] font-semibold'}, label : 'Consentement des données :', attr : {'class' : 'ml-2 mt-1 border rounded-xl border-grey-200 px-3 py-2 placeholder-slate-500'}})}}
+					<p class="container mb-4 text-md text-gray-600 text-center">
+						En cochant cette case, vous consentez à ce que nous collections et utilisions vos données personnelles (nom, prénom, email).
+										Vos données seront traitées conformément à notre
+						<a href="/politique-confidentialite" class=" underline">politique de confidentialité</a>.
+					</p>
+				</div>
+				<div class="flex justify-center">
+					{{ form_widget(form.submit, {label : 'Envoyer une demande de commande', attr : {'class' : 'w-full lg:w-auto border border-[#4C7C80] rounded-md bg-[#4C7C80] px-4 py-2 text-white hover:bg-lime-800 hover:border-transparent'}})}}
+				</div>
+			</div>
+		{{ form_end(form)}}
+	</div>
 {% endblock %}
