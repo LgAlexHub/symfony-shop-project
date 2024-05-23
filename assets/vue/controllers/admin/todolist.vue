@@ -21,6 +21,7 @@
                                 <li class="text-gray-500">
                                     Ajouter une colone deletedAt pour un fake supprimer sur les refs
                                 </li>
+                                <li>Normer tout mes fichiers vue et php (nommage, case, etc...)</li>
                             </ul>
                         </li>
                     </ul>
