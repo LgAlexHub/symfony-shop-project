@@ -54,6 +54,7 @@ class ProductController extends ApiAdminController
                 'description',
                 'isFavorite',
                 'productReferences' => [
+                    'id',
                     'formatedPrice',
                     'weight',
                     'weightType',
@@ -92,7 +93,6 @@ class ProductController extends ApiAdminController
             $editedProduct = $productForm->getData();
             $targetedProduct
                 ->setName($editedProduct->getName())
-                ->setDescription($editedProduct->getDescription())
                 ->setCategory($editedProduct->getCategory());
             $em->persist($targetedProduct);
             $em->flush();
@@ -117,7 +117,7 @@ class ProductController extends ApiAdminController
             return $this->apiJson($enhancedEntityJsonSerializer->serialize());
         }
         //TODO : ajouter un vrai feeback
-        return  $this->json(['error' => ['msg' => 'Formulaire invalide !']], 422);
+        return  $this->json(['error' => ['msg' => $productForm->getErrors(true)]], 422);
     }
 
     #[Route('/{id}/favoris', name: 'favorite')]
@@ -145,7 +145,7 @@ class ProductController extends ApiAdminController
         if (is_null($targetedProduct))
             return  $this->json(['error' => ['msg' => sprintf("Produit avec l'id %d inexistant", $id)]], 404);
        
-        $targetedProduct->setIsFavorite(!$targetedProduct->getIsdFavorite());
+        $targetedProduct->setIsFavorite(!$targetedProduct->getIsFavorite());
         $em->persist($targetedProduct);
         $em->flush();
         return $this->json("Ok", status: 200);
