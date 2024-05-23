@@ -77,10 +77,7 @@ class ProductReferenceController extends ApiAdminController
                 ]);
             return $this->apiJson($enhancedEntityJsonSerializer->serialize());
         }
-        //TODO : Faire un vrai feedback via l'api
-        return $this->json([
-            'error' => ['msg' => sprintf("Erreur de formulaire")]
-        ]);
+        return  $this->json(['error' => ['msg' => $productReferenceForm->getErrors(true)]], 422);
     }
 
     #[Route('/{id}', name: 'delete', methods:['DELETE'])]
