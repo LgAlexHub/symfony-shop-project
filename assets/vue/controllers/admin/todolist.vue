@@ -13,11 +13,11 @@
                         <li class="text-gray-500">
                             <ul class="list-decimal	[&>*]:ml-10">
                                 <li class="text-gray-500">
-                                    Ajouter la fonctionnalité d'upload d'image pour les productReferences.
+                                    Ajouter un hook qui modifie l'url des liens d'image lors d'une modification de nom produit ou de propriété de référence.
                                 </li>
                                 <li class="text-gray-500">
-                                    Ajouter de la validation sur les composants vue js
-                                </li>
+                                    Ajouter la fonctionnalité d'upload d'image pour les productReferences.
+                                </li>  
                                 <li class="text-gray-500">
                                     Ajouter une colone deletedAt pour un fake supprimer sur les refs
                                 </li>
@@ -35,6 +35,13 @@
                         <li class="text-green-500">Trouver un moyen d'isoler les composant vue admin et client, pour que l'utilisateur ne charge pas des composants qu'il n'utilisera jamais !</li>
                         <li class="text-green-500">Ajouter une propriété pour savoir si le client a bien payé le site owner.</li>
                         <li class="text-green-500">Déplacer la constante alias dans order et product repository dans les entités</li>
+                    </ul>
+                </div>
+                <div class="text-sky-600">
+                    <i class="fas fa-arrow-up mr-2"></i> Note :
+                    <ul class="[&>*]:ml-10 list-disc">
+                        <li class="">Les descriptions des produits ne servent pour l'instant à rien</li>
+                        <li class="">Regarde les //TODO dans VSCODE</li>
                     </ul>
                 </div>
             </ul>
