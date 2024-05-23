@@ -1,6 +1,7 @@
 <template>
+    <toast :data-messages="feedbackMsg" :data-type="feedbackType"></toast>
     <div v-if="currentProduct !== null"
-        class="fixed inset-0 flex items-center justify-center bg-gray-900 bg-opacity-50 z-50">
+        class="fixed inset-0 flex items-center justify-center bg-gray-900 bg-opacity-50 z-40">
         <div class="bg-white rounded-lg shadow-lg w-2/4">
             <div class="bg-gray-200 flex justify-between px-4 py-2 rounded-t-lg">
                 <h2 class="text-lg font-bold">
@@ -27,22 +28,24 @@
                     :categories="categories"
                     :api-token="apiToken"
                     @on-product-saved="handleProductSave"
+                    @on-product-edit-error="handleFeedback"
                 ></editProductTab>
                 <prodRefTable
                     v-else
                     :product-references="product.productReferences"
                     :api-token="apiToken"
-                    @on-product-reference-deleted="handleProductReferenceDelete"
-                ></prodRefTable>
+                    @on-product-reference-saved="handleFeedback"
+                    @on-product-reference-edit-error="handleFeedback"
+                    ></prodRefTable>
             </div>
         </div>
     </div>
 </template>
 
 <script>
-import axios from 'axios';
 import editProduct from './popup/editProduct.vue';
 import productReferenceTable from './popup/productReferenceTable.vue';
+import Toast from "../../components/Toast.vue";
 export default {
     name: "popup",
     props: {
@@ -63,13 +66,16 @@ export default {
     components: {
         'editProductTab' : editProduct,
         'prodRefTable'   : productReferenceTable,
+        'toast'          : Toast
     },
     data() {
         return {
             currentProduct: null,
             currentProductReference: null,
             tabs : ['Produit', 'Prix & Tarifs'],
-            activeTab : 'Produit'
+            activeTab : 'Produit',
+            feedbackMsg : null,
+            feedbackType : null,
         }
     },
     methods: {
@@ -85,32 +91,19 @@ export default {
         },
         handleProductReferenceSave(payload) {
             this.currentProductReference = null;
-            let index = this.currentProduct.productReferences.findIndex((ref) => ref.id === payload.id);
+            let index = this.currentProduct.productReferences.findIndex((ref) => ref.id === payload.data.id);
             if (index !== -1) {
-                this.currentProduct.productReferences[index] = payload;
+                this.currentProduct.productReferences[index] = payload.data;
             }
-        },
-        handleEditProductNameForm() {
-            if (this.product.name !== this.currentProduct.name && this.currentProduct.name.trim() !== '' && typeof this.currentProduct.name === 'string') {
-                axios.patch(`/api/admin/produits/${this.currentProduct.id}`, this.currentProduct, {
-                    headers: {
-                        "Authorization": `Bearer ${this.apiToken}`
-                    }
-                })
-                    .then((resolve) => {
-                        console.log(resolve);
-                        //TODO : Emit un event pour le changer dans le composant parent
-                    })
-                    .catch((error) => console.error(error));
-            }
-        },
-        handleProductReferenceDelete(payload){
-            this.currentProduct.productReferences = payload;
-            this.$emit('onProductReferenceDelete', payload);
         },
         handleProductSave(payload){
-            this.currentProduct = payload;
-            this.$emit('onProductSave', payload);
+            this.currentProduct = payload.data;
+            this.handleFeedback(payload);
+            this.$emit('onProductSave', payload.data);
+        },
+        handleFeedback(payload){
+            this.feedbackMsg = payload.messages;
+            this.feedbackType = payload.type;
         }
     },
     beforeMount() {

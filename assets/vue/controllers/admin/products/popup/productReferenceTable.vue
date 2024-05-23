@@ -42,19 +42,12 @@
         :api-token="apiToken"
         @on-form-canceled="reset"
         @on-product-reference-saved="handleProductReferenceSave"
+        @on-product-reference-edit-error="handleProductReferenceEditError"
     ></productRefForm>
-    <productDeleteForm
-        v-if="selectedProductReference !== null && selectedActionType === 'delete'"
-        :product-ref="selectedProductReference"
-        :api-token="apiToken"
-        @on-delete-canceled="reset"
-        @on-product-reference-deleted="handleReferenceDelete"
-    ></productDeleteForm>
 </template>
 
 <script>
 import editProductReference from './editProductReference.vue';
-import deleteProductReference from './deleteProductReference.vue';
 export default {
     name: "popupProductRefTable",
     props: {
@@ -69,9 +62,8 @@ export default {
     },
     components : {
         'productRefForm' : editProductReference,
-        'productDeleteForm' : deleteProductReference,
     },
-    emits : ['onProductReferenceDeleted'],
+    emits : ['onProductReferenceDeleted', 'onProductReferenceEditError', 'onProductReferenceSaved'],
     data() {
         return {
             currentProductReferences: null,
@@ -98,6 +90,9 @@ export default {
                     minute: '2-digit'
                 });
         },
+        handleProductReferenceEditError(payload){
+            this.$emit('onProductReferenceEditError', payload);
+        },
         handleProductReferenceSave(payload) {
             this.selectedProductReference = null;
             this.selectedActionType = null;
@@ -105,15 +100,8 @@ export default {
             if (index !== -1) {
                 this.currentProductReferences[index] = payload;
             }
+            this.$emit('onProductReferenceSaved', payload);
         },
-        handleReferenceDelete(payload) {
-            let index = this.currentProductReferences.findIndex((ref) => ref.id === payload.id);
-            if (index !== -1) {
-                this.currentProductReferences = this.currentProductReferences.splice(index, 1);
-                this.reset();
-                this.$emit('onProductReferenceDeleted', this.currentProductReferences);
-            }
-        }
     },
     beforeMount() {
         this.currentProductReferences = [...this.productReferences];

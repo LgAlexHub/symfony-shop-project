@@ -1,5 +1,6 @@
 <template>
-    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+    <spinner v-if="isLoading"></spinner>
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4" v-else>
         <div>
             <div class="mb-4">
                 <label for="privateId" class="block text-sm font-semibold mb-1">Identifiant privé :</label>
@@ -29,11 +30,6 @@
                     <option v-for="cat in categories" :key="cat.id" :value="cat.id">{{ cat.label }}</option>
                 </select>
             </div>
-            <div class="mb-4">
-                <label for="productDescription" class="block text-sm font-semibold mb-1">Description :</label>
-                <textarea id="productDescription" v-model="currentProduct.description"
-                    class="w-full px-4 py-2 rounded-md border border-gray-300 focus:outline-none focus:border-blue-500 focus:ring-blue-500 resize-none"></textarea>
-            </div>
             <div v-if="isProductDifferent" class="mb-4">
                 <button @click="handleEditProduct" class="bg-slate-500 w-full hover:bg-slate-600 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">
                     Modifier
@@ -46,7 +42,11 @@
 
 <script>
 import axios from 'axios';
+import Spinner from '../../../components/Spinner.vue';
 export default {
+    components : {
+        'spinner' : Spinner
+    },
     name: "popupProductEdit",
     props: {
         product: {
@@ -62,16 +62,17 @@ export default {
             type: String
         }
     },
-    emits : ['onProductSaved'],
+    emits : ['onProductSaved', 'onProductEditError'],
     data() {
         return {
             currentProduct: null,
             selectedCategory : null,
+            isLoading : false,
         }
     },
     computed : {
         isProductDifferent(){
-            return (this.currentProduct.description !== this.product.description || this.currentProduct.name !== this.product.name || this.selectedCategory !== this.product.category.id) && this.currentProduct.name !== "";
+            return (this.currentProduct.name !== this.product.name || this.selectedCategory !== this.product.category.id) && this.currentProduct.name !== "";
         }
     },
     methods: {
@@ -86,6 +87,7 @@ export default {
                 });
         },
         handleEditProduct() {
+            this.isLoading = true;
             axios.patch(`/api/admin/produits/${this.currentProduct.id}`, {
                 name : this.currentProduct.name,
                 description : this.currentProduct.description,
@@ -96,14 +98,23 @@ export default {
                 }
             })
                 .then((resolve) => {
+                    this.isLoading = false;
                     this.currentProduct = resolve.data;
                     this.selectedCategory = this.currentProduct.category.id;
-                    this.$emit('onProductSaved', resolve.data)
-                    //TODO : Ajouter un toast feedback
+                    this.$emit('onProductSaved', {
+                        data : resolve.data,
+                        messages : "Produit modifié avec succès",
+                        type : "success"
+                    })
                 })
-                .catch((error) => console.error(error));
+                .catch((error) => {
+                    this.isLoading = false;
+                    this.$emit('onProductEditError', {
+                        messages : error.response.data.error.msg.map((err) => err.message),
+                        type : "danger"
+                    });
+                });
         }
-        
     },
     beforeMount() {
         this.currentProduct = Object.assign({}, this.product);

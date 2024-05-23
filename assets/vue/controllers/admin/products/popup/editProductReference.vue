@@ -52,7 +52,7 @@
                 type: String
             }
         },
-        emits : ["onFormCanceled", "onProductReferenceSaved"],
+        emits : ["onFormCanceled", "onProductReferenceSaved", "onProductReferenceEditError"],
         data() {
             return {
                 currentProductRef: null,
@@ -60,7 +60,6 @@
         },
         methods: {
             onProductReferenceEditForm() {
-                //TODO : Ajouter de la validation
                 axios.patch(`/api/admin/references/${this.currentProductRef.id}`, {
                     price: this.currentProductRef.formatedPrice * 100,
                     weight: this.currentProductRef.weight,
@@ -71,9 +70,16 @@
                     }
                 })
                     .then((resolve) => {
-                        this.$emit("onProductReferenceSaved", resolve.data);
-                    }) //TODO : Ajouter un toast feedback
-                    .catch((error) => console.error(error)) // TODO : Ajouter un toast feedbacka
+                        this.$emit("onProductReferenceSaved", {
+                            data :  resolve.data,
+                            messages : "La référence produit a été modifié avec succès",
+                            type : "success"
+                        });
+                    }) 
+                    .catch((error) => this.$emit('onProductReferenceEditError', {
+                        messages : error.response.data.error.msg.map((err) => err.message),
+                        type : "danger"
+                    }))
             }
         },
         beforeMount() {
