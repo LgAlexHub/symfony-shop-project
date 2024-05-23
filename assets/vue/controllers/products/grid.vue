@@ -64,12 +64,21 @@
                         <div class="px-6 py-4">
                             <div class="font-bold text-2xl lg:text-md mb-2">{{ product.name }}</div>
                         </div>
-                        <div class="px-6 pt-4 pb-2 sm:block sm:justify-center">
-                            <div @click="addBasket(ref, product.name)"
-                                v-for="(ref, index) in product.productReferences"
-                                :class="'block text-center rounded-full flex hover:bg-fuchsia-950 lg:text-sm hover:font-bold text-2xl text-gray-700 mr-2 mb-2 bg-gradient-to-r from-purple-'+ (300 + (index + 1)* 100)+' to-white'">
-                                <span class="flex-1 border-r-4 border-r-white hover:text-white font-semibold">{{ (ref.formatedPrice).toFixed(2) }} €</span><span class="flex-1"> {{ ref.weight }} {{ ref.weightType }}</span> 
-                            </div>
+                        <div class="px-6 pt-4 pb-2 sm:block sm:justify-center flex text-center space-y-4">
+                            <template v-for="(ref, index) in product.productReferences">
+                                <button class="block w-full border-x-2 border-black rounded-xl bg-red-100 hover:bg-red-200" @click="addBasket(ref, product.name)">
+                                    <span class="">
+                                        {{ ref.weight }} {{ ref.weightType }} 
+                                    </span>
+                                    -
+                                    <span class="font-semibold">
+                                        {{ (ref.formatedPrice).toFixed(2) }} €
+                                    </span>
+                                </button>
+                                <!-- <span  class="lg:text-sm hover:font-bold text-2xl text-gray-700 mr-2 mb-2 block text-center hover:bg-fuchsia-200 flex-1 border-r-4 border-r-white hover:text-white font-semibold">
+                                    </span><span class="flex-1"> 
+                                </span> -->
+                            </template>
                         </div>
                     </div>
                 </div>
