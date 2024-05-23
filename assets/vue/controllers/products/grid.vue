@@ -59,7 +59,7 @@
                     <div v-for="(product, index) in paginator.products" :key="'product_' + index"
                         class="max-w-sm rounded hover:border-4 hover:border-[#804C7C] overflow-hidden shadow-lg transition ease-in-out delay-150 hover:-translate-y-1 hover:scale-105 duration-300">
                         <img v-if="product.productReferences.length > 0"
-                            :src="'/products/' + product.productReferences[0].slug + '.jpg'" class="w-full" alt="">
+                            :src="product.productReferences[0].imageUrl" class="w-full" alt="">
                         <img v-else src="/products/default_product.jpg" class="w-full" alt="">
                         <div class="px-6 py-4">
                             <div class="font-bold text-2xl lg:text-md mb-2">{{ product.name }}</div>
