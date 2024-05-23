@@ -38,8 +38,8 @@ class ProductType extends AbstractType
         $builder
             ->add('name', Type\TextType::class, [
                 'constraints' => [
-                    new NotBlank(),
-                    new Length(['min' => 4])
+                    new NotBlank(message: "Le nom du produit doit être renseigné"),
+                    new Length(['min' => 4], minMessage: "Le nom doit être composé d'au moins 4 caractères")
                 ]
             ])
             ->add('category', EntityType::class, [
@@ -50,11 +50,10 @@ class ProductType extends AbstractType
                 'choice_value' => fn (?ProductCategory $cat) => ($cat ? $cat->getId() : '')
             ], [
                 'constraints' => [
-                    new NotNull(),
+                    new NotNull(message: "Veuiller selectionner une catégorie"),
                     // new Type(ProductCategory::class)
                 ]
             ])
-            ->add('description', Type\TextareaType::class)
             ->add('submit', Type\SubmitType::class, [
                 'label' => 'Ajouter'
             ])

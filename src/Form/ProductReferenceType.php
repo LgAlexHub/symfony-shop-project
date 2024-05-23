@@ -33,20 +33,20 @@ class ProductReferenceType extends AbstractType
         $builder
             ->add('price', Type\NumberType::class, [
                 'constraints' => [
-                    new Positive(),
-                    new NotNull(),
+                    new Positive(message: "Le prix doit être une valeur positive"),
+                    new NotNull(message: "Le prix doit être une valeur numérique valide"),
                 ]
             ])
             ->add('weight', Type\NumberType::class, [
                 'constraints' => [
-                    new Positive(),
-                    new NotNull(),
+                    new Positive(message: "Le poids doit être une valeur positive"),
+                    new NotNull(message: "Le poids doit obligatoirement être renseigné"),
                 ]
             ])
             ->add('weightType', Type\TextType::class, [
                 'constraints' => [
-                    new NotNull(),
-                    new NotBlank()
+                    new NotNull(message: "Le Type de poids doit être renseigné"),
+                    new NotBlank(message: "Le Type de poids ne doit pas être vide")
                 ]
             ])
             // ->add('imageFile', VichImageType::class)
