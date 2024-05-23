@@ -45,7 +45,7 @@
             </li>
         </ul>
     </nav>
-    <table class="table-auto w-full">
+    <table class="table-auto w-full" v-if="!isLoading">
         <thead class="">
             <tr class="[&>*]:text-center [&>*]:font-semibold text-gray-700 bg-blue-100 [&>*]:py-4">
                 <template v-for="(column, index) in columnsKeys">
@@ -64,7 +64,7 @@
                 </template>
             </tr>
         </thead>
-        <tbody class="divide-y divide-gray-200" v-if="!isLoading">
+        <tbody class="divide-y divide-gray-200">
             <template v-for="(product, index) in products" :key="product.id">
                 <tr :class="{ '[&>*]:py-2': true, 'bg-gray-100' : index % 2 == 0 }">
                     <td>
@@ -100,8 +100,9 @@
                 </tr>
             </template>
         </tbody>
-        <loadingSpinner v-else></loadingSpinner>
     </table>
+    <loadingSpinner v-else></loadingSpinner>
+
 </template>
 
 <script>
