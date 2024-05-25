@@ -16,6 +16,7 @@ module.exports = {
         current: 'currentColor',
         'white': '#ffffff',
         'brownmecha' : '#80504C',
+        'bluemecha'  : '#4C7C80',
         'purplemecha': {
           100: '#ccb7c0',
           200: '#b394a1',
