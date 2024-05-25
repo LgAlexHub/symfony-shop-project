@@ -96,9 +96,9 @@ export default {
         handleProductReferenceSave(payload) {
             this.selectedProductReference = null;
             this.selectedActionType = null;
-            let index = this.currentProductReferences.findIndex((ref) => ref.id === payload.id);
+            let index = this.currentProductReferences.findIndex((ref) => ref.id === payload.data.id);
             if (index !== -1) {
-                this.currentProductReferences[index] = payload;
+                this.currentProductReferences[index] = payload.data;
             }
             this.$emit('onProductReferenceSaved', payload);
         },

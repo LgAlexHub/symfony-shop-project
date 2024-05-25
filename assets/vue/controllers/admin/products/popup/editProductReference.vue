@@ -2,7 +2,7 @@
     <p class="text-2xl font-semibold mb-4">
         Modification de la référence : {{ currentProductRef.slug }}
     </p>
-    <form class="space-y-6" @submit.prevent="submitForm">
+    <form v-if="!isLoading" class="space-y-6" @submit.prevent="submitForm">
         <div>
             <label for="weight" class="block text-sm font-medium text-gray-700">Quantité</label>
             <div class="mt-1">
@@ -36,12 +36,17 @@
             </button>
         </div>
     </form>
+    <spinner v-if="isLoading"></spinner>
 </template>
 
 <script>
     import axios from 'axios';
+import Spinner from '../../../components/Spinner.vue';
     export default {
         name: "popupEditProductRef",
+        components : {
+          'spinner' : Spinner
+        },
         props: {
             productRef: {
                 required: true,
@@ -56,10 +61,12 @@
         data() {
             return {
                 currentProductRef: null,
+                isLoading : false,
             }
         },
         methods: {
             onProductReferenceEditForm() {
+                this.isLoading = true;
                 axios.patch(`/api/admin/references/${this.currentProductRef.id}`, {
                     price: this.currentProductRef.formatedPrice * 100,
                     weight: this.currentProductRef.weight,
@@ -80,6 +87,7 @@
                         messages : error.response.data.error.msg.map((err) => err.message),
                         type : "danger"
                     }))
+                    .then((_) => this.isLoading = false);
             }
         },
         beforeMount() {

@@ -45,12 +45,6 @@
                         <li class="">Regarde les //TODO dans VSCODE</li>
                     </ul>
                 </div>
-                <div class="text-red-600">
-                    <i class="fas fa-arrow-up mr-2"></i> fix :
-                    <ul class="[&>*]:ml-10 list-disc">
-                        <li class="">Regarder la modification de prix d'une référence dans la popup ne se met pas à jour coté utilisateur après update</li>
-                    </ul>
-                </div>
             </ul>
         </div>
     </div>
