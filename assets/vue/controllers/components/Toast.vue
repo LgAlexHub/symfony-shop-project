@@ -4,7 +4,8 @@
         :class="{
            'bg-gray-800 dark:bg-gray-900' : toastType === null,
            'bg-red-800 dark:bg-red-900' : toastType === 'danger',
-           'bg-lime-800 dark:bg-lime-900' : toastType === 'success'
+           'bg-lime-800 dark:bg-lime-900' : toastType === 'success',
+           'bg-yellow-800 dark:bg-yellow-900' : toastType === 'warning'
         }"
     >
         <div class="flex px-4 py-2 mx-4">

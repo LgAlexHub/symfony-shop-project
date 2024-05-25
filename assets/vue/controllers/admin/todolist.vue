@@ -42,6 +42,8 @@
                     <i class="fas fa-arrow-up mr-2"></i> Note :
                     <ul class="[&>*]:ml-10 list-disc">
                         <li class="">Les descriptions des produits ne servent pour l'instant à rien</li>
+                        <li>Rajouter un on:hover dans la page nos produits qui change l'image, pour donner une utilité à toutes les photos faites</li>
+                        <li>Regarder l'optimisation des images, voir si on doit les compresser pour le rendu</li>
                         <li class="">Regarde les //TODO dans VSCODE</li>
                     </ul>
                 </div>

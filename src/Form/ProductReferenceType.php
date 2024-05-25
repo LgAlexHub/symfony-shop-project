@@ -49,7 +49,7 @@ class ProductReferenceType extends AbstractType
                     new NotBlank(message: "Le Type de poids ne doit pas être vide")
                 ]
             ])
-            // ->add('imageFile', VichImageType::class)
+            ->add('imageFile', VichImageType::class, ['allow_file_upload' => true])
             ->add('submit', Type\SubmitType::class, [
                 'label' => 'Ajouter'
             ])

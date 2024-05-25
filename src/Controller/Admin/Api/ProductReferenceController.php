@@ -18,7 +18,7 @@ class ProductReferenceController extends ApiAdminController
 {
     use ControllerToolsTrait;
 
-    #[Route('/{id}', name: 'edit', methods:['PATCH'])]
+    #[Route('/{id}', name: 'edit', methods:['POST'])]
     /**
      * This method will try to edit a product reference with content of request
      *
@@ -55,10 +55,40 @@ class ProductReferenceController extends ApiAdminController
                 'imageUrl'
             ]);
         $productReferenceForm = $this->createForm(ProductReferenceType::class, options: ['csrf_protection' => false]);
-        $productReferenceForm->submit(json_decode($request->getContent(), true));
-
-       
+        $productReferenceForm->submit($request->request->all());
         if($productReferenceForm->isValid()){
+            $formImage = $request->files->get('imageFile');
+            if(!is_null($formImage)){
+                if($formImage->getError() !== 0){
+                    $error = match ($formImage->getError()) {
+                        UPLOAD_ERR_INI_SIZE, UPLOAD_ERR_FORM_SIZE => 'Le fichier téléchargé dépasse la taille maximale autorisée.',
+                        UPLOAD_ERR_PARTIAL => 'Le fichier n\'a été que partiellement téléchargé.',
+                        UPLOAD_ERR_NO_FILE => 'Aucun fichier n\'a été téléchargé.',
+                        UPLOAD_ERR_NO_TMP_DIR => 'Un dossier temporaire est manquant.',
+                        UPLOAD_ERR_CANT_WRITE => 'Échec de l\'écriture du fichier sur le disque.',
+                        UPLOAD_ERR_EXTENSION => 'Une extension PHP a arrêté le téléchargement du fichier.',
+                        default => 'Une erreur inconnue est survenue lors de l\'upload.',
+                    };
+                    return  $this->json(['error' => ['msg' => [['message' => $error]]]], 422);
+                }
+                $allowedImageTypes = [
+                    'image/jpeg',
+                    'image/png',
+                    'image/gif',
+                    'image/bmp',
+                    'image/webp',
+                    'image/tiff',
+                    'image/svg+xml',
+                    'image/x-icon',
+                    'image/heif',
+                    'image/heic'
+                ];
+                if(!in_array($formImage->getMimeType(), $allowedImageTypes)){
+                    return  $this->json(['error' => ['msg' => [['message' => sprintf("Le type du fichier uploadé %s n'est pas une image", $formImage->getMimeType())]]]], 422);
+                }
+            
+                $targetedProductReference->setImageFile($formImage);
+            }
             $editedProductReference = $productReferenceForm->getData();
             $targetedProductReference->setPrice($editedProductReference->getPrice())
                 ->setWeight($editedProductReference->getWeight())
