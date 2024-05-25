@@ -77,8 +77,8 @@
                         <div class="flex-1 flex flex-col items-stretch text-center divide-y">
                             <template v-for="(ref, index) in product.productReferences">
                                 <button @click="addBasket(ref, product.name)"
-                                    :class="'flex flex-1 w-full items-center justify-evenly font-thin text-white bg-brownmecha hover:font-semibold py-'+6/(product.productReferences.length)">
-                                    <span>
+                                    :class="'flex flex-1 w-full items-center justify-evenly font-thin text-white bg-bluemecha hover:font-semibold py-'+6/(product.productReferences.length)">
+                                    <span class="font-semibold">
                                         {{ ref.weight }} {{ ref.weightType }} 
                                         <i class="fa-solid fa-weight-hanging ml-2"></i>
                                     </span>

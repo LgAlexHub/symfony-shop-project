@@ -4,14 +4,14 @@
         :basket="cartItems"
         @close-popup="popUpOpenState = false"
     ></popup>
-    <div class="fixed bottom-0 left-0 right-0 bg-brownmecha shadow-md h-16 px-6 z-20 flex justify-arround items-center">
+    <div class="fixed bottom-0 left-0 right-0 bg-brownmecha shadow-md h-32 lg:h-16 px-6 z-20 flex justify-arround items-center">
         <div>
-            <p @click="popUpOpenState = true" class="mr-10 hover:underline text-white"><i class="fa-solid fa-shopping-basket px-2"></i>Votre panier : {{ totalQuantity }} Produit{{ totalQuantity > 1 ? 's' : '' }}</p>
+            <p @click="popUpOpenState = true" class="mr-10 text-xl lg:text-md hover:underline text-white"><i class="fa-solid fa-shopping-basket px-2"></i>Votre panier : {{ totalQuantity }} Produit{{ totalQuantity > 1 ? 's' : '' }}</p>
         </div>
         <div>
             <form action="/commandes/commander" method="POST">
                 <input type="hidden" name="basket_items" :value="JSON.stringify(cartItems)">
-                <button v-if="cartItems.length > 0" class="bg-bluemecha hover:bg-green-600 text-white font-bold py-1 px-4 rounded focus:outline-none focus:ring-2 focus:ring-green-400" type="submit">Commander</button>
+                <button v-if="cartItems.length > 0" class="bg-bluemecha h-16 lg:h-8 hover:bg-green-600 text-white font-bold py-1 px-4 rounded focus:outline-none focus:ring-2 focus:ring-green-400" type="submit">Commander</button>
             </form>
         </div>
     </div>
