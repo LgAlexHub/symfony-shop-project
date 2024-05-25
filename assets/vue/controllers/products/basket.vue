@@ -11,7 +11,7 @@
         <div>
             <form action="/commandes/commander" method="POST">
                 <input type="hidden" name="basket_items" :value="JSON.stringify(cartItems)">
-                <button v-if="cartItems.length > 0" class="bg-[#4C7C80] hover:bg-green-600 text-white font-bold py-1 px-4 rounded focus:outline-none focus:ring-2 focus:ring-green-400" type="submit">Commander</button>
+                <button v-if="cartItems.length > 0" class="bg-bluemecha hover:bg-green-600 text-white font-bold py-1 px-4 rounded focus:outline-none focus:ring-2 focus:ring-green-400" type="submit">Commander</button>
             </form>
         </div>
     </div>

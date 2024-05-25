@@ -4,17 +4,17 @@
             <ul class="list-style-none flex">
                 <li v-if="paginator.page > 1">
                     <button
-                        class="relative block border-2 bg-[#80504C] hover:bg-amber-950 rounded-xl px-3 py-1.5 lg:text-sm text-2xl text-white"
+                        class="relative block border-2 bg-brownmecha hover:bg-amber-950 rounded-xl px-3 py-1.5 lg:text-sm text-2xl text-white"
                         @click="goToPage(paginator.page - 1)"><i class="fa-solid fa-arrow-left-long"></i></button>
                 </li>
                 <li aria-current="page">
                     <p
-                        class="relative border-rounded border-2 mr-3 ml-3 block rounded-xl bg-[#804C62] text-white px-3 py-1.5 lg:text-sm text-2xl">
+                        class="relative border-rounded border-2 mr-3 ml-3 block rounded-xl bg-purplemecha-500 text-white px-3 py-1.5 lg:text-sm text-2xl">
                         {{ paginator.page }}</p>
                 </li>
                 <li v-if="paginator.totalPage > paginator.page" aria-current="page">
                     <button
-                        class="relative block border-2 bg-[#80504C] hover:bg-amber-950 rounded-xl px-3 py-1.5 lg:text-sm text-2xl text-white"
+                        class="relative block border-2 bg-brownmecha hover:bg-amber-950 rounded-xl px-3 py-1.5 lg:text-sm text-2xl text-white"
                         @click="goToPage(paginator.page + 1)">
                         <i class="fa-solid fa-arrow-right-long"></i>
                     </button>
@@ -25,19 +25,19 @@
     <div class="mb-40">
         <div class="grid grid-cols-12">
             <div class="lg:col-span-2 col-span-3 px-5">
-                <h4 class="text-2xl my-4 rounded bg-[#804C62] text-center text-white py-2">Catégories</h4>
+                <h4 class="text-2xl my-4 rounded bg-purplemecha-500 text-center text-white py-2">Catégories</h4>
                 <ul class="text-md space-y-3 text-center space-y-5">
                     <li>
                         <a @click="selectCategory('favorite')" :class="{
-                            'font-bold text-white rounded-2xl bg-[#804C62]/70 mx-2': selectedCategory === 'favorite',
+                            'font-bold text-white rounded-2xl bg-purplemecha-400 mx-2': selectedCategory === 'favorite',
                             'hover:underline': selectedCategory !== 'favorite'
-                        }" class="block transition text-[#80504C] duration-300 ease-in-out lg:text-md text-xl">
+                        }" class="block transition text-purplemecha duration-300 ease-in-out lg:text-md text-xl">
                             Nos recommandations
                         </a>
                     </li>
                     <li v-for="category in categories" :key="'category_' + category.label">
                         <a @click="selectCategory(category.id)" :class="{
-                            'font-bold text-white rounded-2xl bg-[#804C62]/70 mx-2': selectedCategory === category.id,
+                            'font-bold text-white rounded-2xl bg-purplemecha-300 mx-2': selectedCategory === category.id,
                             'hover:underline': selectedCategory !== category.id,
                         }" class="block transition duration-300 ease-in-out lg:text-md text-xl">
                             {{ category.label }}
@@ -45,7 +45,7 @@
                     </li>
                     <li>
                         <a @click="selectCategory(null)" :class="{
-                            'font-bold text-white rounded-2xl bg-[#804C62]/70 mx-2': selectedCategory === null,
+                            'font-bold text-white rounded-2xl bg-purplemecha-300 hover:bg-purplemecha-400 mx-2': selectedCategory === null,
                             'hover:underline': selectedCategory !== null
                         }" class="block transition duration-300 ease-in-out lg:text-md text-xl">
                             Tous
@@ -57,27 +57,37 @@
             <div class="lg:col-span-9 col-span-8">
                 <div v-if="!isLoading" class="grid grid-cols-2 lg:grid-cols-4 gap-10">
                     <div v-for="(product, index) in paginator.products" :key="'product_' + index"
-                        class="max-w-sm rounded hover:border-4 hover:border-[#804C7C] overflow-hidden shadow-lg transition ease-in-out delay-150 hover:-translate-y-1 hover:scale-105 duration-300">
-                        <img v-if="product.productReferences.length > 0"
-                            :src="product.productReferences[0].imageUrl" class="w-full" alt="">
-                        <img v-else src="/products/default_product.jpg" class="w-full" alt="">
-                        <div class="px-6 py-4">
-                            <div class="font-bold text-2xl lg:text-md mb-2">{{ product.name }}</div>
+                        class="max-w-sm rounded hover:border-4 hover:border-purplemecha-100 overflow-hidden shadow-lg transition ease-in-out delay-150 hover:-translate-y-1 hover:scale-105 duration-300 flex flex-col">
+
+                        <!-- Image Section -->
+                        <div>
+                            <img v-if="product.productReferences.length > 0"
+                                :src="product.productReferences[0].imageUrl" class="w-full" alt="">
+                            <img v-else src="/products/default_product.jpg" class="w-full" alt="">
                         </div>
-                        <div class="px-6 pt-4 pb-2 sm:block sm:justify-center flex text-center space-y-4">
+
+                        <!-- Title Section -->
+                        <div class="h-16 flex justify-center items-center">
+                            <p class="font-extralight text-center text-xl lg:text-md">{{ product.name }}</p>
+                        </div>
+
+                        <hr>
+
+                        <!-- Buttons Section - Takes the remaining space -->
+                        <div class="flex-1 flex flex-col items-stretch text-center divide-y">
                             <template v-for="(ref, index) in product.productReferences">
-                                <button class="block w-full border-x-2 border-black rounded-xl bg-red-100 hover:bg-red-200" @click="addBasket(ref, product.name)">
-                                    <span class="">
+                                <button @click="addBasket(ref, product.name)"
+                                    :class="'flex flex-1 w-full items-center justify-evenly font-thin text-white bg-brownmecha hover:font-semibold py-'+6/(product.productReferences.length)">
+                                    <span>
                                         {{ ref.weight }} {{ ref.weightType }} 
+                                        <i class="fa-solid fa-weight-hanging ml-2"></i>
                                     </span>
-                                    -
-                                    <span class="font-semibold">
-                                        {{ (ref.formatedPrice).toFixed(2) }} €
+                                    <span>
+                                        {{ (ref.formatedPrice).toFixed(2) }} 
+                                        <i class="fa-solid fa-euro-sign ml-2"></i>
                                     </span>
                                 </button>
-                                <!-- <span  class="lg:text-sm hover:font-bold text-2xl text-gray-700 mr-2 mb-2 block text-center hover:bg-fuchsia-200 flex-1 border-r-4 border-r-white hover:text-white font-semibold">
-                                    </span><span class="flex-1"> 
-                                </span> -->
+
                             </template>
                         </div>
                     </div>
@@ -98,7 +108,7 @@ import Spinner from "../components/Spinner.vue";
 export default {
     components: {
         'bar': basket,
-        'loadingSpinner' : Spinner
+        'loadingSpinner': Spinner
     },
     data() {
         return {
