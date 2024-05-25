@@ -11,6 +11,23 @@ module.exports = {
       padding: '2rem',
     },
     extend: {
+      colors: {
+        transparent: 'transparent',
+        current: 'currentColor',
+        'white': '#ffffff',
+        'brownmecha' : '#80504C',
+        'purplemecha': {
+          100: '#ccb7c0',
+          200: '#b394a1',
+          300: '#997081',
+          400: '#804c62',
+          500: '#804c62',
+          600: '#663d4e',
+          700: '#4d2e3b',
+          800: '#402631',
+          900: '#26171d',
+        }
+      },
       animation: {
         fade: 'fadeIn 1s ease-in-out'
       },
@@ -19,9 +36,6 @@ module.exports = {
           '0%': { opacity: 0 },
           '100%': { opacity: 100 },
         },
-      },
-      backgroundImage: {
-        'hero': "url('/public/hero_clipped.jpg')"
       },
     },
   },
