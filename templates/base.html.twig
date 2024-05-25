@@ -16,7 +16,7 @@
 		{% endblock %}
 	</head>
 	<body class="font-sans">
-		<nav class="flex items-center justify-between flex-wrap p-6 text-white bg-[#804C62] shadow-xl">
+		<nav class="flex items-center justify-between flex-wrap p-6 text-white bg-purplemecha-500 shadow-xl">
 			<div class="flex items-center lg:w-fit sm:justify-center md:w-full flex-shrink-0 mr-6">
 				<a href="{{path('home')}}">
 					<img src="/logo.png" alt="Icône du site, fraise avec nom du site" class="mr-2 w-14 lg:w-10">
@@ -28,7 +28,7 @@
 						Nos produits
 					</a>
 					{% if is_granted('IS_AUTHENTICATED_FULLY') %}
-						<a href="{{path('admin.orders.index')}}" class="block mx-1 lg:w-fit md:w-full md:text-center mt-4 lg:inline-block lg:mt-0 hover:bg-white px-4 py-2 rounded text-red-500 border rounded border-red-500 hover:border-transparent hover:text-[#804C62] mr-4">
+						<a href="{{path('admin.orders.index')}}" class="block mx-1 lg:w-fit md:w-full md:text-center mt-4 lg:inline-block lg:mt-0 hover:bg-white px-4 py-2 rounded text-red-500 border rounded border-red-500 hover:border-transparent hover:text-red-400 mr-4">
 							Accès Administrateur
 						</a>
 					{% endif %}
@@ -38,7 +38,7 @@
 		<div id="app min-h-screen flex flex-col">
 			{% block body %}{% endblock %}
 		</div>
-		<footer class="bg-[#80504C] text-white text-center text-surface/75 lg:text-left mt-auto">
+		<footer class="bg-brownmecha text-white text-center text-surface/75 lg:text-left mt-auto">
 			<div class="flex items-center justify-center border-b-2 border-neutral-200 p-6 dark:border-white/10 lg:justify-between">
 				<div class="me-12 hidden lg:block text-xl font-bold">
 					<span>Réseau sociaux:</span>

@@ -4,7 +4,7 @@
         :basket="cartItems"
         @close-popup="popUpOpenState = false"
     ></popup>
-    <div class="fixed bottom-0 left-0 right-0 bg-[#80504C] shadow-md h-16 px-6 z-20 flex justify-arround items-center">
+    <div class="fixed bottom-0 left-0 right-0 bg-brownmecha shadow-md h-16 px-6 z-20 flex justify-arround items-center">
         <div>
             <p @click="popUpOpenState = true" class="mr-10 hover:underline text-white"><i class="fa-solid fa-shopping-basket px-2"></i>Votre panier : {{ totalQuantity }} Produit{{ totalQuantity > 1 ? 's' : '' }}</p>
         </div>
