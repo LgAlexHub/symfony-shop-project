@@ -40,9 +40,7 @@
             </div>
             <div class="h-30 flex flex-col justify-center items-center">
                 <p class="text-lg font-bold mb-2">Total du panier: {{ totalCartPrice.toFixed(2) }} €</p>
-               
             </div>
-
         </div>
     </div>
 </template>
