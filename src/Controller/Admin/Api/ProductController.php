@@ -41,11 +41,12 @@ class ProductController extends ApiAdminController
         $page = $request->get('page', 1);
         $query = $request->get('query', '');
         $softDelete = $request->get('deleted', 0);
+        $isFavorite = $request->get('favorite', 0);
         $cat = $request->get('cat', null);
         if (!in_array($softDelete, [0, 1, -1])) {
             $softDelete = 0;
         }
-        $products = $productManager->paginateFilterProducts(page: $page, userSearchQuery: $query, category: $cat, withSoftDelete: $softDelete, isAdmin: true);
+        $products = $productManager->paginateFilterProducts(page: $page, userSearchQuery: $query, category: $cat, withSoftDelete: $softDelete, isAdmin: true, adminFavoriteFilter: $isFavorite);
 
         $enhancedEntityJsonSerializer
             ->setObjectToSerialize($products->results)

@@ -18,14 +18,26 @@
         <option value="favorite">Nos recommandations</option>
         <option v-for="cat in productCategories" :key="cat.id" :value="cat.id">{{ cat.label }}</option>
     </select>
-    <div>
-        <h3 class="block">Filtrer par état de suppression</h3>
-        <div class="flex ml-5 space-x-2">
-            <template v-for="(state, index) in stateOptions" :key="'stateInput-'+index">
-                <input type="radio" :value="state.value" :id="'radioState-' + index" v-model="selectedState"
-                    @change="fetchPaginatedProduct">
-                <label :for="'radioState-' + index">{{ state.label }}</label>
-            </template>
+    <div class="flex">
+        <div class="flex-1">
+            <h3 class="inline-block">Filtrer par état de suppression</h3>
+            <div class="flex ml-5 space-x-2">
+                <template v-for="(state, index) in softDeleteStates" :key="'stateInput-'+index">
+                    <input type="radio" :value="state.value" :id="'radioState-' + index" v-model="softDeleteSelectedState"
+                        @change="fetchPaginatedProduct">
+                    <label :for="'radioState-' + index">{{ state.label }}</label>
+                </template>
+            </div>
+        </div>
+        <div class="flex-1">
+            <h3 class="block">Filtrer par favoris</h3>
+            <div class="flex ml-5 space-x-2">
+                <template v-for="(state, index) in favoriteStates" :key="'favoriteSelectedState-'+index">
+                    <input type="radio" :value="state.value" :id="'favoriteRadioState-' + index" v-model="favoriteSelectedState"
+                        @change="fetchPaginatedProduct">
+                    <label :for="'favoriteRadioState-' + index">{{ state.label }}</label>
+                </template>
+            </div>
         </div>
     </div>
     <nav class="my-12">
@@ -103,7 +115,7 @@
                             <i class="fa-solid fa-magnifying-glass">
                             </i>
                         </button>
-                        <button @click="updateIsFavoriteState(product)"
+                        <button @click="updateIsfavoriteSelectedState(product)"
                             class="flex-1 bg-yellow-400 hover:bg-yellow-500 text-white text-center rounded-md px-2 py-1 mx-5">
                             <i class="fa-heart fa-solid" :class="{
                                 'text-red-700': product.isFavorite
@@ -157,11 +169,18 @@ export default {
             maxPage: null,
             resultCount: null,
             isLoading: false,
-            selectedState: 0,
-            stateOptions: {
+            softDeleteSelectedState: 0,
+            softDeleteStates: {
                 all: { label: 'Tous', value: 0 },
                 deleted: { label: 'Supprimés', value: -1 },
                 active: { label: 'Actifs', value: 1 }
+
+            },
+            favoriteSelectedState: 0,
+            favoriteStates: {
+                all: { label: 'Tous', value: 0 },
+                noneFavorite : { label: 'Non favoris', value: -1 },
+                favorite: { label: 'Favoris', value: 1 }
 
             },
             feedback: {
@@ -188,6 +207,7 @@ export default {
                     orderBy: null
                 },
             },
+            
             products: [],
             productCategories: [],
             queryInput: "",
@@ -252,7 +272,14 @@ export default {
         },
         fetchPaginatedProduct() {
             this.isLoading = true;
-            let paramString = `?page=${this.page}&deleted=${this.selectedState}`;
+            let paramString = `?page=${this.page}`;
+            if(this.softDeleteSelectedState !==0){
+                paramString+=`&deleted=${this.softDeleteSelectedState}`
+            }
+
+            if(this.favoriteSelectedState !== 0 ){
+                paramString+=`&favorite=${this.favoriteSelectedState}`
+            }
 
             if (this.queryInput !== "") {
                 paramString += "&query=" + this.queryInput;
@@ -295,7 +322,7 @@ export default {
             this.feedback.msg = payloadToast.messages;
             this.feedback.type = payloadToast.type;
         },
-        updateIsFavoriteState(targetedProduct) {
+        updateIsfavoriteSelectedState(targetedProduct) {
             let index = this.products.findIndex((product) => product.id === targetedProduct.id);
             if (index === -1) {
                 this.toastFeedback({
@@ -355,7 +382,12 @@ export default {
         
     },
     watch: {
-        selectedState(newState, oldState) {
+        softDeleteSelectedState(newState, oldState) {
+            if (newState !== oldState) {
+                this.resetPage();
+            }
+        },
+        favoriteSelectedState(newState, oldState) {
             if (newState !== oldState) {
                 this.resetPage();
             }

@@ -49,7 +49,7 @@ class ProductRepository extends ServiceEntityRepository
      * @param bool $isAdmin
      * @return QueryBuilder
      */
-    private function buildProductFilterPaginateQuery(string $userSearchQuery, null|string|int $category, int $withSoftDelete, bool $isAdmin) : QueryBuilder {
+    private function buildProductFilterPaginateQuery(string $userSearchQuery, null|string|int $category, int $withSoftDelete, bool $isAdmin, int $adminFavoriteFilter) : QueryBuilder {
         $queryBuilder = $this->createQueryBuilder(self::alias);
         $joinType = $isAdmin ? 'leftJoin' : 'innerJoin';
         $joinArgs = [sprintf("%s.productReferences", self::alias), "productReference"];
@@ -63,6 +63,11 @@ class ProductRepository extends ServiceEntityRepository
 
         $queryBuilder->innerJoin(sprintf("%s.category", self::alias), "productCategory")
             ->addSelect(['productReference', 'productCategory']);
+
+        if($adminFavoriteFilter !== 0){
+            $queryBuilder->where(sprintf("%s.isFavorite = :favoriteState", self::alias))
+                ->setParameter("favoriteState", $adminFavoriteFilter === 1 ? true : false);
+        }
 
 
 
@@ -94,7 +99,7 @@ class ProductRepository extends ServiceEntityRepository
      * @param bool $isAdmin
      * @return QueryBuilder
      */
-    private function buildProductCountQuery(string $userSearchQuery, null|string|int $category, int $withSoftDelete, bool $isAdmin) : QueryBuilder {
+    private function buildProductCountQuery(string $userSearchQuery, null|string|int $category, int $withSoftDelete, bool $isAdmin, int $adminFavoriteFilter) : QueryBuilder {
         $queryBuilder = $this->createQueryBuilder(self::alias)
             ->select(sprintf("COUNT(DISTINCT %s.id)", self::alias));
 
@@ -108,6 +113,11 @@ class ProductRepository extends ServiceEntityRepository
             $condition = $withSoftDelete === 1 ? 'IS NULL' : 'IS NOT NULL';
             $queryBuilder->where(sprintf("%s.deletedAt %s", self::alias, $condition));
             $queryBuilder->orWhere(sprintf("%s.deletedAt %s AND productReference.deletedAt %s", self::alias, $condition, $condition));
+        }
+
+        if($adminFavoriteFilter !== 0){
+            $queryBuilder->where(sprintf("%s.isFavorite = :favoriteState", self::alias))
+                ->setParameter("favoriteState", $adminFavoriteFilter === 1 ? true : false);
         }
 
         if(!is_null($category)){
@@ -174,9 +184,9 @@ class ProductRepository extends ServiceEntityRepository
      * @param bool $isAdmin
      * @return mixed
      */
-    public function paginateFilterProducts(int $page = 1, int $perPage = 12, int|string|null $category = null, $userSearchQuery = null, int $withSoftDelete=1, bool $isAdmin = false) : mixed {
-        $productCountQueryBuilder = $this->buildProductCountQuery($userSearchQuery, $category, $withSoftDelete, $isAdmin);
-        $productFilterQueryBuilder = $this->buildProductFilterPaginateQuery($userSearchQuery, $category, $withSoftDelete, $isAdmin);
+    public function paginateFilterProducts(int $page = 1, int $perPage = 12, int|string|null $category = null, $userSearchQuery = null, int $withSoftDelete=1, bool $isAdmin = false, int $adminFavoriteFilter = 0) : mixed {
+        $productCountQueryBuilder = $this->buildProductCountQuery($userSearchQuery, $category, $withSoftDelete, $isAdmin, $adminFavoriteFilter);
+        $productFilterQueryBuilder = $this->buildProductFilterPaginateQuery($userSearchQuery, $category, $withSoftDelete, $isAdmin, $adminFavoriteFilter);
         $productCountAndMaxPage = $this->calculateProductMaxPage($productCountQueryBuilder, $perPage);
         $productFilterQueryBuilder->setFirstResult($perPage * ($page - 1))
             ->setMaxResults($perPage);

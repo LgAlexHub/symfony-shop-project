@@ -10,10 +10,9 @@
                     [AMELIORATION|FEATURE|CORRECTION] à faire au plus vite car nécessaire au fonctionnement du site
                 </span>
                 <ul class="[&>*]:ml-10 list-disc text-red-600">
-                    <li>Ajuster un composant vue dans la popup product admin pour créer un productReference</li>
-                    <li>Ajouter un filtre bo pour les produits afin de trier par favoris </li>
-                    <li>Ajouter reset filtre bo qui reset la totalité des inputs</li>
-                    <li>Ajouter un init de mail admin pour initialiser un compte via un lien</li>
+                    <li>Ajuster un composant vue dans la popup product admin pour créer un productReference à faire le [26/05/24]</li>
+                    <li>Ajouter reset filtre bo qui reset la totalité des inputs à faire le [26/05/24]</li>
+                    <li>Ajouter un init de mail admin pour initialiser un compte via un lien à faire le [26/05/24]</li>
                 </ul>
             </ul>
             <ul class="list-none border-b border-yellow-700">
