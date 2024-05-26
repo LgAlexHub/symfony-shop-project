@@ -309,8 +309,8 @@ export default {
                     "Authorization": `Bearer ${this.apiToken}`
                 }
             })
-                .then((_) => {
-                    this.products[index].isFavorite = !this.products[index].isFavorite
+                .then((res) => {
+                    this.products[index] = res.data;
                     this.toastFeedback({
                         messages: `Le produit ${targetedProduct.name} est désormais en ${this.products[index].isFavorite ? '' : 'non'} favoris`,
                         type: this.products[index].isFavorite ? 'success' : 'warning'
@@ -338,7 +338,7 @@ export default {
                 }
             })
                 .then((res) => {
-                    this.products[index].deletedAt = res.data.deletedAt;
+                    this.products[index] = res.data;
                     this.toastFeedback({
                         messages: `Le produit ${targetedProduct.name} est désormais en ${this.products[index].deletedAt !== null ? 'supprimé' : 'actif'}`,
                         type: this.products[index].deletedAt !== null ? 'warning' : 'success'

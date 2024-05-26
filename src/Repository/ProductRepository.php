@@ -29,18 +29,11 @@ class ProductRepository extends ServiceEntityRepository
         parent::__construct($registry, Product::class);
     }
 
-    /**
-     * Finds products by a search query. It constructs a query to retrieve 
-     * products whose names match the specified search query, ordered alphabetically.
-     *
-     * @param string $query
-     * @return mixed
-     */
-    public function findProductsByQuery(string $query) : mixed {
+
+    public function getSelectionProductWithoutSoftDelete(){
         return $this->createQueryBuilder(self::alias)
-            ->where(sprintf("%s.name LIKE :query"))
-            ->orderBy(sprintf("%s.name", self::alias), "ASC")
-            ->setParameter("query", "%$query%")
+            ->where(sprintf('%s.isFavorite = 1', self::alias))
+            ->andWhere(sprintf('%s.deletedAt IS NULL', self::alias))
             ->getQuery()
             ->getResult();
     }

@@ -112,6 +112,7 @@ class ProductController extends ApiAdminController
                     'category' => ['label', 'id'],
                     'createdAt',
                     'updatedAt',
+                    'deletedAt',
                     'description',
                     'productReferences' => [
                         'id',
@@ -138,7 +139,7 @@ class ProductController extends ApiAdminController
      * @param EntityManagerInterface $em
      * @return Response
      */
-    public function updateIsDone(Request $request, SessionTokenManager $sessionTokenManager, int $id, EntityManagerInterface $em): Response
+    public function updateIsDone(Request $request, SessionTokenManager $sessionTokenManager, int $id, EntityManagerInterface $em, EnhancedEntityJsonSerializer $enhancedEntityJsonSerializer): Response
     {
         $auth = $this->checkBearerToken($request, $sessionTokenManager);
         // Retrun json api error 401 if auth not valid
@@ -157,7 +158,29 @@ class ProductController extends ApiAdminController
         $targetedProduct->setIsFavorite(!$targetedProduct->getIsFavorite());
         $em->persist($targetedProduct);
         $em->flush();
-        return $this->json("Ok", status: 200);
+        $enhancedEntityJsonSerializer
+            ->setObjectToSerialize($targetedProduct)
+            ->setOptions([AbstractNormalizer::CIRCULAR_REFERENCE_HANDLER => fn (object $product, string $format, array $context) => $product->getId()])
+            ->setAttributes([
+                'id',
+                'name',
+                'category' => ['label', 'id'],
+                'createdAt',
+                'updatedAt',
+                'description',
+                'isFavorite',
+                'deletedAt',
+                'productReferences' => [
+                    'id',
+                    'formatedPrice',
+                    'weight',
+                    'weightType',
+                    'imageUrl',
+                    'slug',
+                    'deletedAt'
+                ]
+            ]);
+        return $this->apiJson($enhancedEntityJsonSerializer->serialize());
     }
 
     #[Route('/{id}/suppression', name: 'delete', methods: ['DELETE'])]
@@ -181,19 +204,19 @@ class ProductController extends ApiAdminController
         if (is_null($id))
             return $this->makeCustomJsonErrorAsReal("Id manquant dans l'url");
 
-        $targetedReference = $em->getRepository(Product::class)->findOneBy(['id' => $id]);
+        $targetedProduct = $em->getRepository(Product::class)->findOneBy(['id' => $id]);
 
-        if (is_null($targetedReference))
+        if (is_null($targetedProduct))
             return $this->makeCustomJsonErrorAsReal(sprintf("Référence avec l'id %d inexistant", $id), 404);
 
 
-        $targetedReference->toggleDelete();
-        $em->persist($targetedReference);
+        $targetedProduct->toggleDelete();
+        $em->persist($targetedProduct);
         $em->flush();
 
         $enhancedEntityJsonSerializer
-            ->setObjectToSerialize($targetedReference)
-            ->setOptions([AbstractNormalizer::CIRCULAR_REFERENCE_HANDLER => fn (object $reference, string $format, array $context) => $reference->getId()])
+            ->setObjectToSerialize($targetedProduct)
+            ->setOptions([AbstractNormalizer::CIRCULAR_REFERENCE_HANDLER => fn (object $product, string $format, array $context) => $product->getId()])
             ->setAttributes([
                 'id',
                 'name',

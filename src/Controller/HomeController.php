@@ -23,7 +23,7 @@ class HomeController extends AbstractController
      */
     public function index(EntityManagerInterface $manager): Response
     {
-        $products = $manager->getRepository(Product::class)->findBy(['isFavorite' => 1]);
+        $products = $manager->getRepository(Product::class)->getSelectionProductWithoutSoftDelete();
         return $this->render('home/index.html.twig', [
             'selection' => $products
         ]);

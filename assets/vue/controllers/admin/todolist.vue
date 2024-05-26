@@ -36,7 +36,6 @@
                 <div class="text-sky-600">
                     <i class="fas fa-arrow-up mr-2"></i> Note :
                     <ul class="[&>*]:ml-10 list-disc">
-                        <li>Lors d'un update product via la popup + api , il faut modifier le updatedAt pour qu'il soit à jour</li>
                         <li class="">Les descriptions des produits ne servent pour l'instant à rien</li>
                         <li>Rajouter un on:hover dans la page nos produits qui change l'image, pour donner une utilité à toutes les photos faites</li>
                         <li>Regarder l'optimisation des images, voir si on doit les compresser pour le rendu</li>
