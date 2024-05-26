@@ -46,29 +46,43 @@ class ProductRepository extends ServiceEntityRepository
     }
 
     /**
-     * Builds a query to paginate products with filtering capabilities based on the user's search query. 
+     * Builds a query to paginate products with filtering capabilities based on the user's search query, cateogry, and softDelete attribute. 
      * It constructs a query builder object with inner joins to fetch associated product
      * references and categories. Additionally, it adds selections for productReference and productCategory.
      *
      * @param string $userSearchQuery
+     * @param null|string|int $cateogry
+     * @param int $withSoftDelete
+     * @param bool $isAdmin
      * @return QueryBuilder
      */
-    private function buildProductFilterPaginateQuery(string $userSearchQuery, null|string|int $category) : QueryBuilder {
-        $queryBuilder = $this->createQueryBuilder(self::alias)
-            ->innerJoin(sprintf("%s.productReferences", self::alias), "productReference")
-            ->innerJoin(sprintf("%s.category", self::alias), "productCategory")
+    private function buildProductFilterPaginateQuery(string $userSearchQuery, null|string|int $category, int $withSoftDelete, bool $isAdmin) : QueryBuilder {
+        $queryBuilder = $this->createQueryBuilder(self::alias);
+        $joinType = $isAdmin ? 'leftJoin' : 'innerJoin';
+        $joinArgs = [sprintf("%s.productReferences", self::alias), "productReference"];
+        
+        if ($withSoftDelete !== 0) {
+            $condition = $withSoftDelete === 1 ? 'NULL' : 'NOT NULL';
+            $joinArgs = array_merge($joinArgs, ["WITH", sprintf("%s.deletedAt IS %s", 'productReference', $condition)]);
+            $queryBuilder->where(sprintf("%s.deletedAt IS %s", self::alias, $condition));
+        }
+        $queryBuilder->{$joinType}(...$joinArgs);
+
+        $queryBuilder->innerJoin(sprintf("%s.category", self::alias), "productCategory")
             ->addSelect(['productReference', 'productCategory']);
+
+
 
         if(!is_null($category)){
             if ($category === "favorite"){
-                $queryBuilder->where(sprintf("%s.isFavorite = :favoriteState", self::alias))
+                $queryBuilder->andWhere(sprintf("%s.isFavorite = :favoriteState", self::alias))
                     ->setParameter("favoriteState", true);
             }else{
-                $queryBuilder->where("productCategory.id = :catId")
+                $queryBuilder->andWhere("productCategory.id = :catId")
                     ->setParameter("catId", $category);
             }
         }
-        
+
         if(!empty($userSearchQuery)){
             $this->filterByUserSearch($queryBuilder, $userSearchQuery);
         }
@@ -82,12 +96,26 @@ class ProductRepository extends ServiceEntityRepository
      * the given search criteria. The query includes inner joins to fetch associated product references.
      *
      * @param string $userSearchQuery
+     * @param null|string|int $cateogry
+     * @param int $withSoftDelete
+     * @param bool $isAdmin
      * @return QueryBuilder
      */
-    private function buildProductCountQuery(string $userSearchQuery, null|string|int $category) : QueryBuilder {
+    private function buildProductCountQuery(string $userSearchQuery, null|string|int $category, int $withSoftDelete, bool $isAdmin) : QueryBuilder {
         $queryBuilder = $this->createQueryBuilder(self::alias)
-            ->select(sprintf("COUNT(DISTINCT %s.id)", self::alias))
-            ->innerJoin(sprintf("%s.productReferences", self::alias), "productReference");
+            ->select(sprintf("COUNT(DISTINCT %s.id)", self::alias));
+
+        if($isAdmin){
+            $queryBuilder->leftJoin(sprintf("%s.productReferences", self::alias), "productReference");
+        }else{
+            $queryBuilder->innerJoin(sprintf("%s.productReferences", self::alias), "productReference");
+        }
+
+        if ($withSoftDelete !== 0) {
+            $condition = $withSoftDelete === 1 ? 'IS NULL' : 'IS NOT NULL';
+            $queryBuilder->where(sprintf("%s.deletedAt %s", self::alias, $condition));
+            $queryBuilder->orWhere(sprintf("%s.deletedAt %s AND productReference.deletedAt %s", self::alias, $condition, $condition));
+        }
 
         if(!is_null($category)){
             $queryBuilder->innerJoin(sprintf("%s.category", self::alias), "productCategory")
@@ -112,7 +140,7 @@ class ProductRepository extends ServiceEntityRepository
      */
     private function filterByUserSearch(QueryBuilder $queryBuilder, string $userSearchQuery) : void {
         $userSearchQueryTerms = explode(" ", $userSearchQuery);
-        $queryBuilder->where(sprintf("%s.name LIKE :term_%d", self::alias, 0))
+        $queryBuilder->andWhere(sprintf("%s.name LIKE :term_%d", self::alias, 0))
             ->setParameter(sprintf("term_%d", 0), sprintf("%%%s%%", $userSearchQueryTerms[0]));
         unset($userSearchQueryTerms[0]);
         foreach($userSearchQueryTerms as $termKey => $termValue){
@@ -147,15 +175,16 @@ class ProductRepository extends ServiceEntityRepository
      *
      * @param integer $page
      * @param integer $perPage
-     * @param [type] $category
-     * @param [type] $userSearchQuery
+     * @param null|string|int $category
+     * @param string $userSearchQuery
+     * @param int $withSoftDelete
+     * @param bool $isAdmin
      * @return mixed
      */
-    public function paginateFilterProducts(int $page = 1, int $perPage = 12, int|string|null $category = null, $userSearchQuery = null) : mixed {
-        $productCountQueryBuilder = $this->buildProductCountQuery($userSearchQuery, $category);
-        $productFilterQueryBuilder = $this->buildProductFilterPaginateQuery($userSearchQuery, $category);
+    public function paginateFilterProducts(int $page = 1, int $perPage = 12, int|string|null $category = null, $userSearchQuery = null, int $withSoftDelete=1, bool $isAdmin = false) : mixed {
+        $productCountQueryBuilder = $this->buildProductCountQuery($userSearchQuery, $category, $withSoftDelete, $isAdmin);
+        $productFilterQueryBuilder = $this->buildProductFilterPaginateQuery($userSearchQuery, $category, $withSoftDelete, $isAdmin);
         $productCountAndMaxPage = $this->calculateProductMaxPage($productCountQueryBuilder, $perPage);
-
         $productFilterQueryBuilder->setFirstResult($perPage * ($page - 1))
             ->setMaxResults($perPage);
 

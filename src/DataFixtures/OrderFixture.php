@@ -88,6 +88,7 @@ class OrderFixture extends Fixture implements DependentFixtureInterface, Fixture
                 ->setComment($this->fakerGenerator->boolean() ? $this->fakerGenerator->realText() : null)
                 ->setIsDone($this->fakerGenerator->boolean())
                 ->setCreatedAt($randomDate)
+                ->setConsentData(true)
                 ->setUpdatedAt($randomDate);
             
             $manager->persist($order);

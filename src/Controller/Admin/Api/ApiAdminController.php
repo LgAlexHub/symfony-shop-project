@@ -20,12 +20,12 @@ abstract class ApiAdminController extends AbstractController{
         //Check if bearer token is in request header
         $bearerToken = $request->headers->get('authorization');
         if (is_null($bearerToken)){
-            return $this->json("Unauthorized", 401);
+            return $this->makeCustomJsonErrorAsReal("Unauthorized : Vous n'avez pas les droits pour accéder à ces ressources veuillez vous connecter", 401);
         }
         //Check if bearer token is same as the one in the session
         $bearerToken = explode(" ", $bearerToken)[1];
         if ($sessionTokenManager->getApiToken() !== $bearerToken){
-            return $this->json("Unauthorized", 401);
+            return $this->makeCustomJsonErrorAsReal("Unauthorized : Vous n'avez pas les droits pour accéder à ces ressources veuillez vous connecter", 401);
         }
         return null;
     }
@@ -41,5 +41,9 @@ abstract class ApiAdminController extends AbstractController{
         return new Response($json, status: $status, headers: [
             'Content-Type' => 'application/json'
         ]); 
+    }
+
+    protected function makeCustomJsonErrorAsReal(string $msg, int $status=422){
+        return  $this->json(['error' => ['msg' => [['message' => $msg]]]], $status);
     }
 }

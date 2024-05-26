@@ -24,6 +24,7 @@ use Doctrine\Common\Collections\ArrayCollection;
 class Product
 {
     use HelperTrait\TimestampableWithIdTrait;
+    use HelperTrait\DeletableTrait;
 
     #[ORM\Column(length: 255, nullable:false, type: Types::STRING)]
     private ?string $name = null;

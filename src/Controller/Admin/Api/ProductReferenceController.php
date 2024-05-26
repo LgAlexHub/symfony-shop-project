@@ -12,6 +12,7 @@ use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Serializer\Normalizer\AbstractNormalizer;
 
 #[Route('/api/admin/references', 'api.admin.product_references.')]
 class ProductReferenceController extends ApiAdminController
@@ -84,7 +85,7 @@ class ProductReferenceController extends ApiAdminController
                     'image/heic'
                 ];
                 if(!in_array($formImage->getMimeType(), $allowedImageTypes)){
-                    return  $this->json(['error' => ['msg' => [['message' => sprintf("Le type du fichier uploadé %s n'est pas une image", $formImage->getMimeType())]]]], 422);
+                    return $this->makeCustomJsonErrorAsReal(sprintf("Le type du fichier uploadé %s n'est pas une image", $formImage->getMimeType()));
                 }
             
                 $targetedProductReference->setImageFile($formImage);
@@ -110,39 +111,58 @@ class ProductReferenceController extends ApiAdminController
         return  $this->json(['error' => ['msg' => $productReferenceForm->getErrors(true)]], 422);
     }
 
-    #[Route('/{id}', name: 'delete', methods:['DELETE'])]
+    #[Route('/{id}/suppression', name: 'delete', methods: ['DELETE'])]
     /**
-     * This method cannot work currently because every ref are bind to orders 
-     * TODO : Use a soft delete
+     * This method will try to soft delete targetedProduct
+     * Will return a json response
      *
      * @param Request $request
      * @param SessionTokenManager $sessionTokenManager
-     * @param EntityManagerInterface $em
      * @param integer $id
+     * @param EntityManagerInterface $em
      * @return void
      */
-    public function delete(Request $request, SessionTokenManager $sessionTokenManager, EntityManagerInterface $em, int $id){
+    public function softDelete(Request $request, SessionTokenManager $sessionTokenManager, int $id, EntityManagerInterface $em, EnhancedEntityJsonSerializer $enhancedEntityJsonSerializer)
+    {
         $authCheck = $this->checkBearerToken($request, $sessionTokenManager);
-        if(!is_null($authCheck)){
+        if (!is_null($authCheck)) {
             return $authCheck;
         }
 
         if (is_null($id))
-            return $this->json(['error' => ['msg' => sprintf("Id manquant dans l'url")]], 422);
+            return $this->makeCustomJsonErrorAsReal("Id manquant dans l'url");
 
-        $targetedProductReference = $em->getRepository(ProductReference::class)->findOneBy(['id' => $id]);
+        $targetedProduct = $em->getRepository(ProductReference::class)->findOneBy(['id' => $id]);
 
-        if (is_null($targetedProductReference))
-            return  $this->json(['error' => ['msg' => sprintf("Référence avec l'id %d inexistant", $id)]], 404);
+        if (is_null($targetedProduct))
+            return $this->makeCustomJsonErrorAsReal(sprintf("Produit avec l'id %d inexistant", $id), 404);
 
-        try {
-            $em->remove($targetedProductReference);
-            $em->flush();
-        } catch (\Throwable $th) {
-            // dd($th->getMessage()); //TODO ecrire les erreur en français
-            return $this->json(['error' => ['msg' => 'Une erreur est survenue pendant la suppression dans la base de données']], 500);
-        }
 
-        return $this->json('OK');
+        $targetedProduct->toggleDelete();
+        $em->persist($targetedProduct);
+        $em->flush();
+
+        $enhancedEntityJsonSerializer
+            ->setObjectToSerialize($targetedProduct)
+            ->setOptions([AbstractNormalizer::CIRCULAR_REFERENCE_HANDLER => fn (object $product, string $format, array $context) => $product->getId()])
+            ->setAttributes([
+                'id',
+                'name',
+                'category' => ['label', 'id'],
+                'createdAt',
+                'updatedAt',
+                'description',
+                'isFavorite',
+                'deletedAt',
+                'productReferences' => [
+                    'id',
+                    'formatedPrice',
+                    'weight',
+                    'weightType',
+                    'imageUrl',
+                    'slug',
+                ]
+            ]);
+        return $this->apiJson($enhancedEntityJsonSerializer->serialize());
     }
 }

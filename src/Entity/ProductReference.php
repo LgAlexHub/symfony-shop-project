@@ -26,6 +26,7 @@ class ProductReference
 {
     use HelperTrait\TimestampableWithIdTrait;
     use HelperTrait\SluggableTrait;
+    use HelperTrait\DeletableTrait;
 
     #[Assert\NotNull]
     #[ORM\Column(type: Types::SMALLINT)]

@@ -1,5 +1,4 @@
 <template>
-    <toast :data-messages="feedbackMsg" :data-type="feedbackType"></toast>
     <div v-if="currentProduct !== null"
         class="fixed inset-0 flex items-center justify-center bg-gray-900 bg-opacity-50 z-40">
         <div class="bg-white rounded-lg shadow-lg w-2/4">
@@ -35,7 +34,7 @@
                     :product-references="product.productReferences"
                     :api-token="apiToken"
                     @on-product-reference-saved="handleFeedback"
-                    @on-product-reference-edit-error="handleFeedback"
+                    @on-toast-emited="handleFeedback"
                     ></prodRefTable>
             </div>
         </div>
@@ -45,7 +44,7 @@
 <script>
 import editProduct from './popup/editProduct.vue';
 import productReferenceTable from './popup/productReferenceTable.vue';
-import Toast from "../../components/Toast.vue";
+
 export default {
     name: "popup",
     props: {
@@ -62,11 +61,10 @@ export default {
             type: String
         }
     },
-    emits: ['closePopup', 'onProductReferenceDelete', 'onProductSave'],
+    emits: ['closePopup', 'onProductReferenceDelete', 'onProductSave', 'onFeedback'],
     components: {
         'editProductTab' : editProduct,
         'prodRefTable'   : productReferenceTable,
-        'toast'          : Toast
     },
     data() {
         return {
@@ -102,8 +100,7 @@ export default {
             this.$emit('onProductSave', payload.data);
         },
         handleFeedback(payload){
-            this.feedbackMsg = payload.messages;
-            this.feedbackType = payload.type;
+            this.$emit('onFeedback', payload);
         }
     },
     beforeMount() {

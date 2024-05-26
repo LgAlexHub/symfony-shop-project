@@ -13,6 +13,11 @@
                     timesptampToEuTimzezoneString(currentProduct.createdAt.timestamp) }}</p>
             </div>
             <div class="mb-4">
+                <label for="registrationDate" class="block text-sm font-semibold mb-1">Produit supprimé le :</label>
+                <p id="registrationDate" class="w-full px-4 py-2 rounded-md border border-gray-300 bg-gray-100">
+                    {{currentProduct.deletedAt !== null ? timesptampToEuTimzezoneString(currentProduct.deletedAt.timestamp) : 'Produit actif' }}</p>
+            </div>
+            <div class="mb-4">
                 <label for="lastModifiedDate" class="block text-sm font-semibold mb-1">Dernière modification :</label>
                 <p id="lastModifiedDate" class="w-full px-4 py-2 rounded-md border border-gray-300 bg-gray-100">{{
                     timesptampToEuTimzezoneString(currentProduct.updatedAt.timestamp) }}</p>
